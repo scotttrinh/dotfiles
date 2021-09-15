@@ -9,4 +9,6 @@
   };
 
   environment.systemPackages = config.pkgSets.system;
+
+  services.nix-daemon.enable = true;
 }
