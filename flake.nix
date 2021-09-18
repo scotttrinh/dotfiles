@@ -24,6 +24,7 @@
         nixosModules = [
           ./modules/emacs.nix
           ./modules/homebrew.nix
+          ./modules/git.nix
           ({ pkgs, ... }: {
             system.stateVersion = 4;
 
