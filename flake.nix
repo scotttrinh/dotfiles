@@ -29,51 +29,66 @@
           ./modules/emacs.nix
           ({ pkgs, ... }: {
             system.stateVersion = 4;
-            system.keyboard.enableKeyMapping = true;
-            system.keyboard.remapCapsLockToEscape = true;
-            system.defaults.dock.autohide = true;
-            system.defaults.dock.mru-spaces = false;
-            system.defaults.dock.orientation = "left";
+
+            system.keyboard = {
+              enableKeyMapping = true;
+              remapCapsLockToEscape = true;
+            };
+
+            system.defaults = {
+              dock = {
+                autohide = true;
+                mru-spaces = false;
+                orientation = "left";
+              };
+            };
 
             programs.zsh.enable = true;
 
             services.nix-daemon.enable = true;
 
-            nixpkgs.overlays = [
-              inputs.mac-emacs.overlay
-            ];
+            nixpkgs = {
+              overlays = [
+                mac-emacs.overlay
+              ];
+              config.allowUnfree = true;
+            };
 
-            nixpkgs.config.allowUnfree = true;
-
-            nix.package = pkgs.nixFlakes;
-            nix.extraOptions = ''
-              system = aarch64-darwin
-              extra-platforms = aarch64-darwin x86_64-darwin
-              experimental-features = nix-command flakes
-              build-users-group = nixbld
-            '';
-            nix.binaryCaches = [ "https://cachix.org/api/v1/cache/emacs" ];
-            nix.binaryCachePublicKeys = [
-              "emacs.cachix.org-1:b1SMJNLY/mZF6GxQE+eDBeps7WnkT0Po55TAyzwOxTY="
-            ];
+            nix = {
+              package = pkgs.nixFlakes;
+              extraOptions = ''
+                system = aarch64-darwin
+                extra-platforms = aarch64-darwin x86_64-darwin
+                experimental-features = nix-command flakes
+                build-users-group = nixbld
+              '';
+              binaryCaches = [ "https://cachix.org/api/v1/cache/emacs" ];
+              binaryCachePublicKeys = [
+                "emacs.cachix.org-1:b1SMJNLY/mZF6GxQE+eDBeps7WnkT0Po55TAyzwOxTY="
+              ];
+            };
 
             environment.systemPackages = with pkgs; [ nixFlakes home-manager ];
 
             users.users.scotttrinh.home = "/Users/scotttrinh";
 
-            fonts.enableFontDir = true;
-            fonts.fonts = with pkgs; [
-              fira-code
-              font-awesome
-              roboto
-              roboto-mono
-            ];
+            fonts = {
+              enableFontDir = true;
+              fonts = with pkgs; [
+                fira-code
+                font-awesome
+                roboto
+                roboto-mono
+              ];
+            };
 
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.users.scotttrinh.home.packages = with pkgs; [
-              bat
-            ];
+            home-manager = {
+              useGlobalPkgs = true;
+              useUserPackages = true;
+              users.scotttrinh.home.packages = with pkgs; [
+                bat
+              ];
+            };
           })
         ];
 
