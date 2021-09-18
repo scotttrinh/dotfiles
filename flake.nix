@@ -21,10 +21,6 @@
       mk-darwin-system.mkDarwinSystem {
         inherit hostName system;
 
-        silliconOverlay = silliconPkgs: intelPkgs: {
-          inherit (silliconPkgs) emacs;
-        };
-
         nixosModules = [
           ./modules/emacs.nix
           ({ pkgs, ... }: {
