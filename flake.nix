@@ -26,6 +26,7 @@
         };
 
         nixosModules = [
+          ./modules/emacs.nix
           ({ pkgs, ... }: {
             system.stateVersion = 4;
             system.keyboard.enableKeyMapping = true;
@@ -33,21 +34,16 @@
             system.defaults.dock.autohide = true;
             system.defaults.dock.mru-spaces = false;
             system.defaults.dock.orientation = "left";
-            # For doom-emacs
-            system.activationScripts.postUserActivation.text = ''
-              # Clone to $XDG_CONFIG_HOME because Emacs expects this location.
-              if [[ ! -d "/Users/scotttrinh/.config/emacs" ]]; then
-                git clone https://github.com/hlissner/doom-emacs "/Users/scotttrinh/.config/emacs"
-              fi
-            '';
 
             programs.zsh.enable = true;
 
             services.nix-daemon.enable = true;
 
             nixpkgs.overlays = [
-              mac-emacs.overlay
+              inputs.mac-emacs.overlay
             ];
+
+            nixpkgs.config.allowUnfree = true;
 
             nix.package = pkgs.nixFlakes;
             nix.extraOptions = ''
@@ -67,7 +63,6 @@
 
             fonts.enableFontDir = true;
             fonts.fonts = with pkgs; [
-              emacs-all-the-icons-fonts
               fira-code
               font-awesome
               roboto
@@ -76,16 +71,9 @@
 
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
-            home-manager.users.scotttrinh = {
-              home.packages = with pkgs; [
-                (ripgrep.override { withPCRE2 = true; })
-                gnutls
-                emacs
-                fd
-                sqlite
-                nodePackages.javascript-typescript-langserver
-              ];
-            };
+            home-manager.users.scotttrinh.home.packages = with pkgs; [
+              bat
+            ];
           })
         ];
 
