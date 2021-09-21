@@ -41,7 +41,15 @@
               };
             };
 
-            programs.zsh.enable = true;
+            environment = {
+              shellAliases = {
+                "ll" = "${pkgs.coreutils}/bin/ls --color=auto -lha";
+              };
+            };
+
+            programs.zsh = {
+              enable = true;
+            };
 
             services.nix-daemon.enable = true;
 
@@ -85,6 +93,7 @@
               useUserPackages = true;
               users.scotttrinh.home.packages = with pkgs; [
                 bat
+                openssh
               ];
             };
           })
