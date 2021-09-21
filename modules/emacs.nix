@@ -15,8 +15,10 @@
     gnutls
     fd
     sqlite
+    nodejs-16_x
     nodePackages.typescript
     nodePackages.typescript-language-server
+    nodePackages.prettier
     emacs
   ];
 }
