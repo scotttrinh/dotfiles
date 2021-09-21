@@ -16,6 +16,9 @@
 
     casks = [
       "firefox"
+      "slack"
+      "amethyst"
+      "zoom"
     ];
 
     masApps = {

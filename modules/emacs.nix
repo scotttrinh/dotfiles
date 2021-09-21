@@ -15,7 +15,8 @@
     gnutls
     fd
     sqlite
-    nodePackages.javascript-typescript-langserver
+    nodePackages.typescript
+    nodePackages.typescript-language-server
     emacs
   ];
 }
