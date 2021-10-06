@@ -46,6 +46,14 @@
               shellAliases = {
                 "ll" = "${pkgs.coreutils}/bin/ls --color=auto -lha";
               };
+
+              variables = {
+                NPM_CONFIG_PREFIX = "~/.npm-global";
+              };
+
+              systemPath = [
+                "~/.npm-global"
+              ];
             };
 
             programs.zsh = {
