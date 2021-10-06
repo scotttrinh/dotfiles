@@ -6,10 +6,11 @@
 
     mk-darwin-system = {
       url = "github:vic/mk-darwin-system/main";
-      inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    mac-emacs.url = "github:cmacrae/emacs";
+    mac-emacs = {
+      url = "github:cmacrae/emacs";
+    };
   };
 
   outputs = { self, mk-darwin-system, nixpkgs, mac-emacs, ... }@inputs:
@@ -61,7 +62,7 @@
             };
 
             nix = {
-              package = pkgs.nixFlakes;
+              package = pkgs.nixUnstable;
               extraOptions = ''
                 system = aarch64-darwin
                 extra-platforms = aarch64-darwin x86_64-darwin
@@ -73,8 +74,6 @@
                 "emacs.cachix.org-1:b1SMJNLY/mZF6GxQE+eDBeps7WnkT0Po55TAyzwOxTY="
               ];
             };
-
-            environment.systemPackages = with pkgs; [ nixFlakes home-manager ];
 
             users.users.scotttrinh.home = "/Users/scotttrinh";
 
