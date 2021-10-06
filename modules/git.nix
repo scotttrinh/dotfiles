@@ -6,6 +6,8 @@
     userEmail = "scott@ca.la";
     ignores = [
       ".dir-locals.el"
+      ".envrc"
+      ".DS_Store"
     ];
   };
 }
