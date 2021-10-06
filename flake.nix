@@ -91,6 +91,8 @@
               useGlobalPkgs = true;
               useUserPackages = true;
               users.scotttrinh.home.packages = with pkgs; [
+                postgresql_13
+                direnv
                 bat
                 openssh
               ];
