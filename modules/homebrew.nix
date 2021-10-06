@@ -19,6 +19,8 @@
       "slack"
       "amethyst"
       "zoom"
+      "discord"
+      "flotato"
     ];
 
     masApps = {
