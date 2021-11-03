@@ -38,8 +38,17 @@
               dock = {
                 autohide = true;
                 mru-spaces = false;
+                static-only = true;
                 orientation = "left";
+                tilesize = 16;
               };
+            };
+
+            system.screenCapture.location = "~/ScreenCaptures";
+
+            system.trackpad = {
+              Clicking = true;
+              TrackpadRightClick = true;
             };
 
             environment = {

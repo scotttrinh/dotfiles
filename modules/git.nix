@@ -8,6 +8,7 @@
       ".dir-locals.el"
       ".envrc"
       ".DS_Store"
+      ".log"
     ];
   };
 }
