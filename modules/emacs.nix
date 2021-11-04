@@ -4,6 +4,9 @@
     if [[ ! -d "/Users/scotttrinh/.config/emacs" ]]; then
       git clone https://github.com/hlissner/doom-emacs "/Users/scotttrinh/.config/emacs"
     fi
+    if [[ ! -d "/Users/scotttrinh/.config/doom" ]]; then
+      git clone https://github.com/scotttrinh/doom-emacs-config.git "/Users/scotttrinh/.config/doom"
+    fi
   '';
 
   fonts.fonts = with pkgs; [
