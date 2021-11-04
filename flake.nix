@@ -26,6 +26,7 @@
           ./modules/emacs.nix
           ./modules/homebrew.nix
           ./modules/git.nix
+          ./modules/terminal.nix
           ({ pkgs, ... }: {
             system.stateVersion = 4;
 
