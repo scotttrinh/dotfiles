@@ -23,9 +23,11 @@
       "flotato"
     ];
 
+    /* `mas` not working on Monterrey
     masApps = {
       "1Password" = 1333542190;
       "Dato" = 1470584107;
     };
+    */
   };
 }
