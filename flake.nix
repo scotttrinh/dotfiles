@@ -40,15 +40,15 @@
                 mru-spaces = false;
                 static-only = true;
                 orientation = "left";
-                tilesize = 16;
+                tilesize = 32;
               };
-            };
 
-            system.screenCapture.location = "~/ScreenCaptures";
+              screencapture.location = "~/ScreenCaptures";
 
-            system.trackpad = {
-              Clicking = true;
-              TrackpadRightClick = true;
+              trackpad = {
+                Clicking = true;
+                TrackpadRightClick = true;
+              };
             };
 
             environment = {
@@ -82,7 +82,7 @@
               package = pkgs.nixUnstable;
               extraOptions = ''
                 system = aarch64-darwin
-                extra-platforms = aarch64-darwin x86_64-darwin
+                extra-platforms = x86_64-darwin
                 experimental-features = nix-command flakes
                 build-users-group = nixbld
               '';
@@ -112,6 +112,7 @@
                 direnv
                 bat
                 openssh
+                gnupg
               ];
             };
           })
