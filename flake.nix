@@ -114,6 +114,7 @@
                 bat
                 openssh
                 gnupg
+                element-desktop
               ];
             };
           })
