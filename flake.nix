@@ -2,7 +2,9 @@
   description = "Scott's Nix Environment";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    nixpkgs = {
+      url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    };
 
     mk-darwin-system = {
       url = "github:vic/mk-darwin-system/main";
@@ -11,9 +13,13 @@
     mac-emacs = {
       url = "github:cmacrae/emacs";
     };
+
+    rust-overlay = {
+      url = "github:oxalica/rust-overlay";
+    };
   };
 
-  outputs = { self, mk-darwin-system, nixpkgs, mac-emacs, ... }@inputs:
+  outputs = { self, mk-darwin-system, nixpkgs, mac-emacs, rust-overlay, ... }@inputs:
     let
       flake-utils = mk-darwin-system.inputs.flake-utils;
       hostName = "cala-2021-mbp-13";
@@ -75,6 +81,7 @@
             nixpkgs = {
               overlays = [
                 mac-emacs.overlay
+                rust-overlay.overlay
               ];
               config.allowUnfree = true;
             };
@@ -115,6 +122,8 @@
                 openssh
                 gnupg
                 element-desktop
+                rust-bin.stable.latest.default
+                rust-analyzer
               ];
             };
           })
