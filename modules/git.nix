@@ -10,5 +10,8 @@
       ".DS_Store"
       ".log"
     ];
+    extraConfig = {
+      init.defaultBranch = "main";
+    };
   };
 }
