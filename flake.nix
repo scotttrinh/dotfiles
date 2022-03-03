@@ -8,27 +8,24 @@
 
     mk-darwin-system = {
       url = "github:vic/mk-darwin-system/main";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     mac-emacs = {
       url = "github:cmacrae/emacs";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
   outputs = { self, mk-darwin-system, nixpkgs, mac-emacs, rust-overlay, ... }@inputs:
     let
-      flake-utils = mk-darwin-system.inputs.flake-utils;
-      hostName = "cala-2021-mbp-13";
-      systems = [ "aarch64-darwin" ];
-    in flake-utils.lib.eachSystem systems (system:
-      mk-darwin-system.mkDarwinSystem {
-        inherit hostName system;
-
-        nixosModules = [
+      darwinFlakeOutput = mk-darwin-system.mkDarwinSystem.m1 {
+        modules = [
           ./modules/emacs.nix
           ./modules/homebrew.nix
           ./modules/git.nix
@@ -87,7 +84,6 @@
             };
 
             nix = {
-              package = pkgs.nixUnstable;
               extraOptions = ''
                 system = aarch64-darwin
                 extra-platforms = x86_64-darwin
@@ -111,7 +107,6 @@
                 roboto-mono
               ];
             };
-
             home-manager = {
               useGlobalPkgs = true;
               useUserPackages = true;
@@ -128,9 +123,9 @@
             };
           })
         ];
+      };
+    in darwinFlakeOutput // {
+      darwinConfigurations."scotts-mbp-16".lan = darwinFlakeOutput.darwinConfiguration.aarch64-darwin;
+    };
 
-        flakeOutputs = { pkgs, ... }@outputs:
-          outputs // (with pkgs; { packages = { inherit hello; }; });
-
-      });
 }
