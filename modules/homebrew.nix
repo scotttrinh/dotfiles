@@ -21,6 +21,8 @@
       "zoom"
       "discord"
       "flotato"
+      "obsidian"
+      "zotero"
     ];
 
     /* `mas` not working on Monterrey
