@@ -19,9 +19,11 @@
     fd
     sqlite
     nodejs-16_x
+    yarn
     nodePackages.typescript
     nodePackages.typescript-language-server
     nodePackages.prettier
+    vscode-extensions.chenglou92.rescript-vscode
     emacs
   ];
 }
