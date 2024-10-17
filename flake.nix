@@ -107,7 +107,6 @@
                   license = pkgs.lib.licenses.asl20;
                 };
               })
-              /*
               (pkgs.writeShellApplication {
                 name = "edgedb-destroy-local-instances";
                 runtimeInputs = [ pkgs.jq ];
@@ -124,7 +123,7 @@
                   echo "$local_instances"
                   echo
 
-                  read -pr "Are you sure you want to destroy these instances? (y/N): " confirm
+                  read -r -p "Are you sure you want to destroy these instances? (y/N): " confirm
                   if [[ "$confirm" != "y" ]]; then
                     echo "Aborted."
                     exit 0
@@ -138,7 +137,6 @@
                   echo "All selected local instances destroyed."
                 '';
               })
-              */
               ffmpeg
               unrar
               cloudflared
