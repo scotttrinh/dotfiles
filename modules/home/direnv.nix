@@ -3,6 +3,7 @@
   # https://nixos.asia/en/direnv
   programs.direnv = {
     enable = true;
+    enableZshIntegration = true;
     nix-direnv = {
       enable = true;
     };

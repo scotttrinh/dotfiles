@@ -13,12 +13,23 @@
   system = {
     defaults = {
       dock = {
-        # autohide = true;
-        # customize Hot Corners
-        wvous-tl-corner = 2; # top-left - Mission Control
-        # wvous-tr-corner = 13; # top-right - Lock Screen
-        wvous-bl-corner = 3; # bottom-left - Application Windows
-        wvous-br-corner = 4; # bottom-right - Desktop
+        autohide = true;
+        mru-spaces = false;
+        static-only = true;
+        orientation = "left";
+        tilesize = 32;
+      };
+
+      screencapture.location = "~/ScreenCaptures";
+
+      trackpad = {
+        Clicking = true;
+        TrackpadRightClick = true;
+      };
+
+      NSGlobalDomain = {
+        NSAutomaticPeriodSubstitutionEnabled = false;
+        NSAutomaticSpellingCorrectionEnabled = false;
       };
 
       finder = {
@@ -32,8 +43,8 @@
     };
 
     keyboard = {
-      # enableKeyMapping = true;
-      # remapCapsLockToControl = true;
+      enableKeyMapping = true;
+      remapCapsLockToControl = true;
     };
   };
 }
