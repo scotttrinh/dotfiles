@@ -2,6 +2,7 @@
   inputs = {
     # Principle inputs (updated by `nix run .#update`)
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+
     nix-darwin.url = "github:lnl7/nix-darwin/master";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.url = "github:nix-community/home-manager";
@@ -30,6 +31,11 @@
           darwinConfigurations.frankie = self.nixos-flake.lib.mkMacosSystem {
             nixpkgs.hostPlatform = "aarch64-darwin";
             nixpkgs.config.allowUnfree = true;
+            nixpkgs.overlays = [
+              (final: prev: {
+                claude-code = final.callPackage ./claude-code.nix { };
+              })
+            ];
             imports = [
               # Your nix-darwin configuration goes here
               ({ pkgs, ... }: {
@@ -65,8 +71,20 @@
                   };
                 };
 
-                nix.useDaemon = true;
-                nix.settings.experimental-features = "nix-command flakes";
+                nix = {
+                  useDaemon = true;
+                  settings = {
+                    experimental-features = "nix-command flakes";
+                    trusted-users = [ "root" (if pkgs.stdenv.isDarwin then myUserName else "@wheel") ];
+                  };
+                };
+
+                homebrew = {
+                  enable = true;
+                  casks = [
+                    "anki"
+                  ];
+                };
               })
               # Setup home-manager in nix-darwin config
               self.darwinModules_.home-manager
@@ -88,6 +106,7 @@
             imports = [ ];
             home.file.".config/aerospace/aerospace.toml".source = ./aerospace.toml;
             home.packages = with pkgs; [
+              #claude-code
               (pkgs.buildGoModule {
                 pname = "vimeo-dl";
                 version = "0.2.0";
@@ -137,6 +156,8 @@
                   echo "All selected local instances destroyed."
                 '';
               })
+              age
+              sops
               ffmpeg
               unrar
               cloudflared
@@ -146,12 +167,24 @@
               nodejs_20
               corepack_20
               yarn
+              bun
               vsce
+              cmake
+              nixfmt-rfc-style
+              fd
+              fontconfig
+              nerd-fonts.symbols-only
+              inetutils
+              aider-chat
+              ollama
               nodePackages.typescript
               nodePackages.typescript-language-server
               nodePackages.vscode-langservers-extracted
               nodePackages.prettier
               inputs.eza.packages.aarch64-darwin.default
+              nix-tree
+              devenv
+              graphviz
             ];
             programs.git = {
               enable = true;
