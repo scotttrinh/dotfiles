@@ -81,6 +81,8 @@
     nix-tree
     devenv
     graphviz
+    nixfmt
+    claude-code
 
     # From template
     omnix

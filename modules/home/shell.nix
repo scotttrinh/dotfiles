@@ -11,6 +11,7 @@
       '';
       profileExtra = ''
         # Custom ~/.zprofile goes here
+        export PATH="$HOME/.cargo/bin:$HOME/Library/Application Support/edgedb/bin:$PATH"
       '';
       loginExtra = ''
         # Custom ~/.zlogin goes here
