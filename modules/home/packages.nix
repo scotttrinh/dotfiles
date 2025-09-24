@@ -83,6 +83,8 @@
     ocamlPackages.ocaml-lsp
     nodejs_24
     corepack_24
+    python312
+    uv
     git-credential-manager
     yarn
     bun
