@@ -81,8 +81,8 @@
     cloudflared
     yt-dlp
     ocamlPackages.ocaml-lsp
-    nodejs_20
-    corepack_20
+    nodejs_24
+    corepack_24
     git-credential-manager
     yarn
     bun
