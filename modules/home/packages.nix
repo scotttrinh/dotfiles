@@ -83,6 +83,7 @@
     ocamlPackages.ocaml-lsp
     nodejs_20
     corepack_20
+    git-credential-manager
     yarn
     bun
     vsce

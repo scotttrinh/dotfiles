@@ -17,6 +17,7 @@
       ];
       extraConfig = {
         init.defaultBranch = "main";
+        credential.helper = "manager";
       };
     };
   };
