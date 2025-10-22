@@ -13,6 +13,7 @@ in
 
   nixpkgs.hostPlatform = "aarch64-darwin";
   nixpkgs.config.allowUnfree = true;
+  nixpkgs.overlays = (import ../../overlays/default.nix { inherit inputs; });
 
   networking.hostName = "frannie";
 

@@ -1,8 +1,5 @@
-{ flake, ... }:
 
-let
-  inherit (flake) inputs;
-  inherit (inputs) self;
-in
-self: super: {
-}
+{ inputs, ... }: [
+  inputs.rust-overlay.overlays.default
+  #(final: prev: import ./uv.nix final prev)
+]
