@@ -86,15 +86,12 @@
     python312
     uv
     git-credential-manager
-    yarn
     bun
     vsce
     cmake
     fontconfig
     nerd-fonts.symbols-only
     inetutils
-    aider-chat
-    ollama
     nodePackages.typescript
     nodePackages.typescript-language-server
     nodePackages.vscode-langservers-extracted
@@ -104,6 +101,7 @@
     devenv
     graphviz
     nixfmt
+    codex
 
     # From template
     omnix
