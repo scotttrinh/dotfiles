@@ -1,12 +1,14 @@
 # Top-level flake glue to get our configuration working
-{ inputs, ... }:
+{ inputs, self, ... }:
 
 {
   imports = [
     inputs.nixos-unified.flakeModules.default
     inputs.nixos-unified.flakeModules.autoWire
   ];
-  perSystem = { self', pkgs, ... }: {
+  debug = true;
+  perSystem = { self', lib, system, pkgs, ... }: {
+
     # For 'nix fmt'
     formatter = pkgs.nixpkgs-fmt;
 
