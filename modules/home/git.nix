@@ -4,8 +4,14 @@
   programs = {
     git = {
       enable = true;
-      userName = config.me.fullname;
-      userEmail = config.me.email;
+      settings = {
+        user = {
+          name = config.me.fullname;
+          email = config.me.email;
+        };
+        init.defaultBranch = "main";
+        credential.helper = "manager";
+      };
       ignores = [
         ".dir-locals.el"
         ".envrc"
@@ -15,10 +21,6 @@
         "*~"
         "*.swp"
       ];
-      extraConfig = {
-        init.defaultBranch = "main";
-        credential.helper = "manager";
-      };
     };
   };
 

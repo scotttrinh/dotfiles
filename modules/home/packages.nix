@@ -4,6 +4,8 @@ let
   uncloud = pkgs.callPackage "${packages}/uncloud.nix" { };
   codex = flake.inputs.nix-ai-tools.packages.${pkgs.system}.codex;
   codex-acp = flake.inputs.nix-ai-tools.packages.${pkgs.system}.codex-acp;
+  cursor-agent = flake.inputs.nix-ai-tools.packages.${pkgs.system}.cursor-agent;
+  opencode = flake.inputs.nix-ai-tools.packages.${pkgs.system}.opencode;
 in {
   # Nix packages to install to $HOME
   #
@@ -87,6 +89,7 @@ in {
     nixfmt
     codex
     codex-acp
+    opencode
 
     # From template
     omnix
