@@ -2,10 +2,7 @@
 let
   packages = flake.inputs.self + /packages;
   uncloud = pkgs.callPackage "${packages}/uncloud.nix" { };
-  codex = flake.inputs.nix-ai-tools.packages.${pkgs.system}.codex;
-  codex-acp = flake.inputs.nix-ai-tools.packages.${pkgs.system}.codex-acp;
-  cursor-agent = flake.inputs.nix-ai-tools.packages.${pkgs.system}.cursor-agent;
-  opencode = flake.inputs.nix-ai-tools.packages.${pkgs.system}.opencode;
+  ai-tools = flake.inputs.nix-ai-tools.packages.${pkgs.system};
 in {
   # Nix packages to install to $HOME
   #
@@ -87,9 +84,11 @@ in {
     devenv
     graphviz
     nixfmt
-    codex
-    codex-acp
-    opencode
+    ai-tools.codex
+    ai-tools.codex-acp
+    ai-tools.opencode
+    ai-tools.gemini-cli
+    ai-tools.amp
 
     # From template
     omnix
