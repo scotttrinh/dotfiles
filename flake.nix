@@ -15,7 +15,7 @@
     eza.url = "https://flakehub.com/f/eza-community/eza/0.18.21.tar.gz";
     rust-overlay.url = "github:oxalica/rust-overlay";
     rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
-    nix-ai-tools.url = "github:scotttrinh/nix-ai-tools";
+    nix-ai-tools.url = "github:numtide/nix-ai-tools";
   };
 
   outputs =
