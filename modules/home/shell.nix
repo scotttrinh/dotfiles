@@ -12,7 +12,6 @@
       profileExtra = ''
         # Custom ~/.zprofile goes here
         export PATH="$HOME/.cargo/bin:$HOME/Library/Application Support/edgedb/bin:$HOME/.npm-global/bin:$PATH"
-        export GOOGLE_CLOUD_PROJECT="gen-lang-client-0394515066"
       '';
       loginExtra = ''
         # Custom ~/.zlogin goes here
