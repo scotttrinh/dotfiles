@@ -9,26 +9,6 @@
   # Use TouchID for `sudo` authentication
   security.pam.services.sudo_local.touchIdAuth = true;
 
-  # (macOS) nix-darwin does not support networking.hosts; use dnsmasq + resolver.
-
-  # Run a small local DNS for wildcard under riff.localhost
-  services.dnsmasq = {
-    enable = true;
-    addresses = {
-      "riff.localhost" = "127.0.0.1";
-      ".riff.test" = "172.19.0.200";
-    };
-  };
-
-  # Tell macOS to query 127.0.0.1 for the riff.test domain
-  # Creates /etc/resolver/riff.test
-  environment.etc."resolver/riff.localhost".text = ''
-    nameserver 127.0.0.1
-  '';
-  environment.etc."resolver/riff.test".text = ''
-    nameserver 127.0.0.1
-  '';
-
   # Configure macOS system
   # More examples => https://github.com/ryan4yin/nix-darwin-kickstarter/blob/main/rich-demo/modules/system.nix
   system = {
