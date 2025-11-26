@@ -48,4 +48,18 @@
       remapCapsLockToControl = true;
     };
   };
+
+  homebrew = {
+    enable = true;
+    onActivation.cleanup = "zap";
+    taps = [
+      "mas-cli/tap"
+    ];
+    brews = [
+      "mas-cli/tap/mas"
+    ];
+    masApps = {
+      Dato = 1470584107;
+    };
+  };
 }

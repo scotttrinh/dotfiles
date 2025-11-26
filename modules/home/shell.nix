@@ -15,6 +15,7 @@
       profileExtra = ''
         # Custom ~/.zprofile goes here
         export PATH="$HOME/.cargo/bin:$HOME/Library/Application Support/edgedb/bin:$HOME/.npm-global/bin:$PATH"
+        eval "$(/opt/homebrew/bin/brew shellenv)"
       '';
       loginExtra = ''
         # Custom ~/.zlogin goes here
