@@ -12,7 +12,7 @@
     # Software inputs
     nix-index-database.url = "github:nix-community/nix-index-database";
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
-    eza.url = "https://flakehub.com/f/eza-community/eza/0.18.21.tar.gz";
+    eza.url = "https://flakehub.com/f/eza-community/eza/0.20.0";
     rust-overlay.url = "github:oxalica/rust-overlay";
     rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
     nix-ai-tools.url = "github:numtide/nix-ai-tools";

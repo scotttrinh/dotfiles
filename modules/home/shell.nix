@@ -1,5 +1,8 @@
 { ... }:
 {
+  home.shellAliases = {
+    ll = "eza -lha";
+  };
   programs = {
     # For macOS's default shell.
     zsh = {

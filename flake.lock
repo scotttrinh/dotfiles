@@ -47,19 +47,20 @@
         "powertest": "powertest",
         "pre-commit-hooks": "pre-commit-hooks",
         "rust-overlay": "rust-overlay",
+        "systems": "systems",
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1722700888,
-        "narHash": "sha256-5UYYFE5IZmK2eAryUG4dNOTGE+Q1C2TDPos39zyQPaQ=",
-        "rev": "6cbb5ba981fc2583328f39e8b0c55caec10b5c8e",
-        "revCount": 2974,
+        "lastModified": 1727339103,
+        "narHash": "sha256-lQEQLINjXGbg9KnqJCQXR/wG50dBTnmWp06wKJi0NE8=",
+        "rev": "a3b0c8b40ed1f4f1a12c23242bbe780c391812f3",
+        "revCount": 3069,
         "type": "tarball",
-        "url": "https://api.flakehub.com/f/pinned/eza-community/eza/0.18.24/019118fd-9dd4-74af-87cb-216234f43e93/source.tar.gz"
+        "url": "https://api.flakehub.com/f/pinned/eza-community/eza/0.20.0/01922dde-2dc5-750a-80e6-bc972fdf11ce/source.tar.gz"
       },
       "original": {
         "type": "tarball",
-        "url": "https://flakehub.com/f/eza-community/eza/0.18.21.tar.gz"
+        "url": "https://flakehub.com/f/eza-community/eza/0.20.0"
       }
     },
     "flake-compat": {
