@@ -55,6 +55,9 @@
     taps = [
       "mas-cli/tap"
     ];
+    casks = [
+      "ghostty"
+    ];
     brews = [
       "mas-cli/tap/mas"
     ];
