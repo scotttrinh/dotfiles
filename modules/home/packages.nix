@@ -36,6 +36,7 @@ in {
     ai-tools.opencode
     ai-tools.gemini-cli
     ai-tools.amp
+    ai-tools.cursor-agent
 
     # From template
     omnix

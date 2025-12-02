@@ -33,6 +33,7 @@ in
     casks = [
       "1password"
       "slack"
+      "cursor"
     ];
   };
 }
