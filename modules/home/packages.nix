@@ -1,7 +1,7 @@
 { flake, pkgs, ... }:
 let
   packages = flake.inputs.self + /packages;
-  ai-tools = flake.inputs.nix-ai-tools.packages.${pkgs.system};
+  llm-agents = flake.inputs.llm-agents.packages.${pkgs.system};
 in {
   # Nix packages to install to $HOME
   #
@@ -31,12 +31,12 @@ in {
     devenv
     graphviz
     nixfmt
-    ai-tools.codex
-    ai-tools.codex-acp
-    ai-tools.opencode
-    ai-tools.gemini-cli
-    ai-tools.amp
-    ai-tools.cursor-agent
+    llm-agents.codex
+    llm-agents.codex-acp
+    llm-agents.opencode
+    llm-agents.gemini-cli
+    llm-agents.amp
+    llm-agents.cursor-agent
 
     # From template
     omnix
