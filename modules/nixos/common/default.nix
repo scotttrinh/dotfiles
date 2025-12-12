@@ -39,9 +39,15 @@ in
       imports = [ (self + /configurations/home/${name}.nix) ];
     });
 
-    # All users can add Nix caches.
-    nix.settings.trusted-users = [
-      "root"
-    ] ++ config.myusers;
+    nix.settings = {
+      # All users can add Nix caches.
+      trusted-users = [
+        "root"
+      ]
+      ++ config.myusers;
+      # Add binary caches here
+      extra-substituters = [ "https://cache.numtide.com" ];
+      extra-trusted-public-keys = [ "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g=" ];
+    };
   };
 }
