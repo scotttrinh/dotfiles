@@ -5,6 +5,31 @@
 let
   inherit (flake) inputs;
   inherit (inputs) self;
+
+  # Define work repos to clone and setup
+  # Each entry: { url, path, postClone (optional) }
+  workRepos = [
+    {
+      url = "https://github.com/vercel/front";
+      path = "$HOME/github.com/vercel/front";
+      postClone = "pnpm install";
+    }
+  ];
+
+  # Generate the activation script for cloning repos
+  cloneRepoScript = repo: ''
+    if [ ! -d "${repo.path}" ]; then
+      echo "Cloning ${repo.url} to ${repo.path}..."
+      mkdir -p "$(dirname "${repo.path}")"
+      ${pkgs.git}/bin/git clone "${repo.url}" "${repo.path}" --depth 1
+      ${lib.optionalString (repo ? postClone) ''
+        echo "Running post-clone commands for ${repo.path}..."
+        cd "${repo.path}" && ${repo.postClone}
+      ''}
+    else
+      echo "Repository ${repo.path} already exists, skipping..."
+    fi
+  '';
 in
 {
   imports = [
@@ -27,12 +52,19 @@ in
 
   # Work-specific home-manager configuration
   # This merges with configurations/home/scotttrinh.nix
-  home-manager.users.scotttrinh = {
+  home-manager.users.scotttrinh = { lib, ... }: {
     home.packages = with pkgs; [
       git-lfs
-      fnm
+      gh
       nodePackages.vercel
     ];
+
+    # Activation script to clone work repos
+    # Runs during `nix run .#activate` / `home-manager switch`
+    home.activation.cloneWorkRepos = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      echo "Setting up work repositories..."
+      ${lib.concatMapStrings cloneRepoScript workRepos}
+    '';
   };
 
   # Used for backwards compatibility, please read the changelog before changing.
