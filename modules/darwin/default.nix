@@ -57,6 +57,7 @@
     ];
     casks = [
       "ghostty"
+      "raycast"
     ];
     brews = [
       "mas-cli/tap/mas"
