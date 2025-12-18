@@ -31,6 +31,7 @@ in {
     devenv
     graphviz
     nixfmt
+    parinfer-rust-emacs
     llm-agents.codex
     llm-agents.codex-acp
     llm-agents.opencode
