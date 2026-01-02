@@ -56,7 +56,6 @@ in
     home.packages = with pkgs; [
       git-lfs
       gh
-      nodePackages.vercel
     ];
 
     # Activation script to clone work repos
@@ -77,6 +76,10 @@ in
       "slack"
       "cursor"
       "orbstack"
+    ];
+    brews = [
+      "vercel-cli"
+      "supabase"
     ];
   };
 }
