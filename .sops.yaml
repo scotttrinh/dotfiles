@@ -6,7 +6,7 @@ keys:
 
   # triangle (work mac) - generate with: age-keygen -o triangle-age.txt
   # Then uncomment and add the public key below:
-  # - &age_triangle AGE_PUBLIC_KEY_HERE
+  - &age_triangle age13c93mwjalmsecpvx05s0c3kpwz9l6x0qyyxxt0tlwhn9rgwyq9nstvptxj
 
 creation_rules:
   - path_regex: secrets\.ya?ml$
@@ -15,4 +15,4 @@ creation_rules:
     #   sops --encrypt --config .sops.yaml secrets.yaml > secrets.yaml.new && mv secrets.yaml.new secrets.yaml
     age: >-
       *age_frankie
-      # ,*age_triangle  # Uncomment when triangle key is added above
+      ,*age_triangle  # Uncomment when triangle key is added above
