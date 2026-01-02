@@ -52,26 +52,11 @@ in
 
   # Work-specific home-manager configuration
   # This merges with configurations/home/scotttrinh.nix
-  home-manager.users.scotttrinh = { lib, config, ... }: {
+  home-manager.users.scotttrinh = { lib, ... }: {
     home.packages = with pkgs; [
       git-lfs
       gh
     ];
-
-    # Claude Code configuration using standard Anthropic endpoint
-    claudeCode = {
-      enable = true;
-      apiKeySecret = config.sops.placeholder.claude_code_api_key;
-      baseUrl = "https://api.anthropic.com";
-      model = "opus";
-      timeoutMs = 120000;  # 2 minutes
-    };
-
-    # Declare the sops secret for this machine
-    sops.secrets.claude_code_api_key = {
-      key = "CLAUDE_CODE_API_KEY_TRIANGLE";
-      mode = "0400";
-    };
 
     # Activation script to clone work repos
     # Runs during `nix run .#activate` / `home-manager switch`
