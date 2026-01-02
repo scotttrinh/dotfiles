@@ -1,0 +1,7 @@
+# sops configuration for encrypting secrets
+keys:
+  - &age_scotttrinh age19g7cg3tkz2p47psy79usywnsv89mf5mpmet99l7nz6tgtaex54mq6m574s
+
+creation_rules:
+  - path_regex: secrets\.ya?ml$
+    age: *age_scotttrinh
