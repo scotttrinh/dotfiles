@@ -76,6 +76,7 @@ in
       "1password"
       "slack"
       "cursor"
+      "orbstack"
     ];
   };
 }
