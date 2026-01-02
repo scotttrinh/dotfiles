@@ -46,6 +46,9 @@
           trim_at = ".local";
           disabled = false;
         };
+        env_var.PI_EXE = {
+          format = "🥧 ";
+        };
       };
     };
   };

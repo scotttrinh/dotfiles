@@ -7,6 +7,7 @@ in {
   #
   # Search for packages here: https://search.nixos.org/packages
   home.packages = with pkgs; [
+    (import (flake.inputs.self + /packages/pi.nix) { inherit pkgs; })
     age
     sops
     ffmpeg
