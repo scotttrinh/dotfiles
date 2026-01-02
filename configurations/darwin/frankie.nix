@@ -28,22 +28,4 @@ in
   # Used for backwards compatibility, please read the changelog before changing.
   # $ darwin-rebuild changelog
   system.stateVersion = 4;
-
-  # Machine-specific home-manager configuration
-  home-manager.users.scotttrinh = { lib, config, ... }: {
-    # Claude Code configuration using z.ai proxy
-    claudeCode = {
-      enable = true;
-      apiKeySecret = config.sops.placeholder.claude_code_api_key;
-      baseUrl = "https://api.z.ai/api/anthropic";
-      model = "opus";
-      timeoutMs = 3000000;  # 50 minutes
-    };
-
-    # Declare the sops secret for this machine
-    sops.secrets.claude_code_api_key = {
-      key = "CLAUDE_CODE_API_KEY_FRANKIE";
-      mode = "0400";
-    };
-  };
 }

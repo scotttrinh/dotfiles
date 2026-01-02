@@ -1,18 +1,15 @@
 # sops configuration for encrypting secrets with multiple device-specific keys
 # Each device should have its own age key, and all secrets are encrypted to all devices
 keys:
-  # frankie (personal mac)
-  - &age_frankie age19g7cg3tkz2p47psy79usywnsv89mf5mpmet99l7nz6tgtaex54mq6m574s
+  # frannie (personal mac)
+  - &age_frannie age19g7cg3tkz2p47psy79usywnsv89mf5mpmet99l7nz6tgtaex54mq6m574s
 
-  # triangle (work mac) - generate with: age-keygen -o triangle-age.txt
-  # Then uncomment and add the public key below:
+  # triangle (work mac)
   - &age_triangle age13c93mwjalmsecpvx05s0c3kpwz9l6x0qyyxxt0tlwhn9rgwyq9nstvptxj
 
 creation_rules:
   - path_regex: secrets\.ya?ml$
     # Encrypt to all device keys - add new devices here
-    # IMPORTANT: When adding a new key, you must re-encrypt secrets.yaml:
-    #   sops --encrypt --config .sops.yaml secrets.yaml > secrets.yaml.new && mv secrets.yaml.new secrets.yaml
     age: >-
-      *age_frankie
-      ,*age_triangle  # Uncomment when triangle key is added above
+      *age_frannie,
+      *age_triangle
