@@ -13,7 +13,8 @@
         "ANTHROPIC_AUTH_TOKEN": "${config.sops.placeholder.zai_api_key}",
         "ANTHROPIC_BASE_URL": "https://api.z.ai/api/anthropic",
         "API_TIMEOUT_MS": "3000000"
-      }
+      },
+      "model": "opus"
     }
   '';
   sops.templates."claude-settings".path = "/Users/scotttrinh/.claude/settings.json";
