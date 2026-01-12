@@ -34,7 +34,10 @@ in
     # Claude Code configuration using z.ai proxy
     claudeCode = {
       enable = true;
-      apiKeySecret = config.sops.placeholder.claude_code_api_key;
+      auth = {
+        type = "api_key";
+        secret = config.sops.placeholder.claude_code_api_key;
+      };
       baseUrl = "https://api.z.ai/api/anthropic";
       model = "opus";
       timeoutMs = 3000000;  # 50 minutes

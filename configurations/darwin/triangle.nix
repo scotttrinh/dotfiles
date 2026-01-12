@@ -52,11 +52,28 @@ in
 
   # Work-specific home-manager configuration
   # This merges with configurations/home/scotttrinh.nix
-  home-manager.users.scotttrinh = { lib, ... }: {
+  home-manager.users.scotttrinh = { lib, config, ... }: {
     home.packages = with pkgs; [
       git-lfs
       gh
     ];
+
+    # Declare the sops secret for this machine
+    sops.secrets.claude_code_auth_token = {
+      key = "CLAUDE_CODE_AUTH_TOKEN_TRIANGLE";
+      mode = "0400";
+    };
+
+    claudeCode = {
+      enable = true;
+      auth = {
+        type = "oauth";
+        secret = config.sops.placeholder.claude_code_auth_token;
+      };
+      baseUrl = "https://ai-gateway.vercel.sh";
+      model = "opus";
+      timeoutMs = 3000000;  # 50 minutes
+    };
 
     # Activation script to clone work repos
     # Runs during `nix run .#activate` / `home-manager switch`
