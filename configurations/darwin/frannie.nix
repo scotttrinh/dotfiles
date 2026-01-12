@@ -35,7 +35,7 @@ in
     claudeCode = {
       enable = true;
       auth = {
-        type = "api_key";
+        type = "apiKey";
         secret = config.sops.placeholder.claude_code_api_key;
       };
       baseUrl = "https://api.z.ai/api/anthropic";
