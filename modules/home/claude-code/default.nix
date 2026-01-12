@@ -6,9 +6,23 @@ in
   options.claudeCode = {
     enable = lib.mkEnableOption "claude-code";
 
-    apiKeySecret = lib.mkOption {
-      type = lib.types.str;
-      description = "The sops placeholder for the API key (e.g., config.sops.placeholder.anthropic_api_key)";
+    auth = lib.mkOption {
+      type = lib.types.submodule {
+        options = {
+          type = lib.mkOption {
+            type = lib.types.enum [ "none" "oauth" "apiKey" ];
+            default = "none";
+            description = "Authentication type: none (passthrough), oauth (token-based), or apiKey (API key-based)";
+          };
+          secret = lib.mkOption {
+            type = lib.types.nullOr lib.types.str;
+            default = null;
+            description = "The sops placeholder for the authentication secret. Required when type is oauth or apiKey.";
+          };
+        };
+      };
+      default = { };
+      description = "Authentication configuration for Claude Code";
     };
 
     baseUrl = lib.mkOption {
@@ -37,14 +51,27 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    assertions = [
+      {
+        assertion = (cfg.auth.type == "none") || (cfg.auth.secret != null);
+        message = "claudeCode.auth.secret must be set when auth.type is '${cfg.auth.type}'";
+      }
+    ];
+
     # Build the settings.json as a proper JSON structure
     sops.templates."claude-settings".content = builtins.toJSON (
       {
         env = {
-          ANTHROPIC_AUTH_TOKEN = cfg.apiKeySecret;
           ANTHROPIC_BASE_URL = cfg.baseUrl;
           API_TIMEOUT_MS = toString cfg.timeoutMs;
-        } // cfg.extraEnv;
+        }
+        // (lib.optionalAttrs (cfg.auth.type == "oauth") {
+          ANTHROPIC_AUTH_TOKEN = cfg.auth.secret;
+        })
+        // (lib.optionalAttrs (cfg.auth.type == "apiKey") {
+          ANTHROPIC_API_KEY = cfg.auth.secret;
+        })
+        // cfg.extraEnv;
         model = cfg.model;
       }
     );
