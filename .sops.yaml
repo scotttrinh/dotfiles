@@ -10,6 +10,7 @@ keys:
 creation_rules:
   - path_regex: secrets\.ya?ml$
     # Encrypt to all device keys - add new devices here
-    age: >-
-      *age_frannie,
-      *age_triangle
+    key_groups:
+      - age:
+          - *age_frannie
+          - *age_triangle
