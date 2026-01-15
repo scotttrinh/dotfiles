@@ -6,6 +6,10 @@ in
   options.claudeCode = {
     enable = lib.mkEnableOption "claude-code";
 
+    statusLine = {
+      enable = lib.mkEnableOption "custom statusLine";
+    };
+
     auth = lib.mkOption {
       type = lib.types.submodule {
         options = {
@@ -58,6 +62,14 @@ in
       }
     ];
 
+    # Install statusLine script if enabled
+    home.file = lib.mkIf cfg.statusLine.enable {
+      ".claude/claude-statusline.sh" = {
+        source = ./claude-statusline.sh;
+        executable = true;
+      };
+    };
+
     # Build the settings.json as a proper JSON structure
     sops.templates."claude-settings".content = builtins.toJSON (
       {
@@ -74,6 +86,12 @@ in
         // cfg.extraEnv;
         model = cfg.model;
       }
+      // (lib.optionalAttrs cfg.statusLine.enable {
+        statusLine = {
+          type = "command";
+          command = "${config.home.homeDirectory}/.claude/claude-statusline.sh";
+        };
+      })
     );
     sops.templates."claude-settings".path = "${config.home.homeDirectory}/.claude/settings.json";
   };
