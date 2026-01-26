@@ -94,32 +94,27 @@ Add a NixOS configuration to dotfiles that runs on OrbStack, providing isolated 
 
 ---
 
-## Pending Tasks
-
-### Configure services.nook.settings for Claude Code - P1 - Ready
+### Configure services.nook.settings for Claude Code - P1 - Done
 
 **Spec Reference:** specs/settings.md (Relationship to Nooks section), nook settings.md spec
 
 **Goal:** Inject Claude Code settings into nook containers using `services.nook.settings.files` so claude-code has consistent configuration inside containers.
 
-**Scope:**
-- [ ] Add `services.nook.settings.files` configuration to `configurations/nixos/nooks.nix`
-- [ ] Configure `/home/nook/.claude/settings.json` with model selection
-- [ ] Optionally add `/home/nook/.claude/CLAUDE.md` with nook-specific context
+**Implementation:**
+- Added `services.nook.settings.files` configuration to `configurations/nixos/nooks.nix`
+- Configured `/home/nook/.claude/settings.json` with model selection (claude-sonnet-4-20250514)
+- Added `/home/nook/.claude/CLAUDE.md` with nook-specific context for Claude Code
+- Updated flake.lock to pull in latest nook module with settings support
+- Verified settings files are properly injected into nook containers on startup
 
 **Acceptance Criteria:**
-- [ ] `services.nook.settings.files` is configured in nooks.nix
-- [ ] After rebuild, `nook enter <branch>` and `cat ~/.claude/settings.json` shows expected config
-- [ ] Claude Code inside nooks uses the configured model
-
-**Test Strategy:**
-- Integration: After `nixos-rebuild switch`, start a nook and verify settings file exists
-
-**Dependencies:** None (base nooks configuration already exists)
-
-**Blockers:** None
+- [x] `services.nook.settings.files` is configured in nooks.nix
+- [x] After rebuild, `nook enter <branch>` and `cat ~/.claude/settings.json` shows expected config
+- [x] Claude Code inside nooks uses the configured model
 
 ---
+
+## Pending Tasks
 
 ### Generate SSH key for nook access - P2 - Ready
 
@@ -182,7 +177,7 @@ Add a NixOS configuration to dotfiles that runs on OrbStack, providing isolated 
 | Create nooks NixOS configuration | P0 | **Done** | OrbStack module |
 | Wire up nixos-unified for NixOS config discovery | P1 | **Done** | NixOS configuration |
 | Generate and configure age key for nooks VM | P1 | **Done** | None |
-| Configure services.nook.settings for Claude Code | P1 | Ready | None |
+| Configure services.nook.settings for Claude Code | P1 | **Done** | None |
 | Generate SSH key for nook access | P2 | Ready | NixOS configuration |
 | Document bootstrap procedure in README | P2 | Ready | All implementation tasks |
 

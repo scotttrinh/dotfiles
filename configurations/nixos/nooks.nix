@@ -102,6 +102,54 @@ in
     secrets.env = {
       ANTHROPIC_API_KEY = config.sops.secrets.anthropic-api-key.path;
     };
+
+    # Settings files copied into all nook containers
+    settings.files = {
+      # Claude Code configuration
+      "/home/nook/.claude/settings.json" = {
+        content = builtins.toJSON {
+          model = "claude-sonnet-4-20250514";
+          permissions = {
+            allow = [
+              "Bash(git *)"
+              "Bash(nix *)"
+              "Bash(npm *)"
+              "Bash(cargo *)"
+            ];
+            deny = [ ];
+          };
+        };
+      };
+
+      # Nook-specific context for Claude Code
+      "/home/nook/.claude/CLAUDE.md" = {
+        content = ''
+          # Nook Container Context
+
+          You are running inside an isolated nook container managed by the nook service.
+
+          ## Environment
+
+          - **Container type**: Systemd-nspawn container on NixOS
+          - **User**: nook (non-root)
+          - **Home directory**: /home/nook
+          - **Working directory**: /home/nook/workspace (contains the cloned repository)
+
+          ## Available Tools
+
+          - `wigg` - Autonomous AI development loop CLI
+          - `git` - Version control (SSH keys shared from host)
+          - Standard development tools (curl, jq, ripgrep, etc.)
+
+          ## Guidelines
+
+          - The repository is cloned to ~/workspace. Always work from there.
+          - Use wigg for autonomous development workflows.
+          - Git operations use shared SSH keys from the host VM.
+          - The ANTHROPIC_API_KEY environment variable is set.
+        '';
+      };
+    };
   };
 
   # =========================================================================
