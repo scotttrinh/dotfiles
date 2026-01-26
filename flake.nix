@@ -20,9 +20,9 @@
     sops-nix.inputs.nixpkgs.follows = "nixpkgs";
 
     # Local development inputs for OrbStack nooks VM
-    nook.url = "path:/Users/scotttrinh/github.com/scotttrinh/nook";
+    nook.url = "github:scotttrinh/nook";
     nook.inputs.nixpkgs.follows = "nixpkgs";
-    wigg.url = "path:/Users/scotttrinh/github.com/scotttrinh/wigg";
+    wigg.url = "github:scotttrinh/wigg";
     wigg.inputs.nixpkgs.follows = "nixpkgs";
   };
 

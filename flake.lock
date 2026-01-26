@@ -168,11 +168,11 @@
         "treefmt-nix": "treefmt-nix_2"
       },
       "locked": {
-        "lastModified": 1769437786,
-        "narHash": "sha256-Ny7aPW+O3eUTGKkSG9JQi5JJIaQICkm5/6nOCR6UdDk=",
+        "lastModified": 1769446543,
+        "narHash": "sha256-h+H6W63S8GB+/fESeM0C8fBBiBRUpDO2gAIRLSieqUg=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "29deeefa741a43bcf954529a672ffdbd3d3993a7",
+        "rev": "f1c0dc88b88fae5cb5e87c79e940ed2cf0a250c1",
         "type": "github"
       },
       "original": {
@@ -344,14 +344,17 @@
         ]
       },
       "locked": {
-        "lastModified": 1769457050,
-        "narHash": "sha256-TEnHpvwKuVq2slM3I3rUCgJIMXf6zU3K0drsZt3MtHE=",
-        "path": "/Users/scotttrinh/github.com/scotttrinh/nook",
-        "type": "path"
+        "lastModified": 1769457045,
+        "narHash": "sha256-1IyTOp9i7ILU+ErSkNDrJdFfx9FtOyKsk25WC/4InBk=",
+        "owner": "scotttrinh",
+        "repo": "nook",
+        "rev": "66559b691a6e5484629ae857d4662032f4f965a2",
+        "type": "github"
       },
       "original": {
-        "path": "/Users/scotttrinh/github.com/scotttrinh/nook",
-        "type": "path"
+        "owner": "scotttrinh",
+        "repo": "nook",
+        "type": "github"
       }
     },
     "powertest": {
@@ -571,14 +574,17 @@
         ]
       },
       "locked": {
-        "lastModified": 1769456834,
-        "narHash": "sha256-MBxA+4VHxjKUFgGWvtKEmLrVR4iFJtwl/kKbnCz8kn4=",
-        "path": "/Users/scotttrinh/github.com/scotttrinh/wigg",
-        "type": "path"
+        "lastModified": 1769458112,
+        "narHash": "sha256-03f7cs7FtIg4QS1ilGEnR+Z+UuCOf3FWODk+KKH37nI=",
+        "owner": "scotttrinh",
+        "repo": "wigg",
+        "rev": "60e3adb80e33665f561ea34740c63f801ecbe125",
+        "type": "github"
       },
       "original": {
-        "path": "/Users/scotttrinh/github.com/scotttrinh/wigg",
-        "type": "path"
+        "owner": "scotttrinh",
+        "repo": "wigg",
+        "type": "github"
       }
     }
   },
