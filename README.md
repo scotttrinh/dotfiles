@@ -91,7 +91,6 @@ isolated AI agent containers ("nooks") with `wigg` and `claude-code`.
 
 1. **OrbStack** installed on macOS (`brew install --cask orbstack`)
 2. **Age key** generated for the nooks VM at `~/.config/sops/age/nooks.key`
-3. **SSH key** for nook access at `~/.ssh/id_ed25519_nooks`
 
 ### macOS-side Setup
 
@@ -105,17 +104,13 @@ age-keygen -o ~/.config/sops/age/nooks.key
 # Add the public key to .sops.yaml and re-encrypt secrets:
 # sops updatekeys secrets.yaml
 
-# Generate SSH key for nook access
-ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519_nooks -C "nooks-access"
-# Public key is already in configurations/nixos/nooks.nix authorizedKeys
-
 # Create the OrbStack NixOS VM
 orb create nixos nooks
 ```
 
 ### VM Bootstrap
 
-Inside the nooks VM (via `orb shell nooks` or OrbStack UI):
+Inside the nooks VM (via `ssh nooks@orb` or OrbStack UI):
 
 ```bash
 # 1. Copy age key from macOS (OrbStack mounts home at /mnt/mac/Users/<username>)
@@ -123,8 +118,9 @@ mkdir -p ~/.config/sops/age
 cp /mnt/mac/Users/scotttrinh/.config/sops/age/nooks.key ~/.config/sops/age/keys.txt
 chmod 600 ~/.config/sops/age/keys.txt
 
-# 2. Generate SSH key for GitHub access from the VM
-ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -C "nooks-vm-github"
+# 2. Set up VM-specific SSH key for GitHub (replacing OrbStack's default symlinks)
+rm -f ~/.ssh/id_ed25519 ~/.ssh/id_ed25519.pub  # Remove OrbStack symlinks to macOS keys
+ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -C "nooks-vm"
 # Add the public key to your GitHub account
 
 # 3. Clone dotfiles and activate
@@ -135,6 +131,10 @@ sudo nixos-rebuild switch --flake .#nooks
 # 4. Verify the setup
 nook list
 ```
+
+> **Note**: OrbStack automatically creates symlinks from `~/.ssh/` to your macOS SSH keys.
+> We replace these with a VM-specific key so it can be rotated independently. SSH access
+> to the VM (`ssh nooks@orb`) is handled separately by OrbStack and remains unaffected.
 
 ### Verifying the Setup
 

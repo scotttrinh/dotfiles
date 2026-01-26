@@ -93,8 +93,11 @@ OrbStack NixOS VM running isolated AI agent containers:
 - Container count: 5 (configurable via `services.nook.nookCount`)
 - Extra packages: claude-code, wigg (installed in all containers)
 - Secrets: `ANTHROPIC_API_KEY` injected via `services.nook.secrets.env`
-- SSH: Dedicated keypair for nook access
-- GitHub: VM's SSH keys shared with containers
+
+**Git Workflow**:
+- Nooks perform local git operations only (commit, merge, branch updates)
+- All GitHub network operations (push/pull/fetch) happen from the VM host
+- VM has its own SSH key (not shared with macOS) for independent rotation
 
 **Architecture**:
 ```

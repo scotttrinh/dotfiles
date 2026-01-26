@@ -83,14 +83,13 @@ in
     enable = true;
     nookCount = 5;
 
-    # SSH keys for accessing nooks
+    # SSH keys for accessing nooks from the VM host
     authorizedKeys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBcIvil2JBo19GyGhNkNnoh9eGGP6RSvdS4LrXQKakyI nooks-access"
     ];
 
-    # Share host SSH keys with nooks for GitHub access
-    hostSshPath = "/home/scotttrinh/.ssh";
-    githubSshKeyName = "id_ed25519";
+    # Note: Nooks don't need SSH access to GitHub. All git push/pull operations
+    # happen from the VM host. Nooks only do local git operations (commit, merge, etc.).
 
     # Extra packages installed in all nook containers (Tier 2: external flakes)
     extraPackages = [
@@ -138,14 +137,14 @@ in
           ## Available Tools
 
           - `wigg` - Autonomous AI development loop CLI
-          - `git` - Version control (SSH keys shared from host)
+          - `git` - Version control (local operations only)
           - Standard development tools (curl, jq, ripgrep, etc.)
 
           ## Guidelines
 
           - The repository is cloned to ~/workspace. Always work from there.
           - Use wigg for autonomous development workflows.
-          - Git operations use shared SSH keys from the host VM.
+          - Git operations are local only (commit, merge, branch). Push/pull happens from the VM host.
           - The ANTHROPIC_API_KEY environment variable is set.
         '';
       };
