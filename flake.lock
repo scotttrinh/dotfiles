@@ -16,6 +16,23 @@
         "type": "github"
       }
     },
+    "agent-cloud": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1769377135,
+        "narHash": "sha256-nO36EPXGNZPUox/BlRvCO+11qCHKy/gW0yPYj+jp7Qs=",
+        "path": "/Users/scotttrinh/github.com/scotttrinh/agent-cloud",
+        "type": "path"
+      },
+      "original": {
+        "path": "/Users/scotttrinh/github.com/scotttrinh/agent-cloud",
+        "type": "path"
+      }
+    },
     "blueprint": {
       "inputs": {
         "nixpkgs": [
@@ -168,11 +185,11 @@
         "treefmt-nix": "treefmt-nix_2"
       },
       "locked": {
-        "lastModified": 1768400511,
-        "narHash": "sha256-dUbrS/tP1X4oCq9o9q+9BaJzrdbWPwHTMNmErlqaVL0=",
+        "lastModified": 1769234232,
+        "narHash": "sha256-88lfPFXzCfxVhWJBq9RvwqvAa5IH+iLcR7f+gRl+8IM=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "2380a3f42c4047a714921d3df7272a8055908b00",
+        "rev": "861ade6060a73482cfd08bd992fa687f910e5c7c",
         "type": "github"
       },
       "original": {
@@ -307,11 +324,11 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1768302833,
-        "narHash": "sha256-h5bRFy9bco+8QcK7rGoOiqMxMbmn21moTACofNLRMP4=",
+        "lastModified": 1769092226,
+        "narHash": "sha256-6h5sROT/3CTHvzPy9koKBmoCa2eJKh4fzQK8eYFEgl8=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "61db79b0c6b838d9894923920b612048e1201926",
+        "rev": "b579d443b37c9c5373044201ea77604e37e748c8",
         "type": "github"
       },
       "original": {
@@ -400,6 +417,7 @@
     },
     "root": {
       "inputs": {
+        "agent-cloud": "agent-cloud",
         "eza": "eza",
         "flake-parts": "flake-parts",
         "home-manager": "home-manager",
@@ -409,7 +427,8 @@
         "nixos-unified": "nixos-unified",
         "nixpkgs": "nixpkgs_3",
         "rust-overlay": "rust-overlay_2",
-        "sops-nix": "sops-nix"
+        "sops-nix": "sops-nix",
+        "wigg": "wigg"
       }
     },
     "rust-overlay": {
@@ -543,6 +562,23 @@
         "owner": "numtide",
         "repo": "treefmt-nix",
         "type": "github"
+      }
+    },
+    "wigg": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1769388669,
+        "narHash": "sha256-27xbYgzGuMVrIXe4CTpR0ECFzGSN2dFUB8BHWvfP0nA=",
+        "path": "/Users/scotttrinh/github.com/scotttrinh/wigg",
+        "type": "path"
+      },
+      "original": {
+        "path": "/Users/scotttrinh/github.com/scotttrinh/wigg",
+        "type": "path"
       }
     }
   },
