@@ -7,6 +7,9 @@ keys:
   # triangle (work mac)
   - &age_triangle age13c93mwjalmsecpvx05s0c3kpwz9l6x0qyyxxt0tlwhn9rgwyq9nstvptxj
 
+  # nooks (OrbStack NixOS VM on triangle)
+  - &age_nooks age1gksfefdf7t6v07t8f6klqff2v5rz97wxwn8jd5kk3zg65j9hqesqt8q37m
+
 creation_rules:
   - path_regex: secrets\.ya?ml$
     # Encrypt to all device keys - add new devices here
@@ -14,3 +17,4 @@ creation_rules:
       - age:
           - *age_frannie
           - *age_triangle
+          - *age_nooks
