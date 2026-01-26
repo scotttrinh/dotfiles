@@ -38,7 +38,7 @@ Add a NixOS configuration to dotfiles that runs on OrbStack, providing isolated 
 
 ### Create OrbStack NixOS module - P0 - Done
 
-**Spec Reference:** agent-cloud/examples/orbstack-host/orbstack.nix
+**Spec Reference:** nook/examples/orbstack-host/orbstack.nix
 
 **Goal:** Create a reusable NixOS module with OrbStack-specific configuration that can be imported by any NixOS configuration running in OrbStack.
 
@@ -58,7 +58,7 @@ Add a NixOS configuration to dotfiles that runs on OrbStack, providing isolated 
 
 **Acceptance Criteria:**
 - [x] Module imports without errors when included in a NixOS configuration
-- [x] Module follows existing patterns from agent-cloud/examples/orbstack-host/orbstack.nix
+- [x] Module follows existing patterns from nook/examples/orbstack-host/orbstack.nix
 
 **Test Strategy:**
 - Unit: Include module in a minimal NixOS configuration, verify evaluation succeeds
@@ -71,7 +71,7 @@ Add a NixOS configuration to dotfiles that runs on OrbStack, providing isolated 
 
 ### Create nooks NixOS configuration - P0 - Ready
 
-**Spec Reference:** agent-cloud/examples/orbstack-host/configuration.nix, agent-cloud/modules/nooks.nix
+**Spec Reference:** nook/examples/orbstack-host/configuration.nix, nook/modules/nooks.nix
 
 **Goal:** Create the main NixOS configuration file for the nooks VM that combines the OrbStack module, nook service, and sops-nix secrets.
 
@@ -79,7 +79,7 @@ Add a NixOS configuration to dotfiles that runs on OrbStack, providing isolated 
 - [ ] Create `configurations/nixos/nooks.nix`
 - [ ] Import lxc-container.nix from nixpkgs/virtualisation
 - [ ] Import self.nixosModules.orbstack
-- [ ] Import agent-cloud.nixosModules.default (nook service)
+- [ ] Import nook.nixosModules.default (nook service)
 - [ ] Import sops-nix.nixosModules.sops
 - [ ] Configure scotttrinh user with UID 501 (match macOS)
 - [ ] Configure services.nook with extraPackages (claude-code, wigg)
@@ -266,6 +266,6 @@ nook enter test-branch
 
 ## References
 
-- agent-cloud/examples/orbstack-host/ - Example OrbStack configuration
-- agent-cloud/modules/nooks.nix - Full module options (nook service configuration)
+- nook/examples/orbstack-host/ - Example OrbStack configuration
+- nook/modules/nooks.nix - Full module options (nook service configuration)
 - nixos-unified docs - https://github.com/srid/nixos-unified

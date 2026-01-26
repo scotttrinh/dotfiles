@@ -20,8 +20,8 @@
     sops-nix.inputs.nixpkgs.follows = "nixpkgs";
 
     # Local development inputs for OrbStack nooks VM
-    agent-cloud.url = "path:/Users/scotttrinh/github.com/scotttrinh/agent-cloud";
-    agent-cloud.inputs.nixpkgs.follows = "nixpkgs";
+    nook.url = "path:/Users/scotttrinh/github.com/scotttrinh/nook";
+    nook.inputs.nixpkgs.follows = "nixpkgs";
     wigg.url = "path:/Users/scotttrinh/github.com/scotttrinh/wigg";
     wigg.inputs.nixpkgs.follows = "nixpkgs";
   };
