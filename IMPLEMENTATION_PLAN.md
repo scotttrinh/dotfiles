@@ -36,6 +36,24 @@ Add a NixOS configuration to dotfiles that runs on OrbStack, providing isolated 
 
 ## Completed Tasks
 
+### Generate SSH key for nook access - P2 - Done
+
+**Spec Reference:** N/A (access infrastructure)
+
+**Goal:** Generate a dedicated SSH key pair for accessing nook containers from the macOS host.
+
+**Implementation:**
+- SSH key generated at `~/.ssh/id_ed25519_nooks`
+- Public key added to `configurations/nixos/nooks.nix` authorizedKeys
+- TODO comment removed from nooks.nix
+
+**Acceptance Criteria:**
+- [x] SSH key pair exists at ~/.ssh/id_ed25519_nooks
+- [x] Public key is in the nooks.nix authorizedKeys configuration
+- [x] Can SSH to nook containers using: `ssh -i ~/.ssh/id_ed25519_nooks nook@<nook-ip>`
+
+---
+
 ### Create OrbStack NixOS module - P0 - Done
 
 **Spec Reference:** nook/examples/orbstack-host/orbstack.nix
@@ -116,31 +134,6 @@ Add a NixOS configuration to dotfiles that runs on OrbStack, providing isolated 
 
 ## Pending Tasks
 
-### Generate SSH key for nook access - P2 - Ready
-
-**Spec Reference:** N/A (access infrastructure)
-
-**Goal:** Generate a dedicated SSH key pair for accessing nook containers from the macOS host.
-
-**Scope:**
-- [ ] Generate key: `ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519_nooks -C "nooks-access"`
-- [ ] Add public key to `configurations/nixos/nooks.nix` authorizedKeys list
-- [ ] Remove TODO comment from nooks.nix
-
-**Acceptance Criteria:**
-- [ ] SSH key pair exists at ~/.ssh/id_ed25519_nooks
-- [ ] Public key is in the nooks.nix authorizedKeys configuration
-- [ ] Can SSH to nook containers using: `ssh -i ~/.ssh/id_ed25519_nooks nook@<nook-ip>`
-
-**Test Strategy:**
-- Integration: After VM bootstrap, verify SSH access works
-
-**Dependencies:** Create nooks NixOS configuration
-
-**Blockers:** None
-
----
-
 ### Document bootstrap procedure in README - P2 - Ready
 
 **Spec Reference:** N/A (documentation)
@@ -178,7 +171,7 @@ Add a NixOS configuration to dotfiles that runs on OrbStack, providing isolated 
 | Wire up nixos-unified for NixOS config discovery | P1 | **Done** | NixOS configuration |
 | Generate and configure age key for nooks VM | P1 | **Done** | None |
 | Configure services.nook.settings for Claude Code | P1 | **Done** | None |
-| Generate SSH key for nook access | P2 | Ready | NixOS configuration |
+| Generate SSH key for nook access | P2 | **Done** | NixOS configuration |
 | Document bootstrap procedure in README | P2 | Ready | All implementation tasks |
 
 ---

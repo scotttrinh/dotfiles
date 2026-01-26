@@ -83,9 +83,9 @@ in
     enable = true;
     nookCount = 5;
 
-    # SSH keys for accessing nooks (add your public key here)
+    # SSH keys for accessing nooks
     authorizedKeys = [
-      # TODO: Add SSH public key after generating ~/.ssh/id_ed25519_nooks
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBcIvil2JBo19GyGhNkNnoh9eGGP6RSvdS4LrXQKakyI nooks-access"
     ];
 
     # Share host SSH keys with nooks for GitHub access
