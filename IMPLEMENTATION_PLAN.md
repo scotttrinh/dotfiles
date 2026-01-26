@@ -36,24 +36,29 @@ Add a NixOS configuration to dotfiles that runs on OrbStack, providing isolated 
 
 ## Tasks
 
-### Create OrbStack NixOS module - P0 - Ready
+### Create OrbStack NixOS module - P0 - Done
 
 **Spec Reference:** agent-cloud/examples/orbstack-host/orbstack.nix
 
 **Goal:** Create a reusable NixOS module with OrbStack-specific configuration that can be imported by any NixOS configuration running in OrbStack.
 
 **Scope:**
-- [ ] Create `modules/nixos/orbstack.nix`
-- [ ] Include OrbStack CLI path setup (profile-early, profile-late)
-- [ ] Configure DNS to use OrbStack's resolver
-- [ ] Disable systemd watchdog services (container environment)
-- [ ] Configure SSH to include OrbStack config
-- [ ] Enable emulated architectures (x86_64 on aarch64)
-- [ ] Create orbstack group with GID 67278
+- [x] Create `modules/nixos/orbstack/default.nix`
+- [x] Include OrbStack CLI path setup (profile-early, profile-late)
+- [x] Configure DNS to use OrbStack's resolver
+- [x] Disable systemd watchdog services (container environment)
+- [x] Configure SSH to include OrbStack config
+- [x] Enable emulated architectures (x86_64 on aarch64)
+- [x] Create orbstack group with GID 67278
+
+**Implementation:**
+- Module created at `modules/nixos/orbstack/default.nix`
+- Auto-discovered by nixos-unified autoWire as `nixosModules.orbstack`
+- Verified module evaluates correctly in a minimal NixOS-like configuration
 
 **Acceptance Criteria:**
-- [ ] Module imports without errors when included in a NixOS configuration
-- [ ] Module follows existing patterns from agent-cloud/examples/orbstack-host/orbstack.nix
+- [x] Module imports without errors when included in a NixOS configuration
+- [x] Module follows existing patterns from agent-cloud/examples/orbstack-host/orbstack.nix
 
 **Test Strategy:**
 - Unit: Include module in a minimal NixOS configuration, verify evaluation succeeds
@@ -208,7 +213,7 @@ Add a NixOS configuration to dotfiles that runs on OrbStack, providing isolated 
 
 | Task | Priority | Status | Dependencies |
 |------|----------|--------|--------------|
-| Create OrbStack NixOS module | P0 | Ready | None |
+| Create OrbStack NixOS module | P0 | **Done** | None |
 | Create nooks NixOS configuration | P0 | Ready | OrbStack module |
 | Wire up nixos-unified for NixOS config discovery | P1 | Ready | NixOS configuration |
 | Generate and configure age key for nooks VM | P1 | **Done** | None |
