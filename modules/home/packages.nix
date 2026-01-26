@@ -34,6 +34,7 @@ in {
     nixfmt
     parinfer-rust-emacs
     llm-agents.claude-code
+    llm-agents.claude-code-acp
     llm-agents.codex
     llm-agents.opencode
     llm-agents.gemini-cli

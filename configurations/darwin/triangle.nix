@@ -72,6 +72,7 @@ in
       };
       baseUrl = "https://ai-gateway.vercel.sh";
       model = "opus";
+      statusLine.enable = true;
       timeoutMs = 3000000;  # 50 minutes
     };
 
