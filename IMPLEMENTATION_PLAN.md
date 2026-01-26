@@ -132,33 +132,26 @@ Add a NixOS configuration to dotfiles that runs on OrbStack, providing isolated 
 
 ---
 
-## Pending Tasks
-
-### Document bootstrap procedure in README - P2 - Ready
+### Document bootstrap procedure in README - P2 - Done
 
 **Spec Reference:** N/A (documentation)
 
 **Goal:** Add clear bootstrap instructions to the dotfiles README for setting up the nooks VM.
 
-**Scope:**
-- [ ] Add "OrbStack NixOS VM" section to README.md
-- [ ] Document prerequisites (OrbStack installed, age key generated)
-- [ ] Document macOS-side setup steps
-- [ ] Document VM-side bootstrap steps
-- [ ] Document how to verify the setup works
-- [ ] Include nook workflow commands (list, start, enter, release)
+**Implementation:**
+- Added "OrbStack NixOS VM (nooks)" section to README.md
+- Documented prerequisites (OrbStack, age key, SSH key)
+- Documented macOS-side setup steps
+- Documented VM-side bootstrap steps
+- Added verification instructions
+- Included nook workflow commands table
+- Added wigg usage examples
+- Referenced .wigg/specs/ for detailed specifications
 
 **Acceptance Criteria:**
-- [ ] README contains complete bootstrap instructions
-- [ ] A new user can follow the instructions to set up the VM
-- [ ] README references appropriate spec files for details
-
-**Test Strategy:**
-- Manual: Follow the documented steps on a fresh setup
-
-**Dependencies:** All other tasks
-
-**Blockers:** None
+- [x] README contains complete bootstrap instructions
+- [x] A new user can follow the instructions to set up the VM
+- [x] README references appropriate spec files for details
 
 ---
 
@@ -172,7 +165,7 @@ Add a NixOS configuration to dotfiles that runs on OrbStack, providing isolated 
 | Generate and configure age key for nooks VM | P1 | **Done** | None |
 | Configure services.nook.settings for Claude Code | P1 | **Done** | None |
 | Generate SSH key for nook access | P2 | **Done** | NixOS configuration |
-| Document bootstrap procedure in README | P2 | Ready | All implementation tasks |
+| Document bootstrap procedure in README | P2 | **Done** | All implementation tasks |
 
 ---
 

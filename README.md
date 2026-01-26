@@ -68,21 +68,115 @@ changes):
    Home Manager will use the modules in `modules/home/` and place files under
    `$HOME`.
 
-## Linux Notes
+## OrbStack NixOS VM (nooks)
 
-The tree currently doesn't include a NixOS host, but nixos-unified supports it.
-To add one:
+This repository includes a NixOS configuration for an OrbStack VM that runs
+isolated AI agent containers ("nooks") with `wigg` and `claude-code`.
 
-1. Create `configurations/nixos/<hostname>.nix` and import
-   `self.nixosModules.default` just like the macOS examples.
-2. Define `nixpkgs.hostPlatform = "x86_64-linux"` (or `aarch64-linux`) and any
-   NixOS-specific settings.
-3. On the target machine, boot into the installer, clone this repo, and run:
-   ```sh
-   sudo nixos-rebuild switch --flake .#<hostname>
-   ```
-   or follow the [`nixos-unified` installation guide](https://nixos-unified.org)
-   for its streamlined `nix run .#activate` workflow on NixOS.
+```
+┌─────────────────────────────────────────────────────┐
+│ OrbStack NixOS VM (nooks)                           │
+│   - sops-nix decrypts ANTHROPIC_API_KEY             │
+│   - nook CLI manages containers                     │
+│                                                     │
+│   ┌───────────┐ ┌───────────┐ ┌───────────┐        │
+│   │ nook-1    │ │ nook-2    │ │ nook-N    │        │
+│   │ - wigg    │ │ - wigg    │ │ - wigg    │        │
+│   │ - claude  │ │ - claude  │ │ - claude  │        │
+│   └───────────┘ └───────────┘ └───────────┘        │
+└─────────────────────────────────────────────────────┘
+```
+
+### Prerequisites
+
+1. **OrbStack** installed on macOS (`brew install --cask orbstack`)
+2. **Age key** generated for the nooks VM at `~/.config/sops/age/nooks.key`
+3. **SSH key** for nook access at `~/.ssh/id_ed25519_nooks`
+
+### macOS-side Setup
+
+If setting up from scratch, generate the required keys:
+
+```bash
+# Generate age key for sops-nix
+mkdir -p ~/.config/sops/age
+age-keygen -o ~/.config/sops/age/nooks.key
+
+# Add the public key to .sops.yaml and re-encrypt secrets:
+# sops updatekeys secrets.yaml
+
+# Generate SSH key for nook access
+ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519_nooks -C "nooks-access"
+# Public key is already in configurations/nixos/nooks.nix authorizedKeys
+
+# Create the OrbStack NixOS VM
+orb create nixos nooks
+```
+
+### VM Bootstrap
+
+Inside the nooks VM (via `orb shell nooks` or OrbStack UI):
+
+```bash
+# 1. Copy age key from macOS (OrbStack mounts home at /mnt/mac/Users/<username>)
+mkdir -p ~/.config/sops/age
+cp /mnt/mac/Users/scotttrinh/.config/sops/age/nooks.key ~/.config/sops/age/keys.txt
+chmod 600 ~/.config/sops/age/keys.txt
+
+# 2. Generate SSH key for GitHub access from the VM
+ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -C "nooks-vm-github"
+# Add the public key to your GitHub account
+
+# 3. Clone dotfiles and activate
+git clone git@github.com:scotttrinh/dotfiles.git ~/dotfiles
+cd ~/dotfiles
+sudo nixos-rebuild switch --flake .#nooks
+
+# 4. Verify the setup
+nook list
+```
+
+### Verifying the Setup
+
+After bootstrap, verify everything works:
+
+```bash
+# Start a test nook
+nook start https://github.com/scotttrinh/some-repo test-branch
+
+# Enter the nook
+nook enter test-branch
+
+# Inside the nook, verify tools and secrets
+echo $ANTHROPIC_API_KEY | head -c 20   # Should show: sk-ant-api03-...
+wigg list                               # Show wigg modes
+cat ~/.claude/settings.json             # Claude Code config
+```
+
+### Nook Workflow Commands
+
+| Command | Description |
+|---------|-------------|
+| `nook list` | List all nooks and their states |
+| `nook start <repo-url> <branch>` | Start a nook for a repo/branch |
+| `nook enter <branch>` | Enter a nook interactively |
+| `nook exec <branch> "<cmd>"` | Run a command in a nook |
+| `nook release <branch>` | Release nook, keep worktree (PAUSED) |
+| `nook release <branch> --merge` | Merge to main, clean up |
+| `nook release <branch> --discard` | Discard work, clean up |
+
+### Running wigg in a Nook
+
+```bash
+nook enter feature-branch
+
+# Inside the nook
+wigg list                      # Show available modes
+wigg run plan                  # Planning mode
+wigg run build --max-iter=5   # Build mode with iteration limit
+```
+
+See `.wigg/specs/` for detailed specifications on nook configuration and workflows.
 
 ## Updating Inputs
 
