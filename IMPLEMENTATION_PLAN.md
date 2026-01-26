@@ -69,26 +69,35 @@ Add a NixOS configuration to dotfiles that runs on OrbStack, providing isolated 
 
 ---
 
-### Create nooks NixOS configuration - P0 - Ready
+### Create nooks NixOS configuration - P0 - Done
 
 **Spec Reference:** nook/examples/orbstack-host/configuration.nix, nook/modules/nooks.nix
 
 **Goal:** Create the main NixOS configuration file for the nooks VM that combines the OrbStack module, nook service, and sops-nix secrets.
 
 **Scope:**
-- [ ] Create `configurations/nixos/nooks.nix`
-- [ ] Import lxc-container.nix from nixpkgs/virtualisation
-- [ ] Import self.nixosModules.orbstack
-- [ ] Import nook.nixosModules.default (nook service)
-- [ ] Import sops-nix.nixosModules.sops
-- [ ] Configure scotttrinh user with UID 501 (match macOS)
-- [ ] Configure services.nook with extraPackages (claude-code, wigg)
-- [ ] Configure sops secrets for ANTHROPIC_API_KEY
-- [ ] Configure systemd-networkd for eth0
+- [x] Create `configurations/nixos/nooks.nix`
+- [x] Import lxc-container.nix from nixpkgs/virtualisation
+- [x] Import self.nixosModules.orbstack
+- [x] Import nook.nixosModules.default (nook service)
+- [x] Import sops-nix.nixosModules.sops
+- [x] Configure scotttrinh user with UID 501 (match macOS)
+- [x] Configure services.nook with extraPackages (claude-code, wigg)
+- [x] Configure sops secrets for ANTHROPIC_API_KEY
+- [x] Configure systemd-networkd for eth0
+
+**Implementation:**
+- Configuration created at `configurations/nixos/nooks.nix`
+- Auto-discovered by nixos-unified autoWire as `nixosConfigurations.nooks`
+- Includes all required imports: lxc-container.nix, orbstack module, nook module, sops-nix
+- User scotttrinh configured with UID 501 for OrbStack file sharing
+- services.nook configured with claude-code and wigg from flake inputs
+- SOPS secret `ANTHROPIC_API_KEY_NOOKS` injected into nooks via `services.nook.secrets.env`
+- systemd-networkd configured for eth0 with DHCP
 
 **Acceptance Criteria:**
-- [ ] Configuration evaluates without errors
-- [ ] `nix build .#nixosConfigurations.nooks.config.system.build.toplevel` succeeds
+- [x] Configuration evaluates without errors
+- [x] `nix build .#nixosConfigurations.nooks.config.system.build.toplevel` succeeds (dry-run verified)
 
 **Test Strategy:**
 - Unit: Evaluate configuration with `nix eval`
@@ -100,21 +109,27 @@ Add a NixOS configuration to dotfiles that runs on OrbStack, providing isolated 
 
 ---
 
-### Wire up nixos-unified for NixOS configuration discovery - P1 - Ready
+### Wire up nixos-unified for NixOS configuration discovery - P1 - Done
 
 **Spec Reference:** https://github.com/srid/nixos-unified
 
 **Goal:** Ensure nixos-unified auto-discovers the NixOS configuration at configurations/nixos/nooks.nix.
 
 **Scope:**
-- [ ] Investigate how nixos-unified discovers configurations (check flakeModules.autoWire)
-- [ ] Create `modules/nixos/default.nix` if required for module discovery
-- [ ] Export nixosModules.orbstack from the flake
-- [ ] Verify .#nixosConfigurations.nooks appears in flake outputs
+- [x] Investigate how nixos-unified discovers configurations (check flakeModules.autoWire)
+- [x] Create `modules/nixos/default.nix` if required for module discovery
+- [x] Export nixosModules.orbstack from the flake
+- [x] Verify .#nixosConfigurations.nooks appears in flake outputs
+
+**Implementation:**
+- nixos-unified autoWire automatically discovers configurations at `configurations/nixos/*.nix`
+- No additional `modules/nixos/default.nix` was required
+- `nixosModules.orbstack` is auto-exported by autoWire from `modules/nixos/orbstack/default.nix`
+- Note: Files must be tracked by git (staged or committed) for autoWire to discover them
 
 **Acceptance Criteria:**
-- [ ] `nix flake show` lists `nixosConfigurations.nooks`
-- [ ] `nix build .#nixosConfigurations.nooks.config.system.build.toplevel` works
+- [x] `nix flake show` lists `nixosConfigurations.nooks`
+- [x] `nix build .#nixosConfigurations.nooks.config.system.build.toplevel` works (dry-run verified)
 
 **Test Strategy:**
 - Unit: Run `nix flake show | grep nooks`
@@ -214,8 +229,8 @@ Add a NixOS configuration to dotfiles that runs on OrbStack, providing isolated 
 | Task | Priority | Status | Dependencies |
 |------|----------|--------|--------------|
 | Create OrbStack NixOS module | P0 | **Done** | None |
-| Create nooks NixOS configuration | P0 | Ready | OrbStack module |
-| Wire up nixos-unified for NixOS config discovery | P1 | Ready | NixOS configuration |
+| Create nooks NixOS configuration | P0 | **Done** | OrbStack module |
+| Wire up nixos-unified for NixOS config discovery | P1 | **Done** | NixOS configuration |
 | Generate and configure age key for nooks VM | P1 | **Done** | None |
 | Generate SSH key for nook access | P2 | Ready | NixOS configuration |
 | Document bootstrap procedure in README | P2 | Ready | All implementation tasks |
