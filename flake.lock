@@ -344,8 +344,8 @@
         ]
       },
       "locked": {
-        "lastModified": 1769444529,
-        "narHash": "sha256-TeIU04xAwTeLrk64Wz2fXrnAoe4Oau9sN9ydJJ/m/4I=",
+        "lastModified": 1769455138,
+        "narHash": "sha256-qMmpTXKv4OCM2YG1S6vFjfUYH5lkYQ//sG3UrltXNME=",
         "path": "/Users/scotttrinh/github.com/scotttrinh/nook",
         "type": "path"
       },
@@ -571,8 +571,8 @@
         ]
       },
       "locked": {
-        "lastModified": 1769388669,
-        "narHash": "sha256-27xbYgzGuMVrIXe4CTpR0ECFzGSN2dFUB8BHWvfP0nA=",
+        "lastModified": 1769455113,
+        "narHash": "sha256-ugguhxNvT3GPMWvDd/BAz3mMxZUL39zefUhIPcV/vEY=",
         "path": "/Users/scotttrinh/github.com/scotttrinh/wigg",
         "type": "path"
       },
