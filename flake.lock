@@ -16,23 +16,6 @@
         "type": "github"
       }
     },
-    "agent-cloud": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1769377135,
-        "narHash": "sha256-nO36EPXGNZPUox/BlRvCO+11qCHKy/gW0yPYj+jp7Qs=",
-        "path": "/Users/scotttrinh/github.com/scotttrinh/agent-cloud",
-        "type": "path"
-      },
-      "original": {
-        "path": "/Users/scotttrinh/github.com/scotttrinh/agent-cloud",
-        "type": "path"
-      }
-    },
     "blueprint": {
       "inputs": {
         "nixpkgs": [
@@ -354,6 +337,23 @@
         "type": "github"
       }
     },
+    "nook": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1769432436,
+        "narHash": "sha256-nO36EPXGNZPUox/BlRvCO+11qCHKy/gW0yPYj+jp7Qs=",
+        "path": "/Users/scotttrinh/github.com/scotttrinh/nook",
+        "type": "path"
+      },
+      "original": {
+        "path": "/Users/scotttrinh/github.com/scotttrinh/nook",
+        "type": "path"
+      }
+    },
     "powertest": {
       "inputs": {
         "flake-utils": [
@@ -417,7 +417,6 @@
     },
     "root": {
       "inputs": {
-        "agent-cloud": "agent-cloud",
         "eza": "eza",
         "flake-parts": "flake-parts",
         "home-manager": "home-manager",
@@ -426,6 +425,7 @@
         "nix-index-database": "nix-index-database",
         "nixos-unified": "nixos-unified",
         "nixpkgs": "nixpkgs_3",
+        "nook": "nook",
         "rust-overlay": "rust-overlay_2",
         "sops-nix": "sops-nix",
         "wigg": "wigg"

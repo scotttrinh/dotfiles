@@ -5,23 +5,23 @@ Add a NixOS configuration to dotfiles that runs on OrbStack, providing isolated 
 ## Goal
 
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│ Mac (triangle) with OrbStack installed                              │
-│                                                                     │
-│  ┌───────────────────────────────────────────────────────────────┐ │
-│  │ OrbStack NixOS VM ("nooks")                                   │ │
-│  │  - Pulls config from dotfiles                                 │ │
-│  │  - Dedicated age key for sops-nix                            │ │
-│  │  - nook CLI manages containers                                │ │
-│  │                                                               │ │
-│  │  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐             │ │
-│  │  │ nook-1      │ │ nook-2      │ │ nook-N      │             │ │
-│  │  │  - wigg     │ │  - wigg     │ │  - wigg     │             │ │
-│  │  │  - claude   │ │  - claude   │ │  - claude   │             │ │
-│  │  │  - $ANTHROPIC_API_KEY set                   │             │ │
-│  │  └─────────────┘ └─────────────┘ └─────────────┘             │ │
-│  └───────────────────────────────────────────────────────────────┘ │
-└─────────────────────────────────────────────────────────────────────┘
++---------------------------------------------------------------------+
+| Mac (triangle) with OrbStack installed                              |
+|                                                                     |
+|  +---------------------------------------------------------------+ |
+|  | OrbStack NixOS VM ("nooks")                                   | |
+|  |  - Pulls config from dotfiles                                 | |
+|  |  - Dedicated age key for sops-nix                            | |
+|  |  - nook CLI manages containers                                | |
+|  |                                                               | |
+|  |  +-------------+ +-------------+ +-------------+             | |
+|  |  | nook-1      | | nook-2      | | nook-N      |             | |
+|  |  |  - wigg     | |  - wigg     | |  - wigg     |             | |
+|  |  |  - claude   | |  - claude   | |  - claude   |             | |
+|  |  |  - $ANTHROPIC_API_KEY set                   |             | |
+|  |  +-------------+ +-------------+ +-------------+             | |
+|  +---------------------------------------------------------------+ |
++---------------------------------------------------------------------+
 ```
 
 ## Design Decisions
@@ -34,7 +34,7 @@ Add a NixOS configuration to dotfiles that runs on OrbStack, providing isolated 
 
 ---
 
-## Tasks
+## Completed Tasks
 
 ### Create OrbStack NixOS module - P0 - Done
 
@@ -42,30 +42,10 @@ Add a NixOS configuration to dotfiles that runs on OrbStack, providing isolated 
 
 **Goal:** Create a reusable NixOS module with OrbStack-specific configuration that can be imported by any NixOS configuration running in OrbStack.
 
-**Scope:**
-- [x] Create `modules/nixos/orbstack/default.nix`
-- [x] Include OrbStack CLI path setup (profile-early, profile-late)
-- [x] Configure DNS to use OrbStack's resolver
-- [x] Disable systemd watchdog services (container environment)
-- [x] Configure SSH to include OrbStack config
-- [x] Enable emulated architectures (x86_64 on aarch64)
-- [x] Create orbstack group with GID 67278
-
 **Implementation:**
 - Module created at `modules/nixos/orbstack/default.nix`
 - Auto-discovered by nixos-unified autoWire as `nixosModules.orbstack`
 - Verified module evaluates correctly in a minimal NixOS-like configuration
-
-**Acceptance Criteria:**
-- [x] Module imports without errors when included in a NixOS configuration
-- [x] Module follows existing patterns from nook/examples/orbstack-host/orbstack.nix
-
-**Test Strategy:**
-- Unit: Include module in a minimal NixOS configuration, verify evaluation succeeds
-
-**Dependencies:** None
-
-**Blockers:** None
 
 ---
 
@@ -74,17 +54,6 @@ Add a NixOS configuration to dotfiles that runs on OrbStack, providing isolated 
 **Spec Reference:** nook/examples/orbstack-host/configuration.nix, nook/modules/nooks.nix
 
 **Goal:** Create the main NixOS configuration file for the nooks VM that combines the OrbStack module, nook service, and sops-nix secrets.
-
-**Scope:**
-- [x] Create `configurations/nixos/nooks.nix`
-- [x] Import lxc-container.nix from nixpkgs/virtualisation
-- [x] Import self.nixosModules.orbstack
-- [x] Import nook.nixosModules.default (nook service)
-- [x] Import sops-nix.nixosModules.sops
-- [x] Configure scotttrinh user with UID 501 (match macOS)
-- [x] Configure services.nook with extraPackages (claude-code, wigg)
-- [x] Configure sops secrets for ANTHROPIC_API_KEY
-- [x] Configure systemd-networkd for eth0
 
 **Implementation:**
 - Configuration created at `configurations/nixos/nooks.nix`
@@ -95,18 +64,6 @@ Add a NixOS configuration to dotfiles that runs on OrbStack, providing isolated 
 - SOPS secret `ANTHROPIC_API_KEY_NOOKS` injected into nooks via `services.nook.secrets.env`
 - systemd-networkd configured for eth0 with DHCP
 
-**Acceptance Criteria:**
-- [x] Configuration evaluates without errors
-- [x] `nix build .#nixosConfigurations.nooks.config.system.build.toplevel` succeeds (dry-run verified)
-
-**Test Strategy:**
-- Unit: Evaluate configuration with `nix eval`
-- Integration: Build the full system configuration
-
-**Dependencies:** Create OrbStack module
-
-**Blockers:** None
-
 ---
 
 ### Wire up nixos-unified for NixOS configuration discovery - P1 - Done
@@ -115,28 +72,11 @@ Add a NixOS configuration to dotfiles that runs on OrbStack, providing isolated 
 
 **Goal:** Ensure nixos-unified auto-discovers the NixOS configuration at configurations/nixos/nooks.nix.
 
-**Scope:**
-- [x] Investigate how nixos-unified discovers configurations (check flakeModules.autoWire)
-- [x] Create `modules/nixos/default.nix` if required for module discovery
-- [x] Export nixosModules.orbstack from the flake
-- [x] Verify .#nixosConfigurations.nooks appears in flake outputs
-
 **Implementation:**
 - nixos-unified autoWire automatically discovers configurations at `configurations/nixos/*.nix`
 - No additional `modules/nixos/default.nix` was required
 - `nixosModules.orbstack` is auto-exported by autoWire from `modules/nixos/orbstack/default.nix`
 - Note: Files must be tracked by git (staged or committed) for autoWire to discover them
-
-**Acceptance Criteria:**
-- [x] `nix flake show` lists `nixosConfigurations.nooks`
-- [x] `nix build .#nixosConfigurations.nooks.config.system.build.toplevel` works (dry-run verified)
-
-**Test Strategy:**
-- Unit: Run `nix flake show | grep nooks`
-
-**Dependencies:** Create nooks NixOS configuration
-
-**Blockers:** None
 
 ---
 
@@ -146,28 +86,36 @@ Add a NixOS configuration to dotfiles that runs on OrbStack, providing isolated 
 
 **Goal:** Generate a dedicated age key for the nooks VM and update .sops.yaml to include it in encryption recipients.
 
-**Scope:**
-- [x] Generate age key: `age-keygen -o ~/.config/sops/age/nooks.key`
-- [x] Add public key to `.sops.yaml` as `&age_nooks`
-- [x] Add `*age_nooks` to the creation_rules key_groups
-- [x] Re-encrypt secrets.yaml with new key: `sops updatekeys secrets.yaml`
-- [x] Add `ANTHROPIC_API_KEY_NOOKS` to secrets.yaml
-
 **Implementation:**
 - Age key generated at `~/.config/sops/age/nooks.key` on triangle
 - Public key: `age1gksfefdf7t6v07t8f6klqff2v5rz97wxwn8jd5kk3zg65j9hqesqt8q37m`
 - secrets.yaml re-encrypted with all three keys (frannie, triangle, nooks)
 - ANTHROPIC_API_KEY_NOOKS uses the triangle auth token
 
+---
+
+## Pending Tasks
+
+### Configure services.nook.settings for Claude Code - P1 - Ready
+
+**Spec Reference:** specs/settings.md (Relationship to Nooks section), nook settings.md spec
+
+**Goal:** Inject Claude Code settings into nook containers using `services.nook.settings.files` so claude-code has consistent configuration inside containers.
+
+**Scope:**
+- [ ] Add `services.nook.settings.files` configuration to `configurations/nixos/nooks.nix`
+- [ ] Configure `/home/nook/.claude/settings.json` with model selection
+- [ ] Optionally add `/home/nook/.claude/CLAUDE.md` with nook-specific context
+
 **Acceptance Criteria:**
-- [x] `.sops.yaml` contains the nooks age public key
-- [x] `sops -d secrets.yaml` succeeds from a machine with any of the three keys
-- [x] `ANTHROPIC_API_KEY_NOOKS` is present in decrypted secrets
+- [ ] `services.nook.settings.files` is configured in nooks.nix
+- [ ] After rebuild, `nook enter <branch>` and `cat ~/.claude/settings.json` shows expected config
+- [ ] Claude Code inside nooks uses the configured model
 
 **Test Strategy:**
-- Manual: Decrypt secrets.yaml on triangle, verify ANTHROPIC_API_KEY_NOOKS exists
+- Integration: After `nixos-rebuild switch`, start a nook and verify settings file exists
 
-**Dependencies:** None
+**Dependencies:** None (base nooks configuration already exists)
 
 **Blockers:** None
 
@@ -182,7 +130,7 @@ Add a NixOS configuration to dotfiles that runs on OrbStack, providing isolated 
 **Scope:**
 - [ ] Generate key: `ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519_nooks -C "nooks-access"`
 - [ ] Add public key to `configurations/nixos/nooks.nix` authorizedKeys list
-- [ ] Document the key's purpose in a comment
+- [ ] Remove TODO comment from nooks.nix
 
 **Acceptance Criteria:**
 - [ ] SSH key pair exists at ~/.ssh/id_ed25519_nooks
@@ -210,10 +158,12 @@ Add a NixOS configuration to dotfiles that runs on OrbStack, providing isolated 
 - [ ] Document macOS-side setup steps
 - [ ] Document VM-side bootstrap steps
 - [ ] Document how to verify the setup works
+- [ ] Include nook workflow commands (list, start, enter, release)
 
 **Acceptance Criteria:**
 - [ ] README contains complete bootstrap instructions
 - [ ] A new user can follow the instructions to set up the VM
+- [ ] README references appropriate spec files for details
 
 **Test Strategy:**
 - Manual: Follow the documented steps on a fresh setup
@@ -232,8 +182,11 @@ Add a NixOS configuration to dotfiles that runs on OrbStack, providing isolated 
 | Create nooks NixOS configuration | P0 | **Done** | OrbStack module |
 | Wire up nixos-unified for NixOS config discovery | P1 | **Done** | NixOS configuration |
 | Generate and configure age key for nooks VM | P1 | **Done** | None |
+| Configure services.nook.settings for Claude Code | P1 | Ready | None |
 | Generate SSH key for nook access | P2 | Ready | NixOS configuration |
 | Document bootstrap procedure in README | P2 | Ready | All implementation tasks |
+
+---
 
 ## Bootstrap Procedure
 
@@ -279,8 +232,11 @@ nook enter test-branch
 # Inside nook: wigg list && echo $ANTHROPIC_API_KEY | head -c 20
 ```
 
+---
+
 ## References
 
 - nook/examples/orbstack-host/ - Example OrbStack configuration
-- nook/modules/nooks.nix - Full module options (nook service configuration)
+- nook/modules/nooks.nix - Full module options (nook service configuration, settings.files)
 - nixos-unified docs - https://github.com/srid/nixos-unified
+- .wigg/specs/settings.md - Settings management patterns
