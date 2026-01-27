@@ -1,4 +1,4 @@
-{ flake, ... }:
+{ flake, config, ... }:
 
 {
   imports = [
@@ -6,5 +6,5 @@
   ];
 
   sops.defaultSopsFile = ../../secrets.yaml;
-  sops.age.keyFile = "/Users/scotttrinh/.config/sops/age/keys.txt";
+  sops.age.keyFile = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
 }

@@ -90,14 +90,9 @@ in
         email = "scott@scotttrinh.com";
       };
 
-      # Home-manager sops configuration
-      sops = {
-        defaultSopsFile = ../../secrets.yaml;
-        age.keyFile = "/home/scotttrinh/.config/sops/age/keys.txt";
-
-        secrets.claude_code_auth_token = {
-          key = "ANTHROPIC_API_KEY_NOOKS";
-        };
+      # Declare the sops secret for Claude Code auth
+      sops.secrets.claude_code_auth_token = {
+        key = "ANTHROPIC_API_KEY_NOOKS";
       };
 
       # Claude Code configuration
