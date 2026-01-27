@@ -27,7 +27,7 @@ in {
     nodePackages.typescript-language-server
     nodePackages.vscode-langservers-extracted
     nodePackages.prettier
-    flake.inputs.eza.packages.aarch64-darwin.default
+    flake.inputs.eza.packages.${pkgs.system}.default
     nix-tree
     devenv
     graphviz

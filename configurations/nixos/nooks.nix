@@ -19,6 +19,8 @@ in
     inputs.nook.nixosModules.default
     # SOPS secrets management
     inputs.sops-nix.nixosModules.sops
+    # Home-manager for user environment management
+    inputs.home-manager.nixosModules.home-manager
   ];
 
   # Platform: aarch64-linux for OrbStack on Apple Silicon
@@ -29,13 +31,9 @@ in
   # User account with UID 501 to match macOS (for OrbStack file sharing)
   users.users.scotttrinh = {
     uid = 501;
-    isSystemUser = true;
-    group = "users";
+    isNormalUser = true;
     extraGroups = [ "wheel" "orbstack" ];
-    createHome = true;
     home = "/home/scotttrinh";
-    homeMode = "700";
-    useDefaultShell = true;
   };
 
   security.sudo.wheelNeedsPassword = false;
@@ -67,9 +65,57 @@ in
     htop
     ripgrep
     jq
+    inputs.llm-agents.packages.${pkgs.system}.claude-code
     # Nook CLI for managing containers
     inputs.nook.packages.${pkgs.system}.nook
   ];
+
+  # =========================================================================
+  # Home-Manager Configuration
+  # =========================================================================
+  home-manager = {
+    useGlobalPkgs = true;
+    useUserPackages = true;
+
+    users.scotttrinh = { config, ... }: {
+      imports = [
+        self.homeModules.default
+        inputs.sops-nix.homeManagerModules.sops
+      ];
+
+      # User info for home modules
+      me = {
+        username = "scotttrinh";
+        fullname = "Scott Trinh";
+        email = "scott@scotttrinh.com";
+      };
+
+      # Home-manager sops configuration
+      sops = {
+        defaultSopsFile = ../../secrets.yaml;
+        age.keyFile = "/home/scotttrinh/.config/sops/age/keys.txt";
+
+        secrets.claude_code_auth_token = {
+          key = "ANTHROPIC_API_KEY_NOOKS";
+        };
+      };
+
+      # Claude Code configuration
+      claudeCode = {
+        enable = true;
+        auth = {
+          type = "oauth";
+          secret = config.sops.placeholder.claude_code_auth_token;
+        };
+        baseUrl = "https://ai-gateway.vercel.sh";
+        model = "opus";
+        statusLine.enable = true;
+        timeoutMs = 3000000;  # 50 minutes
+      };
+
+      home.stateVersion = "24.11";
+    };
+  };
 
   # Enable flakes
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
