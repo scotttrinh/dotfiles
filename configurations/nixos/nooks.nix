@@ -98,6 +98,8 @@ in
   services.nook = {
     enable = true;
     nookCount = 5;
+    user = "scotttrinh";
+    group = "users";
 
     # SSH keys for accessing nooks from the VM host
     authorizedKeys = [
