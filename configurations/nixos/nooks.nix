@@ -87,6 +87,8 @@ in
     secrets = {
       anthropic-api-key = {
         key = "ANTHROPIC_API_KEY_NOOKS";
+        owner = "scotttrinh";
+        group = "users";
       };
     };
   };
