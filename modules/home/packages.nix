@@ -11,7 +11,7 @@ in {
     age
     sops
     ffmpeg
-    unrar
+    unar
     nodejs_24
     corepack_24
     python312
