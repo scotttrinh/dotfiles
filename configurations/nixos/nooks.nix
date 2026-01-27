@@ -41,6 +41,22 @@ in
   security.sudo.wheelNeedsPassword = false;
   users.mutableUsers = false;
 
+  # SSH agent and GitHub configuration
+  programs.ssh = {
+    startAgent = true;
+    extraConfig = ''
+      Host github.com
+        HostName github.com
+        User git
+        IdentityFile ~/.ssh/id_ed25519
+        AddKeysToAgent yes
+    '';
+    # GitHub host keys from https://api.github.com/meta
+    knownHosts = {
+      "github.com".publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl";
+    };
+  };
+
   # System packages available on the VM host
   environment.systemPackages = with pkgs; [
     git
