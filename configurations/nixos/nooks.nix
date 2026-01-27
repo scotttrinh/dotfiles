@@ -29,11 +29,15 @@ in
   networking.hostName = "nooks";
 
   # User account with UID 501 to match macOS (for OrbStack file sharing)
+  # Using isSystemUser since uid < 1000, but configured for interactive use with home-manager
   users.users.scotttrinh = {
     uid = 501;
-    isNormalUser = true;
+    isSystemUser = true;
+    group = "users";
     extraGroups = [ "wheel" "orbstack" ];
     home = "/home/scotttrinh";
+    createHome = true;
+    shell = pkgs.bash;
   };
 
   security.sudo.wheelNeedsPassword = false;
