@@ -74,6 +74,7 @@ in
     casks = [
       "ghostty"
       "raycast"
+      "opencode-desktop"
     ];
     brews = [
       "mas-cli/tap/mas"
