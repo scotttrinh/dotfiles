@@ -1,10 +1,26 @@
 # This is your nix-darwin configuration.
 # For home configuration, see /modules/home/*
+{ flake, ... }:
+let
+  inherit (flake) inputs;
+in
 {
   imports = [
     ../nixos/common
+    inputs.determinate.darwinModules.default
   ];
+
+  # Let Determinate Nix manage nix.conf
   nix.enable = false;
+
+  # Custom nix settings written to /etc/nix/nix.custom.conf
+  determinateNix = {
+    enable = true;
+    customSettings = {
+      extra-substituters = "https://cache.numtide.com";
+      extra-trusted-public-keys = "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g=";
+    };
+  };
 
   # Use TouchID for `sudo` authentication
   security.pam.services.sudo_local.touchIdAuth = true;
