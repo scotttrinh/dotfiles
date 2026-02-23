@@ -33,6 +33,7 @@ in {
     graphviz
     nixfmt
     parinfer-rust-emacs
+    hyperfine
     llm-agents.claude-code
     llm-agents.claude-code-acp
     llm-agents.codex
