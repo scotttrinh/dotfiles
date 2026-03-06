@@ -20,6 +20,7 @@
         ".direnv"
         "*~"
         "*.swp"
+        ".locals-only"
       ];
     };
   };
