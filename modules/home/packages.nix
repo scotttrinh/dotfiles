@@ -1,6 +1,7 @@
 { flake, pkgs, ... }:
 let
   packages = flake.inputs.self + /packages;
+  jj = flake.inputs.jj.packages.${pkgs.system}.default;
   llm-agents = flake.inputs.llm-agents.packages.${pkgs.system};
 in {
   # Nix packages to install to $HOME
@@ -35,6 +36,7 @@ in {
     nixfmt
     parinfer-rust-emacs
     hyperfine
+    jj
     llm-agents.claude-code
     llm-agents.claude-code-acp
     llm-agents.codex

@@ -16,6 +16,7 @@
     nix-index-database.url = "github:nix-community/nix-index-database";
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
     eza.url = "https://flakehub.com/f/eza-community/eza/0.20.0";
+    jj.url = "github:jj-vcs/jj/v0.39.0";
     rust-overlay.url = "github:oxalica/rust-overlay";
     rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
     llm-agents.url = "github:numtide/llm-agents.nix";
