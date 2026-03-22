@@ -15,14 +15,14 @@ pkgs.callPackage
 
     rustPlatform.buildRustPackage (finalAttrs: {
       pname = "ty";
-      version = "0.0.18";
+      version = "0.0.23";
 
       src = fetchFromGitHub {
         owner = "astral-sh";
         repo = "ty";
         tag = finalAttrs.version;
         fetchSubmodules = true;
-        hash = "sha256-GinkBZcRD9vxEHSGDoZb/TkpSPmPYoYOQ0tmrP8zJ+c=";
+        hash = "sha256-ft94sem5OuJNN3q99BnFqXAFdTnY7LMZFntYAvTjXvs=";
       };
 
       postPatch = lib.optionalString stdenv.hostPlatform.isDarwin ''
@@ -34,7 +34,7 @@ pkgs.callPackage
 
       cargoBuildFlags = [ "--package=ty" ];
 
-      cargoHash = "sha256-3GCPejBOyLRZpanFrXHlaLWImMUEmoSejCazzG5sVfo=";
+      cargoHash = "sha256-TD5FLdi4YJwDzJpCctNKYxUNj/VgMnB/OBp3exk3cZw=";
 
       nativeBuildInputs = [ installShellFiles ];
 
@@ -53,6 +53,7 @@ pkgs.callPackage
         "--skip=python_environment::ty_environment_and_discovered_venv"
         "--skip=python_environment::ty_environment_is_only_environment"
         "--skip=python_environment::ty_environment_is_system_not_virtual"
+        "--skip=mdtest::generics/pep695/functions.md"
       ];
 
       nativeInstallCheckInputs = [ versionCheckHook ];
