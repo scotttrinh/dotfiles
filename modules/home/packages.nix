@@ -10,6 +10,7 @@ in {
   home.packages = with pkgs; [
     (import (flake.inputs.self + /packages/pi.nix) { inherit pkgs; })
     (import (flake.inputs.self + /packages/ty.nix) { inherit pkgs; })
+    (import (flake.inputs.self + /packages/uv.nix) { inherit flake pkgs; })
     age
     sops
     ffmpeg
@@ -17,7 +18,6 @@ in {
     nodejs_24
     corepack_24
     python312
-    uv
     git-credential-manager
     bun
     vsce
