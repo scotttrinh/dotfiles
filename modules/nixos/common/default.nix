@@ -23,6 +23,19 @@ in
   };
 
   config = {
+    nixpkgs.overlays = [
+      (final: prev: {
+        direnv = prev.direnv.overrideAttrs (oldAttrs: {
+          # direnv 2.37.1 currently fails its fish test suite on Darwin.
+          doCheck =
+            if prev.stdenv.isDarwin && prev.direnv.version == "2.37.1" then
+              false
+            else
+              oldAttrs.doCheck or true;
+        });
+      })
+    ];
+
     # For home-manager to work.
     # https://github.com/nix-community/home-manager/issues/4026#issuecomment-1565487545
     users.users = mapListToAttrs config.myusers (name:
