@@ -21,6 +21,7 @@
         "*~"
         "*.swp"
         ".locals-only"
+        ".agent-shell"
       ];
     };
   };

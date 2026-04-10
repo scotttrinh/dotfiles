@@ -40,6 +40,7 @@ in {
     llm-agents.claude-code
     llm-agents.claude-code-acp
     llm-agents.codex
+    llm-agents.codex-acp
     llm-agents.opencode
     llm-agents.gemini-cli
     llm-agents.amp
