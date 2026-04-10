@@ -25,6 +25,19 @@ in
   # Use TouchID for `sudo` authentication
   security.pam.services.sudo_local.touchIdAuth = true;
 
+  # Raise the default file-descriptor limits for launchd-managed processes.
+  launchd.daemons.maxfiles = {
+    script = ''
+      /usr/bin/true
+    '';
+    serviceConfig = {
+      RunAtLoad = true;
+      KeepAlive = false;
+      SoftResourceLimits.NumberOfFiles = 65536;
+      HardResourceLimits.NumberOfFiles = 200000;
+    };
+  };
+
   # Configure macOS system
   # More examples => https://github.com/ryan4yin/nix-darwin-kickstarter/blob/main/rich-demo/modules/system.nix
   system = {

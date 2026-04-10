@@ -16,6 +16,8 @@
         # Custom ~/.zprofile goes here
         export PATH="$HOME/.bun/bin:$HOME/.cargo/bin:$HOME/Library/Application Support/edgedb/bin:$HOME/.npm-global/bin:$PATH"
         eval "$(/opt/homebrew/bin/brew shellenv)"
+
+        ulimit -n 65536 >/dev/null 2>&1 || true
       '';
       loginExtra = ''
         # Custom ~/.zlogin goes here
