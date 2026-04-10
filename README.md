@@ -100,7 +100,7 @@ Currently they're imported in `modules/home/packages.nix`:
 ```nix
 home.packages = [
   (import (flake.inputs.self + /packages/pi.nix) { inherit pkgs; })
-  (import (flake.inputs.self + /packages/ty.nix) { inherit pkgs; })
+  (import (flake.inputs.self + /packages/ty.nix) { inherit flake pkgs; })
 ];
 ```
 

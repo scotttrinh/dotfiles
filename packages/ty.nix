@@ -1,5 +1,12 @@
-{ pkgs }:
+{ flake, pkgs }:
 
+let
+  rustToolchain = flake.inputs.rust-overlay.packages.${pkgs.system}.rust_1_92_0;
+  rustPlatform = pkgs.makeRustPlatform {
+    cargo = rustToolchain;
+    rustc = rustToolchain;
+  };
+in
 pkgs.callPackage
   (
     {
@@ -15,14 +22,14 @@ pkgs.callPackage
 
     rustPlatform.buildRustPackage (finalAttrs: {
       pname = "ty";
-      version = "0.0.23";
+      version = "0.0.29";
 
       src = fetchFromGitHub {
         owner = "astral-sh";
         repo = "ty";
         tag = finalAttrs.version;
         fetchSubmodules = true;
-        hash = "sha256-ft94sem5OuJNN3q99BnFqXAFdTnY7LMZFntYAvTjXvs=";
+        hash = "sha256-rOkh6HgZ5F/1wJr0iZwaqqYmcEONioz7jeebp19xxXs=";
       };
 
       postPatch = lib.optionalString stdenv.hostPlatform.isDarwin ''
@@ -34,7 +41,7 @@ pkgs.callPackage
 
       cargoBuildFlags = [ "--package=ty" ];
 
-      cargoHash = "sha256-TD5FLdi4YJwDzJpCctNKYxUNj/VgMnB/OBp3exk3cZw=";
+      cargoHash = "sha256-ajuhF+jpx+9U9swrd8HF3ZH7ovSwz0nDNRiQzcrttwg=";
 
       nativeBuildInputs = [ installShellFiles ];
 
@@ -89,4 +96,4 @@ pkgs.callPackage
       };
     })
   )
-  { }
+  { inherit rustPlatform; }

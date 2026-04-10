@@ -9,7 +9,7 @@ in {
   # Search for packages here: https://search.nixos.org/packages
   home.packages = with pkgs; [
     (import (flake.inputs.self + /packages/pi.nix) { inherit pkgs; })
-    (import (flake.inputs.self + /packages/ty.nix) { inherit pkgs; })
+    (import (flake.inputs.self + /packages/ty.nix) { inherit flake pkgs; })
     (import (flake.inputs.self + /packages/uv.nix) { inherit flake pkgs; })
     age
     sops
