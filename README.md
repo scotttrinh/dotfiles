@@ -155,6 +155,62 @@ age-keygen -o ~/.config/sops/age/keys.txt
 sops updatekeys secrets.yaml
 ```
 
+## Git Commit Signing
+
+Git commit and tag signing in this repo uses **SSH signing**. On macOS, the
+default path assumes [Secretive](https://github.com/maxgoedjen/secretive) with
+the private key living in the Secure Enclave.
+
+- `me.gitSigning.enable = true` turns on `gpg.format = ssh`,
+  `commit.gpgsign = true`, and `tag.gpgSign = true`
+- `modules/home/secretive.nix` configures all Darwin hosts to use Secretive's
+  agent socket for both `ssh` and Git signing
+- Home Manager writes `~/.gitallowedsigners` so `git verify-commit`,
+  `git verify-tag`, and `git log --show-signature` work locally
+
+You cannot reuse the SOPS key at `~/.config/sops/age/keys.txt` for Git commit
+signing. An `AGE-SECRET-KEY-...` key is an `age` encryption key; Git signing
+expects an SSH, OpenPGP, or X.509 key.
+
+### Secretive Setup on macOS
+
+All Darwin hosts install the `secretive` Homebrew cask and set:
+
+- `SSH_AUTH_SOCK` to Secretive's agent socket in new shells
+- `programs.ssh.matchBlocks."*".identityAgent` to the same socket
+- Git's SSH signing program to a wrapper that exports that socket explicitly
+
+That means Git signing does not depend on the ambient macOS launchd agent.
+
+### Per-Host Key Setup
+
+On each Mac:
+
+1. Open Secretive and create a signing key in Secure Enclave.
+2. Give it a comment that contains `GitHub-Commit-Signing@secretive`.
+3. Add the public key to GitHub under **Settings -> SSH and GPG keys** as a
+   **Signing Key**.
+4. Run `nix run .#activate`.
+5. Open a new terminal so the shell picks up `SSH_AUTH_SOCK` for general SSH
+   usage.
+
+The shared macOS config can discover the signing key from the Secretive agent
+by comment. If you want a specific host to pin an exact public key instead,
+override `me.gitSigning.publicKey` in that host config. `triangle` does this in
+[`configurations/darwin/triangle.nix`](configurations/darwin/triangle.nix).
+
+### Verification
+
+```bash
+git commit --allow-empty -m "test signing"
+git log --show-signature -1
+```
+
+If you prefer a file-backed SSH key instead of Secretive on a Darwin host,
+override `me.gitSigning.agentSocket = null;`, set
+`me.gitSigning.agentKeyCommentPattern = null;`, and then point
+`me.gitSigning.keyFile` at the key you want Git to use.
+
 ## Shared macOS System Settings
 
 All Darwin hosts inherit `modules/darwin/default.nix`, which configures:
@@ -166,7 +222,7 @@ All Darwin hosts inherit `modules/darwin/default.nix`, which configures:
 - **Finder**: Full POSIX path in title, show all extensions, quit menu enabled
 - **Keyboard**: Caps Lock remapped to Control
 - **Trackpad**: Tap-to-click, secondary click enabled
-- **Homebrew**: Ghostty, Raycast, OpenCode Desktop (casks), Dato (App Store)
+- **Homebrew**: Ghostty, Raycast, OpenCode Desktop, Secretive (casks), Dato (App Store)
 
 Individual hosts can add more Homebrew packages or system settings on top.
 
@@ -200,7 +256,9 @@ Individual hosts can add more Homebrew packages or system settings on top.
    your hostname.
 2. Set `networking.hostName`, `system.primaryUser`, and any per-machine tweaks.
 3. If the machine needs secrets, generate an age key and add it to `.sops.yaml`.
-4. Commit and run `nix run .#activate`.
+4. Create a Secretive signing key on that Mac and add its public key to GitHub
+   as a **Signing Key**.
+5. Commit and run `nix run .#activate`.
 
 ## Adding a Home Manager-Only User
 

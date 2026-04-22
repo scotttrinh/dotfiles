@@ -5,6 +5,7 @@
 let
   inherit (flake) inputs;
   inherit (inputs) self;
+  secretiveSigningPublicKey = "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBOmJRCvBJwxxTm+LDnWseEJ861NISo8rpCA7Mj7NDdT1XfHCuUmDXAOEZw5NFv+MCnq4LzTyY2CNEH9dVqkm8fg= GitHub-Commit-Signing@secretive.triangle.local";
 
   # Define work repos to clone and setup
   # Each entry: { url, path, postClone (optional) }
@@ -53,6 +54,10 @@ in
   # Work-specific home-manager configuration
   # This merges with configurations/home/scotttrinh.nix
   home-manager.users.scotttrinh = { lib, config, ... }: {
+    me.gitSigning = {
+      publicKey = secretiveSigningPublicKey;
+    };
+
     home.packages = with pkgs; [
       git-lfs
       gh

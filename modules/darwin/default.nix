@@ -88,6 +88,7 @@ in
       "ghostty"
       "raycast"
       "opencode-desktop"
+      "secretive"
     ];
     brews = [
       "mas-cli/tap/mas"

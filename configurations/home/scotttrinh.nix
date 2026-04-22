@@ -14,6 +14,7 @@ in
     username = "scotttrinh";
     fullname = "Scott Trinh";
     email = "scott@scotttrinh.com";
+    gitSigning.enable = true;
   };
 
   home.stateVersion = "24.11";
