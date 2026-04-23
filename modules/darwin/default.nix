@@ -85,6 +85,7 @@ in
       "mas-cli/tap"
     ];
     casks = [
+      "1password"
       "ghostty"
       "raycast"
       "opencode-desktop"

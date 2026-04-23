@@ -95,7 +95,6 @@ in
 
   homebrew = {
     casks = [
-      "1password"
       "slack"
       "cursor"
       "orbstack"
