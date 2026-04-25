@@ -4,7 +4,13 @@ let
     "${config.home.homeDirectory}/Library/Containers/com.maxgoedjen.Secretive.SecretAgent/Data/socket.ssh";
 in
 {
-  config = lib.mkIf pkgs.stdenv.isDarwin {
+  options.me.secretive = {
+    enable = lib.mkEnableOption "Secretive SSH agent integration" // {
+      default = pkgs.stdenv.isDarwin;
+    };
+  };
+
+  config = lib.mkIf config.me.secretive.enable {
     home.sessionVariables.SSH_AUTH_SOCK = secretiveAgentSocket;
 
     programs.ssh = {
@@ -26,9 +32,9 @@ in
     };
 
     me.gitSigning = {
-      agentSocket = secretiveAgentSocket;
-      agentKeyCommentPattern = "GitHub-Commit-Signing@secretive";
-      allowedSignersFile = "${config.home.homeDirectory}/.gitallowedsigners";
+      agentSocket = lib.mkDefault secretiveAgentSocket;
+      agentKeyCommentPattern = lib.mkDefault "GitHub-Commit-Signing@secretive";
+      allowedSignersFile = lib.mkDefault "${config.home.homeDirectory}/.gitallowedsigners";
     };
   };
 }
