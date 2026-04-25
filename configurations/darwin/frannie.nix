@@ -5,6 +5,7 @@
 let
   inherit (flake) inputs;
   inherit (inputs) self;
+  secretiveSigningPublicKey = "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBHPTx4gM8No07bfV2bY1JdGrJKdq1/H+fn8rvHTxddxZFPrYR6uyKIbUmxNq59GpMinEoitaVHSA606DH4GuqVQ= Frannie-GitHub-Signing-Key @secretive.Scott’s-MacBook-Air.local";
 in
 {
   imports = [
@@ -31,14 +32,19 @@ in
 
   # Machine-specific home-manager configuration
   home-manager.users.scotttrinh = { lib, config, ... }: {
+    me.gitSigning = {
+      publicKey = secretiveSigningPublicKey;
+      agentKeyCommentPattern = "Frannie-GitHub-Signing-Key";
+    };
+
     # Claude Code configuration using z.ai proxy
     claudeCode = {
       enable = true;
-      auth = {
-        type = "apiKey";
-        secret = config.sops.placeholder.claude_code_api_key;
-      };
-      baseUrl = "https://api.z.ai/api/anthropic";
+      # auth = {
+      #   type = "apiKey";
+      #   secret = config.sops.placeholder.claude_code_api_key;
+      # };
+      # baseUrl = "https://api.z.ai/api/anthropic";
       model = "opus";
       timeoutMs = 3000000;  # 50 minutes
     };
