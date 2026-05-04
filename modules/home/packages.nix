@@ -1,6 +1,6 @@
 { flake, pkgs, ... }:
 let
-  packages = flake.inputs.self + /packages;
+  selfPackages = flake.inputs.self.packages.${pkgs.system};
   jj = flake.inputs.jj.packages.${pkgs.system}.default;
   llm-agents = flake.inputs.llm-agents.packages.${pkgs.system};
 in
@@ -9,9 +9,9 @@ in
   #
   # Search for packages here: https://search.nixos.org/packages
   home.packages = with pkgs; [
-    (import (flake.inputs.self + /packages/pi.nix) { inherit pkgs; })
-    (import (flake.inputs.self + /packages/ty.nix) { inherit flake pkgs; })
-    (import (flake.inputs.self + /packages/uv.nix) { inherit flake pkgs; })
+    selfPackages.pi
+    selfPackages.ty
+    selfPackages.uv
     age
     sops
     ffmpeg

@@ -8,6 +8,12 @@
   ];
   debug = true;
   perSystem = { self', lib, system, pkgs, ... }: {
+    _module.args.pkgs = import inputs.nixpkgs {
+      inherit system;
+      overlays = [
+        inputs.rust-overlay.overlays.default
+      ];
+    };
 
     # For 'nix fmt'
     formatter = pkgs.nixpkgs-fmt;

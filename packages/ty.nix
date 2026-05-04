@@ -1,7 +1,10 @@
-{ flake, pkgs }:
+{
+  pkgs,
+  rust-bin,
+}:
 
 let
-  rustToolchain = flake.inputs.rust-overlay.packages.${pkgs.system}.rust_1_92_0;
+  rustToolchain = rust-bin.stable."1.92.0".default;
   rustPlatform = pkgs.makeRustPlatform {
     cargo = rustToolchain;
     rustc = rustToolchain;
