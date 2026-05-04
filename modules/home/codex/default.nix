@@ -12,6 +12,48 @@ let
   home = config.home.homeDirectory;
   generatedConfig = toml.generate "codex-config.toml" settings;
 
+  modelCatalogUsesBundled = lib.any (m: m.inheritFromBundled != null) cfg.modelCatalog;
+
+  rawModelCatalogJson = builtins.toJSON {
+    models = map modelCatalogEntry cfg.modelCatalog;
+  };
+
+  generatedModelCatalog =
+    if !modelCatalogUsesBundled then
+      pkgs.writeText "codex-model-catalog.json" rawModelCatalogJson
+    else
+      pkgs.runCommand "codex-model-catalog.json"
+        {
+          nativeBuildInputs = [
+            pkgs.jq
+            cfg.package
+          ];
+          rawCatalog = rawModelCatalogJson;
+          passAsFile = [ "rawCatalog" ];
+        }
+        ''
+          export HOME="$TMPDIR"
+          bundled=$(codex debug models --bundled)
+
+          jq --argjson bundled "$bundled" '
+            ($bundled.models | map({key: .slug, value: .}) | from_entries) as $b
+            | .models |= map(
+                if .inherit_from_bundled then
+                  .inherit_from_bundled as $key
+                  | ($b[$key] // error("codex.modelCatalog: inheritFromBundled slug \"" + $key + "\" is not present in the bundled codex catalog")) as $src
+                  | ({
+                      base_instructions: $src.base_instructions,
+                      truncation_policy: $src.truncation_policy,
+                      experimental_supported_tools: $src.experimental_supported_tools,
+                      model_messages: $src.model_messages
+                    }
+                    | with_entries(select(.value != null))) + .
+                  | del(.inherit_from_bundled)
+                else . end
+              )
+          ' "$rawCatalogPath" > "$out"
+        '';
+
   nullable = type: types.nullOr type;
   stringMap = types.attrsOf types.str;
   tomlScalar = types.oneOf [
@@ -84,6 +126,60 @@ let
     })
     cfg.agents.roles;
 
+  reasoningLevelConfig =
+    level: {
+      inherit (level) effort description;
+    };
+
+  modelCatalogEntry =
+    model:
+    removeNulls {
+      inherit (model) slug;
+      display_name = model.displayName;
+      description = model.description;
+      default_reasoning_level = model.defaultReasoningLevel;
+      supported_reasoning_levels = map reasoningLevelConfig model.supportedReasoningLevels;
+      shell_type = model.shellType;
+      visibility = model.visibility;
+      supported_in_api = model.supportedInApi;
+      priority = model.priority;
+      additional_speed_tiers = model.additionalSpeedTiers;
+      supports_reasoning_summaries = model.supportsReasoningSummaries;
+      default_reasoning_summary = model.defaultReasoningSummary;
+      support_verbosity = model.supportVerbosity;
+      default_verbosity = model.defaultVerbosity;
+      apply_patch_tool_type = model.applyPatchToolType;
+      web_search_tool_type = model.webSearchToolType;
+      supports_parallel_tool_calls = model.supportsParallelToolCalls;
+      supports_image_detail_original = model.supportsImageDetailOriginal;
+      context_window = model.contextWindow;
+      max_context_window = model.maxContextWindow;
+      effective_context_window_percent = model.effectiveContextWindowPercent;
+      input_modalities = model.inputModalities;
+      supports_search_tool = model.supportsSearchTool;
+      inherit_from_bundled = model.inheritFromBundled;
+      base_instructions = model.baseInstructions;
+      truncation_policy =
+        if model.truncationPolicy == null then
+          null
+        else
+          { inherit (model.truncationPolicy) mode limit; };
+      experimental_supported_tools = model.experimentalSupportedTools;
+      availability_nux =
+        if model.availabilityNux == null then
+          null
+        else
+          { inherit (model.availabilityNux) message; };
+      upgrade =
+        if model.upgrade == null then
+          null
+        else
+          {
+            inherit (model.upgrade) model;
+            migration_markdown = model.upgrade.migrationMarkdown;
+          };
+    };
+
   agentSettings =
     removeNulls
       {
@@ -108,6 +204,11 @@ let
           inherit (cfg) model;
           model_reasoning_effort = cfg.modelReasoningEffort;
           model_provider = cfg.modelProvider;
+          model_catalog_json =
+            if cfg.modelCatalog == [ ] then
+              null
+            else
+              "${generatedModelCatalog}";
           openai_base_url = cfg.openaiBaseUrl;
           oss_provider = cfg.ossProvider;
           project_root_markers = cfg.projectRootMarkers;
@@ -262,6 +363,252 @@ let
       };
     };
   };
+
+  modelCatalogEntryType = types.submodule {
+    options = {
+      slug = mkOption {
+        type = types.str;
+        description = "Model slug shown to and selected by Codex.";
+      };
+
+      displayName = mkOption {
+        type = nullable types.str;
+        default = null;
+        description = "Display name shown in Codex model selection UI.";
+      };
+
+      description = mkOption {
+        type = nullable types.str;
+        default = null;
+        description = "Model description shown in Codex model selection UI.";
+      };
+
+      defaultReasoningLevel = mkOption {
+        type = nullable types.str;
+        default = null;
+        description = "Default reasoning effort for this model.";
+      };
+
+      supportedReasoningLevels = mkOption {
+        type = types.listOf (
+          types.submodule {
+            options = {
+              effort = mkOption {
+                type = types.str;
+                description = "Reasoning effort value.";
+              };
+
+              description = mkOption {
+                type = types.str;
+                description = "Description shown for this reasoning effort.";
+              };
+            };
+          }
+        );
+        default = [ ];
+        description = "Reasoning efforts supported by this model.";
+      };
+
+      shellType = mkOption {
+        type = nullable types.str;
+        default = "shell_command";
+        description = "Codex shell tool type used by this model.";
+      };
+
+      visibility = mkOption {
+        type = nullable types.str;
+        default = "list";
+        description = "Model visibility in Codex model selection UI.";
+      };
+
+      supportedInApi = mkOption {
+        type = nullable types.bool;
+        default = true;
+        description = "Whether this model is supported in the Codex API mode.";
+      };
+
+      priority = mkOption {
+        type = nullable types.int;
+        default = null;
+        description = "Sort priority in Codex model selection UI.";
+      };
+
+      additionalSpeedTiers = mkOption {
+        type = nullable (types.listOf types.str);
+        default = null;
+        description = "Additional speed tiers supported by this model.";
+      };
+
+      supportsReasoningSummaries = mkOption {
+        type = nullable types.bool;
+        default = true;
+        description = "Whether this model supports reasoning summaries.";
+      };
+
+      defaultReasoningSummary = mkOption {
+        type = nullable types.str;
+        default = "none";
+        description = "Default reasoning summary setting.";
+      };
+
+      supportVerbosity = mkOption {
+        type = nullable types.bool;
+        default = true;
+        description = "Whether this model supports verbosity settings.";
+      };
+
+      defaultVerbosity = mkOption {
+        type = nullable types.str;
+        default = "low";
+        description = "Default verbosity setting.";
+      };
+
+      applyPatchToolType = mkOption {
+        type = nullable types.str;
+        default = "freeform";
+        description = "Apply-patch tool type used by this model.";
+      };
+
+      webSearchToolType = mkOption {
+        type = nullable types.str;
+        default = "text_and_image";
+        description = "Web-search tool type used by this model.";
+      };
+
+      supportsParallelToolCalls = mkOption {
+        type = nullable types.bool;
+        default = true;
+        description = "Whether this model supports parallel tool calls.";
+      };
+
+      supportsImageDetailOriginal = mkOption {
+        type = nullable types.bool;
+        default = true;
+        description = "Whether this model supports original-detail image inputs.";
+      };
+
+      contextWindow = mkOption {
+        type = nullable types.int;
+        default = null;
+        description = "Context window size in tokens.";
+      };
+
+      maxContextWindow = mkOption {
+        type = nullable types.int;
+        default = null;
+        description = "Maximum context window size in tokens.";
+      };
+
+      effectiveContextWindowPercent = mkOption {
+        type = nullable types.int;
+        default = null;
+        description = "Effective context-window percentage used by Codex.";
+      };
+
+      inputModalities = mkOption {
+        type = nullable (types.listOf types.str);
+        default = [
+          "text"
+          "image"
+        ];
+        description = "Input modalities supported by this model.";
+      };
+
+      supportsSearchTool = mkOption {
+        type = nullable types.bool;
+        default = true;
+        description = "Whether this model supports the search tool.";
+      };
+
+      inheritFromBundled = mkOption {
+        type = nullable types.str;
+        default = null;
+        description = ''
+          Bundled Codex model slug to inherit base_instructions, truncation_policy,
+          experimental_supported_tools, and model_messages from at build time.
+          Resolved by running `codex debug models --bundled` and merging the named
+          entry under any explicit overrides on this catalog entry. Requires
+          codex.package to be set.
+        '';
+      };
+
+      baseInstructions = mkOption {
+        type = nullable types.str;
+        default = null;
+        description = ''
+          Override base_instructions for this model. Takes precedence over the
+          value pulled in via inheritFromBundled.
+        '';
+      };
+
+      truncationPolicy = mkOption {
+        type = nullable (
+          types.submodule {
+            options = {
+              mode = mkOption {
+                type = types.enum [ "tokens" "bytes" ];
+                description = "Truncation mode.";
+              };
+
+              limit = mkOption {
+                type = types.int;
+                description = "Truncation limit (tokens or bytes, per mode).";
+              };
+            };
+          }
+        );
+        default = null;
+        description = ''
+          Override truncation_policy for this model. Takes precedence over the
+          value pulled in via inheritFromBundled.
+        '';
+      };
+
+      experimentalSupportedTools = mkOption {
+        type = nullable (types.listOf types.str);
+        default = null;
+        description = ''
+          Override experimental_supported_tools for this model. Takes precedence
+          over the value pulled in via inheritFromBundled.
+        '';
+      };
+
+      availabilityNux = mkOption {
+        type = nullable (
+          types.submodule {
+            options = {
+              message = mkOption {
+                type = types.str;
+                description = "Notice shown when this model first becomes available.";
+              };
+            };
+          }
+        );
+        default = null;
+        description = "Optional availability_nux notice for this model.";
+      };
+
+      upgrade = mkOption {
+        type = nullable (
+          types.submodule {
+            options = {
+              model = mkOption {
+                type = types.str;
+                description = "Slug of the model recommended as an upgrade.";
+              };
+
+              migrationMarkdown = mkOption {
+                type = types.str;
+                description = "Markdown shown when prompting the user to upgrade.";
+              };
+            };
+          }
+        );
+        default = null;
+        description = "Optional upgrade prompt for this model.";
+      };
+    };
+  };
 in
 {
   options.codex = {
@@ -405,6 +752,12 @@ in
       description = "Custom Codex model providers.";
     };
 
+    modelCatalog = mkOption {
+      type = types.listOf modelCatalogEntryType;
+      default = [ ];
+      description = "Typed Codex model catalog entries serialized to model_catalog_json.";
+    };
+
     skills = mkOption {
       type = types.listOf toml.type;
       default = [ ];
@@ -474,6 +827,10 @@ in
           )
           (builtins.attrValues cfg.modelProviders);
         message = "codex.modelProviders entries with command-backed auth cannot also set envKey, experimentalBearerToken, or requiresOpenAIAuth.";
+      }
+      {
+        assertion = !modelCatalogUsesBundled || cfg.package != null;
+        message = "codex.modelCatalog entries that set inheritFromBundled require codex.package to be set so the bundled catalog can be read at build time.";
       }
     ];
 
