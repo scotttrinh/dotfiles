@@ -1,6 +1,11 @@
 # See /modules/darwin/* for actual settings
 # This file is just *top-level* configuration.
-{ flake, lib, pkgs, ... }:
+{
+  flake,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   inherit (flake) inputs;
@@ -53,41 +58,62 @@ in
 
   # Work-specific home-manager configuration
   # This merges with configurations/home/scotttrinh.nix
-  home-manager.users.scotttrinh = { lib, config, ... }: {
-    me.gitSigning = {
-      publicKey = secretiveSigningPublicKey;
-    };
-
-    home.packages = with pkgs; [
-      git-lfs
-      gh
-    ];
-
-    # Declare the sops secret for this machine
-    sops.secrets.claude_code_auth_token = {
-      key = "CLAUDE_CODE_AUTH_TOKEN_TRIANGLE";
-      mode = "0400";
-    };
-
-    claudeCode = {
-      enable = true;
-      auth = {
-        type = "oauth";
-        secret = config.sops.placeholder.claude_code_auth_token;
+  home-manager.users.scotttrinh =
+    { lib, config, ... }:
+    {
+      me.gitSigning = {
+        publicKey = secretiveSigningPublicKey;
       };
-      baseUrl = "https://ai-gateway.vercel.sh";
-      model = "opus";
-      statusLine.enable = true;
-      timeoutMs = 3000000;  # 50 minutes
-    };
 
-    # Activation script to clone work repos
-    # Runs during `nix run .#activate` / `home-manager switch`
-    home.activation.cloneWorkRepos = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      echo "Setting up work repositories..."
-      ${lib.concatMapStrings cloneRepoScript workRepos}
-    '';
-  };
+      home.packages = with pkgs; [
+        git-lfs
+        gh
+      ];
+
+      # Declare the sops secret for this machine
+      sops.secrets.claude_code_auth_token = {
+        key = "CLAUDE_CODE_AUTH_TOKEN_TRIANGLE";
+        mode = "0400";
+      };
+
+      claudeCode = {
+        enable = true;
+        auth = {
+          type = "oauth";
+          secret = config.sops.placeholder.claude_code_auth_token;
+        };
+        baseUrl = "https://ai-gateway.vercel.sh";
+        model = "opus";
+        statusLine.enable = true;
+        timeoutMs = 3000000; # 50 minutes
+      };
+
+      codex.trustedProjects = [
+        "${config.home.homeDirectory}/github.com/vercel"
+        "${config.home.homeDirectory}/github.com/scotttrinh/changing"
+        "${config.home.homeDirectory}/github.com/scotttrinh/vpi"
+        "${config.home.homeDirectory}/.codex"
+        "${config.home.homeDirectory}/github.com/scotttrinh/subreq"
+        "${config.home.homeDirectory}/github.com/scotttrinh/dotfiles"
+        "${config.home.homeDirectory}/github.com/scotttrinh/forward-roll"
+        "${config.home.homeDirectory}/.config/doom"
+        "${config.home.homeDirectory}/github.com/scotttrinh/jj"
+        "${config.home.homeDirectory}/github.com/scotttrinh/org"
+        "${config.home.homeDirectory}/github.com/openai-early-access/openai-agents-python-preview"
+        "${config.home.homeDirectory}/github.com/scotttrinh/hermes-agent"
+        "${config.home.homeDirectory}/github.com/scotttrinh/chano"
+        "${config.home.homeDirectory}/github.com/vercel-labs/openai-agents-fastapi-starter"
+        "${config.home.homeDirectory}/github.com/scotttrinh/bw-to-op"
+        "${config.home.homeDirectory}/github.com/scotttrinh/mru-tab-switcher"
+      ];
+
+      # Activation script to clone work repos
+      # Runs during `nix run .#activate` / `home-manager switch`
+      home.activation.cloneWorkRepos = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        echo "Setting up work repositories..."
+        ${lib.concatMapStrings cloneRepoScript workRepos}
+      '';
+    };
 
   # Used for backwards compatibility, please read the changelog before changing.
   # $ darwin-rebuild changelog

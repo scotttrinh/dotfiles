@@ -1,7 +1,8 @@
-{ flake, ... }:
+{ flake, pkgs, ... }:
 let
   inherit (flake) inputs;
   inherit (inputs) self;
+  llm-agents = inputs.llm-agents.packages.${pkgs.system};
 in
 {
   imports = [
@@ -15,6 +16,11 @@ in
     fullname = "Scott Trinh";
     email = "scott@scotttrinh.com";
     gitSigning.enable = true;
+  };
+
+  codex = {
+    enable = true;
+    package = llm-agents.codex;
   };
 
   home.stateVersion = "24.11";

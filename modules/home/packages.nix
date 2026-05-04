@@ -3,7 +3,8 @@ let
   packages = flake.inputs.self + /packages;
   jj = flake.inputs.jj.packages.${pkgs.system}.default;
   llm-agents = flake.inputs.llm-agents.packages.${pkgs.system};
-in {
+in
+{
   # Nix packages to install to $HOME
   #
   # Search for packages here: https://search.nixos.org/packages
@@ -39,7 +40,6 @@ in {
     jj
     llm-agents.claude-code
     llm-agents.claude-code-acp
-    llm-agents.codex
     llm-agents.codex-acp
     llm-agents.opencode
     llm-agents.gemini-cli
@@ -73,7 +73,7 @@ in {
     # Tmate terminal sharing.
     tmate = {
       enable = true;
-      #host = ""; #In case you wish to use a server other than tmate.io 
+      #host = ""; #In case you wish to use a server other than tmate.io
     };
   };
 }
