@@ -1,8 +1,7 @@
-{
-  config,
-  lib,
-  pkgs,
-  ...
+{ config
+, lib
+, pkgs
+, ...
 }:
 
 let
@@ -23,6 +22,7 @@ let
   ];
 
   removeNulls = lib.filterAttrsRecursive (_: value: value != null);
+  optionalNonEmpty = name: value: lib.optionalAttrs (value != { }) { ${name} = value; };
 
   trustedProject = path: {
     name = path;
@@ -62,54 +62,75 @@ let
           };
     };
 
-  settings = lib.recursiveUpdate (
-    removeNulls {
-      inherit (cfg) model;
-      model_reasoning_effort = cfg.modelReasoningEffort;
-      model_provider = cfg.modelProvider;
-      openai_base_url = cfg.openaiBaseUrl;
-      oss_provider = cfg.ossProvider;
-      project_root_markers = cfg.projectRootMarkers;
-
-      projects = builtins.listToAttrs (map trustedProject cfg.trustedProjects) // cfg.projects;
-
-      notice = {
+  noticeSettings =
+    removeNulls
+      {
         fast_default_opt_out = cfg.notice.fastDefaultOptOut;
-        model_migrations = cfg.notice.modelMigrations;
-      };
+      }
+    // lib.optionalAttrs (cfg.notice.modelMigrations != { }) {
+      model_migrations = cfg.notice.modelMigrations;
+    };
 
-      features = {
-        default_mode_request_user_input = cfg.features.defaultModeRequestUserInput;
-        multi_agent = cfg.features.multiAgent;
-        prevent_idle_sleep = cfg.features.preventIdleSleep;
-      };
+  featuresSettings = removeNulls {
+    default_mode_request_user_input = cfg.features.defaultModeRequestUserInput;
+    multi_agent = cfg.features.multiAgent;
+    prevent_idle_sleep = cfg.features.preventIdleSleep;
+  };
 
-      agents = {
+  agentRoleSettings = lib.mapAttrs
+    (_: agent: {
+      inherit (agent) description;
+      config_file = agent.configFile;
+    })
+    cfg.agents.roles;
+
+  agentSettings =
+    removeNulls
+      {
         max_threads = cfg.agents.maxThreads;
         max_depth = cfg.agents.maxDepth;
       }
-      // lib.mapAttrs (_: agent: {
-        inherit (agent) description;
-        config_file = agent.configFile;
-      }) cfg.agents.roles;
+    // agentRoleSettings;
 
-      mcp_servers = cfg.mcpServers;
-
-      skills.config = cfg.skills;
-
-      tui = {
+  tuiSettings =
+    removeNulls
+      {
         status_line = cfg.tui.statusLine;
-        model_availability_nux = cfg.tui.modelAvailabilityNux;
-      };
+      }
+    // lib.optionalAttrs (cfg.tui.modelAvailabilityNux != { }) {
+      model_availability_nux = cfg.tui.modelAvailabilityNux;
+    };
 
-      plugins = lib.mapAttrs (_: plugin: {
-        enabled = plugin.enable;
-      }) cfg.plugins;
-    }
-    // lib.optionalAttrs (cfg.modelProviders != { }) {
-      model_providers = lib.mapAttrs (_: providerConfig) cfg.modelProviders;
-    }
-  ) cfg.extraSettings;
+  settings = lib.recursiveUpdate
+    (
+      removeNulls
+        {
+          inherit (cfg) model;
+          model_reasoning_effort = cfg.modelReasoningEffort;
+          model_provider = cfg.modelProvider;
+          openai_base_url = cfg.openaiBaseUrl;
+          oss_provider = cfg.ossProvider;
+          project_root_markers = cfg.projectRootMarkers;
+        }
+      // optionalNonEmpty "projects" ((builtins.listToAttrs (map trustedProject cfg.trustedProjects)) // cfg.projects)
+      // optionalNonEmpty "notice" noticeSettings
+      // optionalNonEmpty "features" featuresSettings
+      // optionalNonEmpty "agents" agentSettings
+      // optionalNonEmpty "mcp_servers" cfg.mcpServers
+      // lib.optionalAttrs (cfg.skills != [ ]) {
+        skills.config = cfg.skills;
+      }
+      // optionalNonEmpty "tui" tuiSettings
+      // optionalNonEmpty "plugins" (lib.mapAttrs
+        (_: plugin: {
+          enabled = plugin.enable;
+        })
+        cfg.plugins)
+      // lib.optionalAttrs (cfg.modelProviders != { }) {
+        model_providers = lib.mapAttrs (_: providerConfig) cfg.modelProviders;
+      }
+    )
+    cfg.extraSettings;
 
   providerType = types.submodule {
     options = {
@@ -257,14 +278,14 @@ in
     };
 
     model = mkOption {
-      type = types.str;
-      default = "gpt-5.5";
+      type = nullable types.str;
+      default = null;
       description = "Default Codex model.";
     };
 
     modelReasoningEffort = mkOption {
       type = nullable types.str;
-      default = "medium";
+      default = null;
       description = "Default model reasoning effort.";
     };
 
@@ -306,51 +327,49 @@ in
 
     notice = {
       fastDefaultOptOut = mkOption {
-        type = types.bool;
-        default = true;
+        type = nullable types.bool;
+        default = null;
         description = "Opt out of the fast default notice.";
       };
 
       modelMigrations = mkOption {
         type = stringMap;
-        default = {
-          "gpt-5.2" = "gpt-5.2-codex";
-        };
+        default = { };
         description = "Model migration notice mapping.";
       };
     };
 
     features = {
       defaultModeRequestUserInput = mkOption {
-        type = types.bool;
-        default = true;
+        type = nullable types.bool;
+        default = null;
         description = "Enable request_user_input in default mode.";
       };
 
       multiAgent = mkOption {
-        type = types.bool;
-        default = true;
+        type = nullable types.bool;
+        default = null;
         description = "Enable multi-agent support.";
       };
 
       preventIdleSleep = mkOption {
-        type = types.bool;
-        default = true;
+        type = nullable types.bool;
+        default = null;
         description = "Prevent idle sleep while Codex is active.";
       };
     };
 
     agents = {
       maxThreads = mkOption {
-        type = types.int;
-        default = 4;
-        description = "Maximum GSD agent threads.";
+        type = nullable types.int;
+        default = null;
+        description = "Maximum Codex agent threads.";
       };
 
       maxDepth = mkOption {
-        type = types.int;
-        default = 2;
-        description = "Maximum GSD agent depth.";
+        type = nullable types.int;
+        default = null;
+        description = "Maximum Codex agent depth.";
       };
 
       roles = mkOption {
@@ -369,65 +388,14 @@ in
             };
           }
         );
-        default = {
-          gsd-codebase-mapper = {
-            description = "Explores codebase and writes structured analysis documents. Spawned by map-codebase with a focus area (tech, arch, quality, concerns). Writes documents directly to reduce orchestrator context load.";
-            configFile = "agents/gsd-codebase-mapper.toml";
-          };
-          gsd-debugger = {
-            description = "Investigates bugs using scientific method, manages debug sessions, handles checkpoints. Spawned by /gsd:debug orchestrator.";
-            configFile = "agents/gsd-debugger.toml";
-          };
-          gsd-executor = {
-            description = "Executes GSD plans with atomic commits, deviation handling, checkpoint protocols, and state management. Spawned by execute-phase orchestrator or execute-plan command.";
-            configFile = "agents/gsd-executor.toml";
-          };
-          gsd-integration-checker = {
-            description = "Verifies cross-phase integration and E2E flows. Checks that phases connect properly and user workflows complete end-to-end.";
-            configFile = "agents/gsd-integration-checker.toml";
-          };
-          gsd-nyquist-auditor = {
-            description = "Fills Nyquist validation gaps by generating tests and verifying coverage for phase requirements";
-            configFile = "agents/gsd-nyquist-auditor.toml";
-          };
-          gsd-phase-researcher = {
-            description = "Researches how to implement a phase before planning. Produces RESEARCH.md consumed by gsd-planner. Spawned by /gsd:plan-phase orchestrator.";
-            configFile = "agents/gsd-phase-researcher.toml";
-          };
-          gsd-plan-checker = {
-            description = "Verifies plans will achieve phase goal before execution. Goal-backward analysis of plan quality. Spawned by /gsd:plan-phase orchestrator.";
-            configFile = "agents/gsd-plan-checker.toml";
-          };
-          gsd-planner = {
-            description = "Creates executable phase plans with task breakdown, dependency analysis, and goal-backward verification. Spawned by /gsd:plan-phase orchestrator.";
-            configFile = "agents/gsd-planner.toml";
-          };
-          gsd-project-researcher = {
-            description = "Researches domain ecosystem before roadmap creation. Produces files in .planning/research/ consumed during roadmap creation. Spawned by /gsd:new-project or /gsd:new-milestone orchestrators.";
-            configFile = "agents/gsd-project-researcher.toml";
-          };
-          gsd-research-synthesizer = {
-            description = "Synthesizes research outputs from parallel researcher agents into SUMMARY.md. Spawned by /gsd:new-project after 4 researcher agents complete.";
-            configFile = "agents/gsd-research-synthesizer.toml";
-          };
-          gsd-roadmapper = {
-            description = "Creates project roadmaps with phase breakdown, requirement mapping, success criteria derivation, and coverage validation. Spawned by /gsd:new-project orchestrator.";
-            configFile = "agents/gsd-roadmapper.toml";
-          };
-          gsd-verifier = {
-            description = "Verifies phase goal achievement through goal-backward analysis. Checks codebase delivers what phase promised, not just that tasks completed. Creates VERIFICATION.md report.";
-            configFile = "agents/gsd-verifier.toml";
-          };
-        };
+        default = { };
         description = "Configured Codex subagent roles.";
       };
     };
 
     mcpServers = mkOption {
       type = types.attrsOf toml.type;
-      default = {
-        linear.url = "https://mcp.linear.app/mcp";
-      };
+      default = { };
       description = "MCP server settings.";
     };
 
@@ -439,87 +407,20 @@ in
 
     skills = mkOption {
       type = types.listOf toml.type;
-      default =
-        map
-          (name: {
-            path = "${home}/.codex/skills/${name}/SKILL.md";
-            enabled = false;
-          })
-          [
-            "gsd-add-tests"
-            "gsd-add-phase"
-            "gsd-add-todo"
-            "gsd-audit-milestone"
-            "gsd-check-todos"
-            "gsd-cleanup"
-            "gsd-complete-milestone"
-            "gsd-debug"
-            "gsd-discuss-phase"
-            "gsd-execute-phase"
-            "gsd-health"
-            "gsd-help"
-            "gsd-insert-phase"
-            "gsd-join-discord"
-            "gsd-list-phase-assumptions"
-            "gsd-map-codebase"
-            "gsd-new-milestone"
-            "gsd-new-project"
-            "gsd-pause-work"
-            "gsd-plan-milestone-gaps"
-            "gsd-plan-phase"
-            "gsd-progress"
-            "gsd-quick"
-            "gsd-reapply-patches"
-            "gsd-remove-phase"
-            "gsd-research-phase"
-            "gsd-resume-work"
-            "gsd-set-profile"
-            "gsd-settings"
-            "gsd-update"
-            "gsd-validate-phase"
-            "gsd-verify-work"
-          ]
-        ++ [
-          {
-            path = "${home}/.agents/skills/linear/SKILL.md";
-            enabled = false;
-          }
-          {
-            path = "${home}/.codex/skills/.system/imagegen/SKILL.md";
-            enabled = false;
-          }
-          {
-            path = "${home}/.codex/skills/.system/openai-docs/SKILL.md";
-            enabled = false;
-          }
-          {
-            path = "${home}/.codex/skills/.system/plugin-creator/SKILL.md";
-            enabled = false;
-          }
-          {
-            path = "${home}/.codex/skills/.system/skill-installer/SKILL.md";
-            enabled = false;
-          }
-        ];
+      default = [ ];
       description = "Skill enablement config entries.";
     };
 
     tui = {
       statusLine = mkOption {
-        type = types.listOf types.str;
-        default = [
-          "model-with-reasoning"
-          "current-dir"
-          "context-used"
-        ];
+        type = nullable (types.listOf types.str);
+        default = null;
         description = "Codex TUI status line segments.";
       };
 
       modelAvailabilityNux = mkOption {
         type = types.attrsOf types.int;
-        default = {
-          "gpt-5.5" = 4;
-        };
+        default = { };
         description = "Model availability notice state.";
       };
     };
@@ -534,9 +435,7 @@ in
           };
         }
       );
-      default = {
-        "forward-roll@forward-roll-local".enable = true;
-      };
+      default = { };
       description = "Codex plugin enablement settings.";
     };
 
@@ -550,26 +449,30 @@ in
   config = mkIf cfg.enable {
     assertions = [
       {
-        assertion = lib.all (
-          providerName:
-          !(builtins.elem providerName [
-            "openai"
-            "ollama"
-            "lmstudio"
-          ])
-        ) (builtins.attrNames cfg.modelProviders);
+        assertion = lib.all
+          (
+            providerName:
+              !(builtins.elem providerName [
+                "openai"
+                "ollama"
+                "lmstudio"
+              ])
+          )
+          (builtins.attrNames cfg.modelProviders);
         message = "codex.modelProviders cannot define reserved built-in provider IDs: openai, ollama, or lmstudio.";
       }
       {
-        assertion = lib.all (
-          provider:
-          provider.auth == null
-          || (
-            provider.envKey == null
-            && provider.experimentalBearerToken == null
-            && provider.requiresOpenAIAuth == null
+        assertion = lib.all
+          (
+            provider:
+            provider.auth == null
+            || (
+              provider.envKey == null
+              && provider.experimentalBearerToken == null
+              && provider.requiresOpenAIAuth == null
+            )
           )
-        ) (builtins.attrValues cfg.modelProviders);
+          (builtins.attrValues cfg.modelProviders);
         message = "codex.modelProviders entries with command-backed auth cannot also set envKey, experimentalBearerToken, or requiresOpenAIAuth.";
       }
     ];
