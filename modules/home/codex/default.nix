@@ -71,6 +71,114 @@ let
     value.trust_level = "trusted";
   };
 
+  openAIReasoningLevels = [
+    {
+      effort = "low";
+      description = "Fast responses with lighter reasoning";
+    }
+    {
+      effort = "medium";
+      description = "Balances speed and reasoning depth for everyday tasks";
+    }
+    {
+      effort = "high";
+      description = "Greater reasoning depth for complex problems";
+    }
+    {
+      effort = "xhigh";
+      description = "Extra high reasoning depth for complex problems";
+    }
+  ];
+
+  defaultReasoningLevels = [
+    {
+      effort = "medium";
+      description = "Default reasoning depth";
+    }
+  ];
+
+  aiGatewayModelCatalog = [
+    {
+      slug = "openai/gpt-5.5";
+      inheritFromBundled = "gpt-5.5";
+      displayName = "GPT-5.5";
+      description = "Frontier model for complex coding, research, and real-world work.";
+      defaultReasoningLevel = "medium";
+      supportedReasoningLevels = openAIReasoningLevels;
+      priority = 0;
+      additionalSpeedTiers = [
+        "priority"
+        "fast"
+      ];
+    }
+    {
+      slug = "openai/gpt-5.4-mini";
+      inheritFromBundled = "gpt-5.4-mini";
+      displayName = "GPT-5.4 Mini";
+      description = "Small, fast, and cost-efficient model for simpler coding tasks.";
+      defaultReasoningLevel = "medium";
+      supportedReasoningLevels = openAIReasoningLevels;
+      priority = 1;
+      additionalSpeedTiers = [ "fast" ];
+    }
+    {
+      slug = "moonshotai/kimi-k2.6";
+      inheritFromBundled = "gpt-5.5";
+      displayName = "Kimi K2.6";
+      description = "Moonshot AI model served through Vercel AI Gateway.";
+      defaultReasoningLevel = "medium";
+      supportedReasoningLevels = defaultReasoningLevels;
+      priority = 2;
+    }
+    {
+      slug = "deepseek/deepseek-v4-pro";
+      inheritFromBundled = "gpt-5.5";
+      displayName = "DeepSeek V4 Pro";
+      description = "DeepSeek model served through Vercel AI Gateway.";
+      defaultReasoningLevel = "medium";
+      supportedReasoningLevels = defaultReasoningLevels;
+      priority = 3;
+    }
+  ];
+
+  aiGatewayProvider = removeNulls {
+    name = "Vercel AI Gateway";
+    baseUrl = "https://ai-gateway.vercel.sh/v1";
+    wireApi = "responses";
+    auth =
+      if cfg.aiGateway.apiKeyFile == null then
+        null
+      else
+        {
+          command = "${pkgs.coreutils}/bin/cat";
+          args = [ cfg.aiGateway.apiKeyFile ];
+          timeoutMs = 5000;
+          refreshIntervalMs = 300000;
+        };
+  };
+
+  providerPresets = {
+    openai = {
+      model = "gpt-5.5";
+      modelReasoningEffort = "medium";
+      modelProviders = { };
+      modelCatalog = [ ];
+    };
+
+    ai-gateway = {
+      model = "openai/gpt-5.5";
+      modelReasoningEffort = "medium";
+      modelProviders.ai-gateway = aiGatewayProvider;
+      modelCatalog = aiGatewayModelCatalog;
+    };
+  };
+
+  selectedProviderPreset =
+    if cfg.modelProvider != null && builtins.hasAttr cfg.modelProvider providerPresets then
+      providerPresets.${cfg.modelProvider}
+    else
+      null;
+
   providerConfig =
     provider:
     removeNulls {
@@ -654,6 +762,17 @@ in
       description = "Default local provider used with codex --oss.";
     };
 
+    aiGateway = {
+      apiKeyFile = mkOption {
+        type = nullable types.str;
+        default = null;
+        description = ''
+          Path to a file containing the Vercel AI Gateway API key. Used when
+          codex.modelProvider is set to ai-gateway.
+        '';
+      };
+    };
+
     projectRootMarkers = mkOption {
       type = nullable (types.listOf types.str);
       default = null;
@@ -799,55 +918,65 @@ in
     };
   };
 
-  config = mkIf cfg.enable {
-    assertions = [
-      {
-        assertion = lib.all
-          (
-            providerName:
-              !(builtins.elem providerName [
-                "openai"
-                "ollama"
-                "lmstudio"
-              ])
-          )
-          (builtins.attrNames cfg.modelProviders);
-        message = "codex.modelProviders cannot define reserved built-in provider IDs: openai, ollama, or lmstudio.";
-      }
-      {
-        assertion = lib.all
-          (
-            provider:
-            provider.auth == null
-            || (
-              provider.envKey == null
-              && provider.experimentalBearerToken == null
-              && provider.requiresOpenAIAuth == null
+  config = mkIf cfg.enable (lib.mkMerge [
+    (mkIf (selectedProviderPreset != null) {
+      codex = {
+        model = lib.mkDefault selectedProviderPreset.model;
+        modelReasoningEffort = lib.mkDefault selectedProviderPreset.modelReasoningEffort;
+        modelProviders = lib.mkDefault selectedProviderPreset.modelProviders;
+        modelCatalog = lib.mkDefault selectedProviderPreset.modelCatalog;
+      };
+    })
+    {
+      assertions = [
+        {
+          assertion = lib.all
+            (
+              providerName:
+                !(builtins.elem providerName [
+                  "openai"
+                  "ollama"
+                  "lmstudio"
+                ])
             )
-          )
-          (builtins.attrValues cfg.modelProviders);
-        message = "codex.modelProviders entries with command-backed auth cannot also set envKey, experimentalBearerToken, or requiresOpenAIAuth.";
-      }
-      {
-        assertion = !modelCatalogUsesBundled || cfg.package != null;
-        message = "codex.modelCatalog entries that set inheritFromBundled require codex.package to be set so the bundled catalog can be read at build time.";
-      }
-    ];
+            (builtins.attrNames cfg.modelProviders);
+          message = "codex.modelProviders cannot define reserved built-in provider IDs: openai, ollama, or lmstudio.";
+        }
+        {
+          assertion = lib.all
+            (
+              provider:
+              provider.auth == null
+              || (
+                provider.envKey == null
+                && provider.experimentalBearerToken == null
+                && provider.requiresOpenAIAuth == null
+              )
+            )
+            (builtins.attrValues cfg.modelProviders);
+          message = "codex.modelProviders entries with command-backed auth cannot also set envKey, experimentalBearerToken, or requiresOpenAIAuth.";
+        }
+        {
+          assertion = !modelCatalogUsesBundled || cfg.package != null;
+          message = "codex.modelCatalog entries that set inheritFromBundled require codex.package to be set so the bundled catalog can be read at build time.";
+        }
+      ];
 
-    home.packages = lib.optional (cfg.package != null) cfg.package;
+      home.packages = lib.optional (cfg.package != null) cfg.package;
 
-    home.activation.codexConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      codex_dir="${home}/.codex"
-      codex_config="$codex_dir/config.toml"
-      codex_backup="$codex_dir/config.toml.pre-nix"
+      home.activation.codexConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        codex_dir="${home}/.codex"
+        codex_config="$codex_dir/config.toml"
+        codex_backup="$codex_dir/config.toml.pre-nix"
 
-      $DRY_RUN_CMD ${pkgs.coreutils}/bin/mkdir -p "$codex_dir"
+        $DRY_RUN_CMD ${pkgs.coreutils}/bin/mkdir -p "$codex_dir"
 
-      if [ -e "$codex_config" ] && [ ! -e "$codex_backup" ] && ! ${pkgs.diffutils}/bin/cmp -s ${generatedConfig} "$codex_config"; then
-        $DRY_RUN_CMD ${pkgs.coreutils}/bin/cp "$codex_config" "$codex_backup"
-      fi
+        if [ -e "$codex_config" ] && [ ! -e "$codex_backup" ] && ! ${pkgs.diffutils}/bin/cmp -s ${generatedConfig} "$codex_config"; then
+          $DRY_RUN_CMD ${pkgs.coreutils}/bin/cp "$codex_config" "$codex_backup"
+        fi
 
-      $DRY_RUN_CMD ${pkgs.coreutils}/bin/install -m 0600 ${generatedConfig} "$codex_config"
-    '';
-  };
+        $DRY_RUN_CMD ${pkgs.coreutils}/bin/install -m 0600 ${generatedConfig} "$codex_config"
+      '';
+    }
+  ]);
 }

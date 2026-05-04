@@ -93,110 +93,9 @@ in
       };
 
       codex = {
-        model = "openai/gpt-5.5";
-        modelReasoningEffort = "medium";
-        modelProvider = "ai-gateway";
-
-        modelCatalog = [
-          {
-            slug = "openai/gpt-5.5";
-            inheritFromBundled = "gpt-5.5";
-            displayName = "GPT-5.5";
-            description = "Frontier model for complex coding, research, and real-world work.";
-            defaultReasoningLevel = "medium";
-            supportedReasoningLevels = [
-              {
-                effort = "low";
-                description = "Fast responses with lighter reasoning";
-              }
-              {
-                effort = "medium";
-                description = "Balances speed and reasoning depth for everyday tasks";
-              }
-              {
-                effort = "high";
-                description = "Greater reasoning depth for complex problems";
-              }
-              {
-                effort = "xhigh";
-                description = "Extra high reasoning depth for complex problems";
-              }
-            ];
-            priority = 0;
-            additionalSpeedTiers = [
-              "priority"
-              "fast"
-            ];
-          }
-          {
-            slug = "openai/gpt-5.4-mini";
-            inheritFromBundled = "gpt-5.4-mini";
-            displayName = "GPT-5.4 Mini";
-            description = "Small, fast, and cost-efficient model for simpler coding tasks.";
-            defaultReasoningLevel = "medium";
-            supportedReasoningLevels = [
-              {
-                effort = "low";
-                description = "Fast responses with lighter reasoning";
-              }
-              {
-                effort = "medium";
-                description = "Balances speed and reasoning depth for everyday tasks";
-              }
-              {
-                effort = "high";
-                description = "Greater reasoning depth for complex problems";
-              }
-              {
-                effort = "xhigh";
-                description = "Extra high reasoning depth for complex problems";
-              }
-            ];
-            priority = 1;
-            additionalSpeedTiers = [ "fast" ];
-          }
-          {
-            slug = "moonshotai/kimi-k2.6";
-            inheritFromBundled = "gpt-5.5";
-            displayName = "Kimi K2.6";
-            description = "Moonshot AI model served through Vercel AI Gateway.";
-            defaultReasoningLevel = "medium";
-            supportedReasoningLevels = [
-              {
-                effort = "medium";
-                description = "Default reasoning depth";
-              }
-            ];
-            priority = 2;
-          }
-          {
-            slug = "deepseek/deepseek-v4-pro";
-            inheritFromBundled = "gpt-5.5";
-            displayName = "DeepSeek V4 Pro";
-            description = "DeepSeek model served through Vercel AI Gateway.";
-            defaultReasoningLevel = "medium";
-            supportedReasoningLevels = [
-              {
-                effort = "medium";
-                description = "Default reasoning depth";
-              }
-            ];
-            priority = 3;
-          }
-        ];
-
-        modelProviders = {
-          ai-gateway = {
-            name = "Vercel AI Gateway";
-            baseUrl = "https://ai-gateway.vercel.sh/v1";
-            wireApi = "responses";
-            auth = {
-              command = "${pkgs.coreutils}/bin/cat";
-              args = [ config.sops.secrets.codex_ai_gateway_api_key.path ];
-              timeoutMs = 5000;
-              refreshIntervalMs = 300000;
-            };
-          };
+        modelProvider = "openai";
+        aiGateway = {
+          apiKeyFile = config.sops.secrets.codex_ai_gateway_api_key.path;
         };
 
         notice = {
@@ -261,6 +160,7 @@ in
 
         trustedProjects = [
           "${config.home.homeDirectory}/github.com/vercel"
+          "${config.home.homeDirectory}/github.com/vercel/vercel-py"
           "${config.home.homeDirectory}/github.com/scotttrinh/changing"
           "${config.home.homeDirectory}/github.com/scotttrinh/vpi"
           "${config.home.homeDirectory}/.codex"
