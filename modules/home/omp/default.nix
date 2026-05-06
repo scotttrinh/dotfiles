@@ -71,10 +71,6 @@ let
       name = "Gemini 3.1 Pro";
     }
     {
-      id = "xai/grok-4.3";
-      name = "Grok 4.3";
-    }
-    {
       id = "moonshotai/kimi-k2.6";
       name = "Kimi K2.6";
     }
@@ -146,25 +142,25 @@ in
 
     defaultModel = mkOption {
       type = types.str;
-      default = "ai-gateway/openai/gpt-5.5";
+      default = "ai-gateway/moonshotai/kimi-k2.6";
       description = "Default omp model selector.";
     };
 
     planModel = mkOption {
       type = types.str;
-      default = cfg.defaultModel;
+      default = "ai-gateway/openai/gpt-5.5";
       description = "omp model selector used for planning.";
     };
 
     smolModel = mkOption {
       type = types.str;
-      default = "ai-gateway/openai/gpt-5.4-codex";
+      default = "ai-gateway/openai/gpt-5.4-mini";
       description = "omp model selector used for small tasks.";
     };
 
     commitModel = mkOption {
       type = types.str;
-      default = cfg.smolModel;
+      default = "ai-gateway/openai/gpt-5.4-nano";
       description = "omp model selector used for commit generation.";
     };
 
