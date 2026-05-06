@@ -1,4 +1,9 @@
-{ flake, pkgs, ... }:
+{
+  config,
+  flake,
+  pkgs,
+  ...
+}:
 let
   inherit (flake) inputs;
   inherit (inputs) self;
@@ -21,6 +26,17 @@ in
   codex = {
     enable = true;
     package = llm-agents.codex;
+  };
+
+  sops.secrets.omp_ai_gateway_api_key = {
+    key = "OMP_AI_GATEWAY_API_KEY";
+    mode = "0400";
+  };
+
+  omp = {
+    enable = true;
+    package = llm-agents.omp;
+    aiGateway.apiKey = config.sops.placeholder.omp_ai_gateway_api_key;
   };
 
   home.stateVersion = "24.11";
