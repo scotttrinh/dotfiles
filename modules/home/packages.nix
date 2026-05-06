@@ -9,7 +9,6 @@ in
   #
   # Search for packages here: https://search.nixos.org/packages
   home.packages = with pkgs; [
-    selfPackages.pi
     selfPackages.ty
     selfPackages.uv
     age
