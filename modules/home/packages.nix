@@ -38,7 +38,6 @@ in
     hyperfine
     jj
     llm-agents.claude-code
-    llm-agents.claude-code-acp
     llm-agents.codex-acp
     llm-agents.opencode
     llm-agents.gemini-cli
