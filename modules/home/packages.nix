@@ -23,6 +23,7 @@ in
     vsce
     cmake
     fontconfig
+    geist-font
     nerd-fonts.symbols-only
     nerd-fonts.geist-mono
     inetutils
