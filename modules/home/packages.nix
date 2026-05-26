@@ -41,7 +41,7 @@ in
     llm-agents.claude-code
     llm-agents.codex-acp
     llm-agents.opencode
-    llm-agents.gemini-cli
+    llm-agents.antigravity
     llm-agents.amp
     llm-agents.cursor-agent
 
