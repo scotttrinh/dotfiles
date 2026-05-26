@@ -24,6 +24,7 @@ in
     cmake
     fontconfig
     nerd-fonts.symbols-only
+    nerd-fonts.geist-mono
     inetutils
     nodePackages.typescript
     nodePackages.typescript-language-server
