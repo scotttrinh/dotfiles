@@ -112,7 +112,6 @@ in
         };
 
         agents = {
-          maxThreads = 4;
           maxDepth = 2;
         };
 
@@ -192,6 +191,9 @@ in
   system.stateVersion = 4;
 
   homebrew = {
+    masApps = {
+      OktaVerify = 490179405;
+    };
     casks = [
       "slack"
       "cursor"
