@@ -27,6 +27,7 @@ in
     geist-font
     nerd-fonts.symbols-only
     nerd-fonts.geist-mono
+    symbola
     inetutils
     typescript
     typescript-language-server
@@ -59,6 +60,10 @@ in
     nixpkgs-fmt
     less
   ];
+
+  # Doom's doctor uses fc-list even on macOS. Generate a Fontconfig catalog
+  # that includes fonts installed through the Home Manager profile.
+  fonts.fontconfig.enable = true;
 
   # Programs natively supported by home-manager.
   # They can be configured in `programs.*` instead of using home.packages.

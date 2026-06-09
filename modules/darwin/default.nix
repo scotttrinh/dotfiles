@@ -1,6 +1,6 @@
 # This is your nix-darwin configuration.
 # For home configuration, see /modules/home/*
-{ flake, ... }:
+{ flake, pkgs, ... }:
 let
   inherit (flake) inputs;
 in
@@ -21,6 +21,15 @@ in
       extra-trusted-public-keys = "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g=";
     };
   };
+
+  # Register fonts with Core Text so native macOS applications, including
+  # graphical Emacs, can discover fonts installed from Nix.
+  fonts.packages = with pkgs; [
+    geist-font
+    nerd-fonts.symbols-only
+    nerd-fonts.geist-mono
+    symbola
+  ];
 
   # Use TouchID for `sudo` authentication
   security.pam.services.sudo_local.touchIdAuth = true;

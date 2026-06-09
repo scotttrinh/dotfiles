@@ -90,6 +90,7 @@ in
       extraPackages = epkgs: with epkgs; [
         vterm
         treesit-grammars.with-all-grammars
+        all-the-icons-nerd-fonts
       ];
     };
   };
