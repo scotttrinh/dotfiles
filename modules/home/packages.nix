@@ -28,10 +28,10 @@ in
     nerd-fonts.symbols-only
     nerd-fonts.geist-mono
     inetutils
-    nodePackages.typescript
-    nodePackages.typescript-language-server
-    nodePackages.vscode-langservers-extracted
-    nodePackages.prettier
+    typescript
+    typescript-language-server
+    vscode-langservers-extracted
+    prettier
     flake.inputs.eza.packages.${system}.default
     nix-tree
     devenv
