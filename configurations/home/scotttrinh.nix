@@ -7,7 +7,8 @@
 let
   inherit (flake) inputs;
   inherit (inputs) self;
-  llm-agents = inputs.llm-agents.packages.${pkgs.system};
+  system = pkgs.stdenv.hostPlatform.system;
+  llm-agents = inputs.llm-agents.packages.${system};
 in
 {
   imports = [

@@ -8,6 +8,7 @@
 let
   inherit (flake) inputs;
   inherit (inputs) self;
+  system = pkgs.stdenv.hostPlatform.system;
 in
 {
   imports = [
@@ -69,9 +70,9 @@ in
     htop
     ripgrep
     jq
-    inputs.llm-agents.packages.${pkgs.system}.claude-code
+    inputs.llm-agents.packages.${system}.claude-code
     # Nook CLI for managing containers
-    inputs.nook.packages.${pkgs.system}.nook
+    inputs.nook.packages.${system}.nook
   ];
 
   # =========================================================================
@@ -158,8 +159,8 @@ in
 
     # Extra packages installed in all nook containers (Tier 2: external flakes)
     extraPackages = [
-      inputs.llm-agents.packages.${pkgs.system}.claude-code
-      inputs.wigg.packages.${pkgs.system}.wigg
+      inputs.llm-agents.packages.${system}.claude-code
+      inputs.wigg.packages.${system}.wigg
     ];
 
     # Inject ANTHROPIC_API_KEY into all nooks

@@ -1,8 +1,9 @@
 { flake, pkgs, ... }:
 let
-  selfPackages = flake.inputs.self.packages.${pkgs.system};
-  jj = flake.inputs.jj.packages.${pkgs.system}.default;
-  llm-agents = flake.inputs.llm-agents.packages.${pkgs.system};
+  system = pkgs.stdenv.hostPlatform.system;
+  selfPackages = flake.inputs.self.packages.${system};
+  jj = flake.inputs.jj.packages.${system}.default;
+  llm-agents = flake.inputs.llm-agents.packages.${system};
 in
 {
   # Nix packages to install to $HOME
@@ -31,7 +32,7 @@ in
     nodePackages.typescript-language-server
     nodePackages.vscode-langservers-extracted
     nodePackages.prettier
-    flake.inputs.eza.packages.${pkgs.system}.default
+    flake.inputs.eza.packages.${system}.default
     nix-tree
     devenv
     graphviz
