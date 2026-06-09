@@ -42,9 +42,8 @@ in
     llm-agents.claude-code
     llm-agents.codex-acp
     llm-agents.opencode
-    llm-agents.antigravity
+    llm-agents.antigravity-cli
     llm-agents.amp
-    llm-agents.cursor-agent
 
     # From template
     omnix
