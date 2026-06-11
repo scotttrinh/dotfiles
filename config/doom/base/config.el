@@ -36,6 +36,111 @@
 ;; `load-theme' function. This is the default:
 (setq doom-theme 'doric-copper)
 
+(require 'cl-lib)
+(require 'color)
+
+(defconst scott/diff-soften-background-blend 0.6
+  "How much to blend diff backgrounds toward the default background.")
+
+(defconst scott/diff-soften-faces
+  '(magit-diff-added
+    magit-diff-removed
+    magit-diff-base
+    magit-diff-our
+    magit-diff-their
+    magit-diff-added-highlight
+    magit-diff-removed-highlight
+    magit-diff-base-highlight
+    magit-diff-our-highlight
+    magit-diff-their-highlight
+    ediff-current-diff-A
+    ediff-current-diff-B
+    ediff-current-diff-C
+    ediff-current-diff-Ancestor
+    ediff-fine-diff-A
+    ediff-fine-diff-B
+    ediff-fine-diff-C
+    ediff-fine-diff-Ancestor
+    ediff-even-diff-A
+    ediff-even-diff-B
+    ediff-even-diff-C
+    ediff-even-diff-Ancestor
+    ediff-odd-diff-A
+    ediff-odd-diff-B
+    ediff-odd-diff-C
+    ediff-odd-diff-Ancestor)
+  "Diff faces whose backgrounds should be softened.")
+
+(defvar scott/diff-soften-background-cache (make-hash-table :test 'equal)
+  "Theme-specific source backgrounds for `scott/diff-soften-faces'.")
+
+(defun scott/diff-soften--color-p (value)
+  "Return non-nil when VALUE names a displayable color."
+  (and (stringp value)
+       (condition-case nil
+           (color-name-to-rgb value)
+         (error nil))))
+
+(defun scott/diff-soften--theme-background (face)
+  "Return FACE's background from an enabled theme, if available."
+  (when (fboundp 'doom-theme-face-attribute)
+    (cl-loop for theme in custom-enabled-themes
+             for background = (unless (eq theme 'user)
+                                (doom-theme-face-attribute theme face :background t))
+             when (scott/diff-soften--color-p background)
+             return background)))
+
+(defun scott/diff-soften--source-background (face)
+  "Return FACE's unsoftened background for the current theme set."
+  (or
+   (scott/diff-soften--theme-background face)
+   (let* ((key (cons face (copy-sequence custom-enabled-themes)))
+          (missing (make-symbol "missing"))
+          (cached (gethash key scott/diff-soften-background-cache missing)))
+     (if (eq cached missing)
+         (let ((background (and (facep face) (face-background face nil t))))
+           (when (scott/diff-soften--color-p background)
+             (puthash key background scott/diff-soften-background-cache))
+           background)
+       cached))))
+
+(defun scott/diff-soften--blend (foreground background)
+  "Blend FOREGROUND toward BACKGROUND."
+  (apply #'color-rgb-to-hex
+         (append
+          (cl-mapcar
+           (lambda (fg bg)
+             (+ (* (- 1 scott/diff-soften-background-blend) fg)
+                (* scott/diff-soften-background-blend bg)))
+           (color-name-to-rgb foreground)
+           (color-name-to-rgb background))
+          '(2))))
+
+(defun scott/diff-soften-faces ()
+  "Soften diff backgrounds while leaving foregrounds unspecified."
+  (when custom-enabled-themes
+    (let ((default-background (scott/diff-soften--source-background 'default))
+          (specs nil))
+      (when (scott/diff-soften--color-p default-background)
+        (dolist (face scott/diff-soften-faces)
+          (when-let ((background (scott/diff-soften--source-background face)))
+            (when (scott/diff-soften--color-p background)
+              (push `(,face ((t :background
+                               ,(scott/diff-soften--blend
+                                 background
+                                 default-background)
+                               :foreground unspecified)))
+                    specs))))
+        (when specs
+          (apply #'custom-theme-set-faces 'user (nreverse specs)))))))
+
+(add-hook 'doom-load-theme-hook #'scott/diff-soften-faces)
+(with-eval-after-load 'magit-diff
+  (scott/diff-soften-faces))
+(with-eval-after-load 'ediff-diff
+  (scott/diff-soften-faces))
+(scott/diff-soften-faces)
+
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
 (setq display-line-numbers-type t)
