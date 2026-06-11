@@ -87,7 +87,7 @@ in
           secret = config.sops.placeholder.claude_code_auth_token;
         };
         baseUrl = "https://ai-gateway.vercel.sh";
-        model = "opus";
+        model = "claude-fable-5";
         statusLine.enable = true;
         timeoutMs = 3000000; # 50 minutes
       };
