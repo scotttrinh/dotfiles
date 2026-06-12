@@ -94,11 +94,13 @@ in
 
       mimoCode = {
         enable = true;
-        auth.secret = config.sops.placeholder.claude_code_auth_token;
         model = "vercel/deepseek/deepseek-v4-pro";
         smallModel = "vercel/deepseek/deepseek-v4-flash";
-        timeoutMs = 3000000; # 50 minutes
         enabledProviders = [ "vercel" ];
+        providers.vercel = {
+          auth.secret = config.sops.placeholder.claude_code_auth_token;
+          timeoutMs = 3000000; # 50 minutes
+        };
       };
 
       codex = {
