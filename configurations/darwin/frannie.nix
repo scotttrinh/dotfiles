@@ -49,6 +49,10 @@ in
       timeoutMs = 3000000;  # 50 minutes
     };
 
+    mimoCode = {
+        enable = true;
+    };
+
     # Declare the sops secret for this machine
     sops.secrets.claude_code_api_key = {
       key = "CLAUDE_CODE_API_KEY_FRANNIE";
