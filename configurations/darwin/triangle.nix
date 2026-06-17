@@ -96,7 +96,7 @@ in
         enable = true;
         model = "vercel/deepseek/deepseek-v4-pro";
         smallModel = "vercel/deepseek/deepseek-v4-flash";
-        enabledProviders = [ "vercel" ];
+        enabledProviders = [ "vercel" "openai" ];
         providers.vercel = {
           auth.secret = config.sops.placeholder.claude_code_auth_token;
           timeoutMs = 3000000; # 50 minutes
