@@ -14,7 +14,8 @@
       '';
       profileExtra = ''
         # Custom ~/.zprofile goes here
-        export PATH="$HOME/.bun/bin:$HOME/.cargo/bin:$HOME/Library/Application Support/edgedb/bin:$HOME/.npm-global/bin:$PATH"
+        export PNPM_HOME="$HOME/.pnpm-global"
+        export PATH="$HOME/.bun/bin:$HOME/.cargo/bin:$HOME/Library/Application Support/edgedb/bin:$HOME/.npm-global/bin:$PATH:$HOME/.pnpm-global"
         eval "$(/opt/homebrew/bin/brew shellenv)"
 
         ulimit -n 65536 >/dev/null 2>&1 || true
