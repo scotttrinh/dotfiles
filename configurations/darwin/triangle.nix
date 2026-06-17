@@ -64,11 +64,6 @@ in
         publicKey = secretiveSigningPublicKey;
       };
 
-      home.packages = with pkgs; [
-        git-lfs
-        gh
-      ];
-
       # Declare the sops secret for this machine
       sops.secrets.claude_code_auth_token = {
         key = "CLAUDE_CODE_AUTH_TOKEN_TRIANGLE";
