@@ -42,6 +42,8 @@ in
     parinfer-rust-emacs
     hyperfine
     jj
+    gh
+    git-lfs
     llm-agents.claude-code
     llm-agents.codex-acp
     llm-agents.opencode
