@@ -61,4 +61,9 @@ in
       mode = "0400";
     };
   };
+  homebrew = {
+    casks = [
+      "orbstack"
+    ];
+  };
 }
