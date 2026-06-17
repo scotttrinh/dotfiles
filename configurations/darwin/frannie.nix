@@ -46,11 +46,13 @@ in
       # };
       # baseUrl = "https://api.z.ai/api/anthropic";
       model = "opus";
-      timeoutMs = 3000000;  # 50 minutes
+      timeoutMs = 3000000; # 50 minutes
     };
 
     mimoCode = {
-        enable = true;
+      enable = true;
+      model = "zai-coding-plan/glm-5.2";
+      enabledProviders = [ "zai-coding-plan" ];
     };
 
     # Declare the sops secret for this machine

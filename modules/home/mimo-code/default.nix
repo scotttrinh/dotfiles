@@ -167,7 +167,11 @@ in
           };
         }
       );
-      default = { };
+      default = {
+        zai-coding-plan.models."glm-5.2" = {
+          name = "GLM-5.2";
+        };
+      };
       description = "Provider configuration keyed by MiMo-Code provider ID.";
     };
 
