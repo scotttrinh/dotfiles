@@ -315,8 +315,28 @@ let
       name = "Kimi K2.6";
     }
     {
+      id = "zai/glm-5.2";
+      name = "GLM-5.2";
+    }
+    {
+      id = "moonshotai/kimi-k2.7-code";
+      name = "Kimi K2.7 Code";
+    }
+    {
+      id = "minimax/minimax-m3";
+      name = "MiniMax M3";
+    }
+    {
+      id = "alibaba/qwen3.7-max";
+      name = "Qwen3.7 Max";
+    }
+    {
       id = "deepseek/deepseek-v4-pro";
       name = "DeepSeek V4 Pro";
+    }
+    {
+      id = "deepseek/deepseek-v4-flash";
+      name = "DeepSeek V4 Flash";
     }
   ];
 

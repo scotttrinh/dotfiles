@@ -95,6 +95,14 @@ in
         providers.vercel = {
           auth.secret = config.sops.placeholder.claude_code_auth_token;
           timeoutMs = 3000000; # 50 minutes
+          models = {
+            "zai/glm-5.2".name = "GLM-5.2";
+            "moonshotai/kimi-k2.7-code".name = "Kimi K2.7 Code";
+            "minimax/minimax-m3".name = "MiniMax M3";
+            "alibaba/qwen3.7-max".name = "Qwen3.7 Max";
+            "deepseek/deepseek-v4-pro".name = "DeepSeek V4 Pro";
+            "deepseek/deepseek-v4-flash".name = "DeepSeek V4 Flash";
+          };
         };
       };
 
