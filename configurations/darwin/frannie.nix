@@ -52,7 +52,7 @@ in
     mimoCode = {
       enable = true;
       model = "zai-coding-plan/glm-5.2";
-      enabledProviders = [ "zai-coding-plan" ];
+      enabledProviders = [ "zai-coding-plan" "openai" ];
       providers.openai.models."gpt-5.5-codex" = {
         id = "gpt-5.5";
         name = "GPT-5.5";
