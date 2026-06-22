@@ -17,6 +17,7 @@ let
         omp = {
           enable = true;
           aiGateway.enable = false;
+          setupVersion = 1;
 
           appearance = {
             themeDark = "custom";
@@ -30,6 +31,7 @@ let
           interaction = {
             autoResume = true;
             approvalTimeout = 30;
+            setupWizard = false;
           };
           context = {
             compactionEnabled = true;
@@ -154,6 +156,8 @@ let
   failedAssertions = builtins.filter (assertion: !assertion.assertion) home.config.assertions;
 in
 assert failedAssertions == [ ];
+assert configJson.setupVersion == 1;
+assert configJson.startup.setupWizard == false;
 assert configJson.temperature == 0.75;
 assert configJson.compaction.enabled;
 assert configJson.compaction.thresholdTokens == 1234;

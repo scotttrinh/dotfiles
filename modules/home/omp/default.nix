@@ -327,10 +327,6 @@ let
       name = "MiniMax M3";
     }
     {
-      id = "alibaba/qwen3.7-max";
-      name = "Qwen3.7 Max";
-    }
-    {
       id = "deepseek/deepseek-v4-pro";
       name = "DeepSeek V4 Pro";
     }
@@ -381,11 +377,16 @@ let
   promptFileType = nullable managedFileType;
 
   typedSettings = removeNulls {
+    setupVersion = cfg.setupVersion;
     modelRoles = {
       default = cfg.defaultModel;
-      plan = cfg.planModel;
       smol = cfg.smolModel;
+      slow = cfg.slowModel;
+      plan = cfg.planModel;
+      vision = cfg.visionModel;
+      designer = cfg.designerModel;
       commit = cfg.commitModel;
+      task = cfg.taskModel;
     };
     enabledModels = cfg.enabledModels;
 
@@ -832,25 +833,47 @@ in
       description = "Oh My Pi package to install. Set to null to manage only configuration.";
     };
 
+    setupVersion = nullableOption types.int "Completed OMP setup wizard schema version.";
+
     defaultModel = mkOption {
       type = types.str;
-      default = "ai-gateway/moonshotai/kimi-k2.6";
+      default = "ai-gateway/google/gemini-3.1-pro-preview";
       description = "Default OMP model selector.";
     };
     planModel = mkOption {
       type = types.str;
-      default = "ai-gateway/openai/gpt-5.5";
+      default = "ai-gateway/openai/gpt-5.5:xhigh";
       description = "OMP model selector used for planning.";
     };
     smolModel = mkOption {
       type = types.str;
-      default = "ai-gateway/openai/gpt-5.4-mini";
+      default = "ai-gateway/moonshotai/kimi-k2.7-code";
       description = "OMP model selector used for small tasks.";
     };
     commitModel = mkOption {
       type = types.str;
       default = "ai-gateway/openai/gpt-5.4-nano";
       description = "OMP model selector used for commit generation.";
+    };
+    slowModel = mkOption {
+      type = types.str;
+      default = "ai-gateway/openai/gpt-5.5:xhigh";
+      description = "OMP model selector used for deep reasoning.";
+    };
+    visionModel = mkOption {
+      type = types.str;
+      default = "ai-gateway/google/gemini-3.5-flash";
+      description = "OMP model selector used for image-capable fallback.";
+    };
+    designerModel = mkOption {
+      type = types.str;
+      default = "ai-gateway/anthropic/claude-opus-4.8";
+      description = "OMP model selector used for the designer subagent.";
+    };
+    taskModel = mkOption {
+      type = types.str;
+      default = "ai-gateway/google/gemini-3.1-pro-preview";
+      description = "OMP model selector used for subagent work.";
     };
     enabledModels = mkOption {
       type = stringList;

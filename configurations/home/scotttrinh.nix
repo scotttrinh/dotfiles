@@ -37,6 +37,14 @@ in
   omp = {
     enable = true;
     package = llm-agents.omp;
+    setupVersion = 1;
+    appearance = {
+      themeDark = "titanium";
+      themeLight = "light";
+      symbolPreset = "nerd";
+    };
+    interaction.setupWizard = false;
+    providers.webSearch = "auto";
     aiGateway.apiKey = config.sops.placeholder.omp_ai_gateway_api_key;
   };
 
