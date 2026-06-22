@@ -104,6 +104,10 @@ in
             "deepseek/deepseek-v4-flash".name = "DeepSeek V4 Flash";
           };
         };
+        providers.openai.models."gpt-5.5-codex" = {
+          id = "gpt-5.5";
+          name = "GPT-5.5";
+        };
       };
 
       codex = {

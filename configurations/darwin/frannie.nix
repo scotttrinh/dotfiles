@@ -53,6 +53,10 @@ in
       enable = true;
       model = "zai-coding-plan/glm-5.2";
       enabledProviders = [ "zai-coding-plan" ];
+      providers.openai.models."gpt-5.5-codex" = {
+        id = "gpt-5.5";
+        name = "GPT-5.5";
+      };
     };
 
     # Declare the sops secret for this machine
