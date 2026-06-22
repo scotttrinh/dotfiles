@@ -4,7 +4,6 @@ let
   selfPackages = flake.inputs.self.packages.${system};
   jj = flake.inputs.jj.packages.${system}.default;
   llm-agents = flake.inputs.llm-agents.packages.${system};
-  llm-agents-mimo-code = flake.inputs.llm-agents-mimo-code.packages.${system};
 in
 {
   # Nix packages to install to $HOME
@@ -49,7 +48,7 @@ in
     llm-agents.opencode
     llm-agents.antigravity-cli
     llm-agents.amp
-    llm-agents-mimo-code.mimo-code
+    llm-agents.mimo-code
 
     # From template
     omnix

@@ -20,15 +20,6 @@
     rust-overlay.url = "github:oxalica/rust-overlay";
     rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
     llm-agents.url = "github:numtide/llm-agents.nix";
-    llm-agents-mimo-code = {
-      url = "github:scotttrinh/nix-ai-tools/scotttrinh/add-mimo-code";
-      inputs.blueprint.follows = "llm-agents/blueprint";
-      inputs.bun2nix.follows = "llm-agents/bun2nix";
-      inputs.flake-parts.follows = "llm-agents/flake-parts";
-      inputs.nixpkgs.follows = "llm-agents/nixpkgs";
-      inputs.systems.follows = "llm-agents/systems";
-      inputs.treefmt-nix.follows = "llm-agents/treefmt-nix";
-    };
     sops-nix.url = "github:Mic92/sops-nix";
     sops-nix.inputs.nixpkgs.follows = "nixpkgs";
 
