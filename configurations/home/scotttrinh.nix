@@ -46,6 +46,7 @@ in
     interaction.setupWizard = false;
     providers.webSearch = "auto";
     aiGateway.apiKey = config.sops.placeholder.omp_ai_gateway_api_key;
+    plugins.superpowers.package = self.packages.${system}.superpowers;
   };
 
   home.stateVersion = "24.11";

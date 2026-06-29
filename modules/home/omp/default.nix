@@ -375,6 +375,37 @@ let
   };
 
   promptFileType = nullable managedFileType;
+  pluginType = types.submodule {
+    options = {
+      package = mkOption {
+        type = nullable types.package;
+        default = null;
+        description = ''
+          Store package for this OMP plugin. When set, the module links the
+          package into ~/.omp/plugins/node_modules and records matching plugin
+          runtime state for OMP discovery.
+        '';
+      };
+      name = nullableOption types.str "Package name used under ~/.omp/plugins/node_modules. Defaults to the attr name.";
+      version = nullableOption types.str "Plugin version recorded in omp-plugins.lock.json. Defaults to package.version when available.";
+      enable = mkOption {
+        type = types.bool;
+        default = true;
+        description = "Whether OMP should treat this plugin as enabled.";
+      };
+      features = mkOption {
+        type = nullable stringList;
+        default = null;
+        description = "Enabled OMP plugin features. Null means OMP default features.";
+      };
+      settings = mkOption {
+        type = json.type;
+        default = { };
+        description = "Plugin settings recorded in omp-plugins.lock.json.";
+      };
+    };
+  };
+
 
   typedSettings = removeNulls {
     setupVersion = cfg.setupVersion;
@@ -738,6 +769,56 @@ let
   generatedAgentFiles = lib.mapAttrs' (
     name: value: lib.nameValuePair ".omp/agent/${name}" (fileConfig value)
   ) cfg.agentFiles;
+  pluginName = attrName: plugin: if plugin.name != null then plugin.name else attrName;
+
+  configuredPlugins = lib.mapAttrsToList (attrName: plugin: {
+    name = pluginName attrName plugin;
+    inherit attrName plugin;
+  }) cfg.plugins;
+
+  packagedPlugins = lib.filter (entry: entry.plugin.package != null) configuredPlugins;
+
+  pluginsByName = builtins.listToAttrs (
+    map (entry: lib.nameValuePair entry.name entry.plugin) packagedPlugins
+  );
+
+  pluginVersion = plugin:
+    if plugin.version != null then
+      plugin.version
+    else
+      plugin.package.version or "0.0.0";
+
+  pluginPackageJson = {
+    name = "omp-plugins";
+    private = true;
+    dependencies = lib.mapAttrs (_: plugin: "file:${builtins.unsafeDiscardStringContext "${plugin.package}"}") pluginsByName;
+  };
+
+  pluginLockJson = {
+    plugins = lib.mapAttrs (_: plugin: {
+      version = pluginVersion plugin;
+      enabledFeatures = plugin.features;
+      enabled = plugin.enable;
+    }) pluginsByName;
+    settings = lib.mapAttrs (_: plugin: plugin.settings) pluginsByName;
+  };
+
+  generatedPluginFiles = lib.optionalAttrs (pluginsByName != { }) ({
+    ".omp/plugins/package.json".text = builtins.toJSON pluginPackageJson;
+    ".omp/plugins/omp-plugins.lock.json".text = builtins.toJSON pluginLockJson;
+  } // lib.mapAttrs' (name: plugin: lib.nameValuePair ".omp/plugins/node_modules/${name}" {
+    source = plugin.package;
+  }) pluginsByName);
+
+  effectivePluginNames = map (entry: entry.name) configuredPlugins;
+  duplicatePluginNames = lib.filter (
+    name: builtins.length (lib.filter (candidate: candidate == name) effectivePluginNames) > 1
+  ) (lib.unique effectivePluginNames);
+  unsafePluginNames = lib.filter (
+    name:
+    name == "" || lib.hasPrefix "/" name || lib.any (part: part == "..") (lib.splitString "/" name)
+  ) effectivePluginNames;
+
 
   agentFileNames = builtins.attrNames cfg.agentFiles;
   unsafeAgentFileNames = lib.filter (
@@ -1172,6 +1253,15 @@ in
       '';
     };
 
+    plugins = mkOption {
+      type = types.attrsOf pluginType;
+      default = { };
+      description = ''
+        Declarative OMP plugins. Entries with package set are linked into
+        ~/.omp/plugins/node_modules and recorded in omp-plugins.lock.json.
+      '';
+    };
+
     modelProviders = mkOption {
       type = types.attrsOf providerType;
       default = { };
@@ -1320,6 +1410,14 @@ in
         message = "omp.prompts entries must set exactly one of text or source: ${lib.concatStringsSep ", " invalidPromptFiles}";
       }
       {
+        assertion = duplicatePluginNames == [ ];
+        message = "omp.plugins entries must have unique effective names: ${lib.concatStringsSep ", " duplicatePluginNames}";
+      }
+      {
+        assertion = unsafePluginNames == [ ];
+        message = "omp.plugins names must be non-empty, relative, and may not contain '..': ${lib.concatStringsSep ", " unsafePluginNames}";
+      }
+      {
         assertion = providerValidationErrors == [ ];
         message = lib.concatStringsSep "\n" providerValidationErrors;
       }
@@ -1342,6 +1440,7 @@ in
       }
       // generatedThemeFiles
       // generatedPromptFiles
-      // generatedAgentFiles;
+      // generatedAgentFiles
+      // generatedPluginFiles;
   };
 }

@@ -1,6 +1,27 @@
 { flake }:
 let
   pkgs = flake.inputs.nixpkgs.legacyPackages.aarch64-darwin;
+  testPlugin = pkgs.stdenvNoCC.mkDerivation {
+    pname = "example-omp-plugin";
+    version = "1.2.3";
+    dontUnpack = true;
+    installPhase = ''
+      mkdir -p "$out/.pi/extensions" "$out/skills/example"
+      cat > "$out/package.json" <<'JSON'
+      {
+        "name": "example-omp-plugin",
+        "version": "1.2.3",
+        "pi": {
+          "extensions": ["./.pi/extensions/example.ts"],
+          "skills": ["./skills"]
+        }
+      }
+      JSON
+      touch "$out/.pi/extensions/example.ts"
+      touch "$out/skills/example/SKILL.md"
+    '';
+  };
+
 
   home = flake.inputs.home-manager.lib.homeManagerConfiguration {
     inherit pkgs;
@@ -71,6 +92,11 @@ let
           extraConfig = {
             temperature = 0.75;
             startup.quiet = true;
+          };
+
+          plugins.example = {
+            name = "example-omp-plugin";
+            package = testPlugin;
           };
 
           modelProviders = {
@@ -152,6 +178,9 @@ let
 
   configJson = builtins.fromJSON home.config.sops.templates.omp-config.content;
   modelsJson = builtins.fromJSON home.config.sops.templates.omp-models.content;
+  pluginPackageJson = builtins.fromJSON files.".omp/plugins/package.json".text;
+  pluginLockJson = builtins.fromJSON files.".omp/plugins/omp-plugins.lock.json".text;
+
   files = home.config.home.file;
   failedAssertions = builtins.filter (assertion: !assertion.assertion) home.config.assertions;
 in
@@ -171,7 +200,13 @@ assert files.".omp/agent/themes/custom.json" ? text;
 assert files.".omp/agent/APPEND_SYSTEM.md".text == "Keep the default prompt.";
 assert files.".omp/agent/tools/check.sh".executable;
 assert files.".omp/agent/skills/example".recursive;
+assert pluginPackageJson.dependencies."example-omp-plugin" == builtins.unsafeDiscardStringContext "file:${testPlugin}";
+assert pluginLockJson.plugins."example-omp-plugin".version == "1.2.3";
+assert pluginLockJson.plugins."example-omp-plugin".enabledFeatures == null;
+assert pluginLockJson.plugins."example-omp-plugin".enabled;
+assert pluginLockJson.settings."example-omp-plugin" == { };
+assert files.".omp/plugins/node_modules/example-omp-plugin".source == testPlugin;
 {
-  inherit configJson modelsJson;
+  inherit configJson modelsJson pluginPackageJson pluginLockJson;
   managedFiles = builtins.attrNames files;
 }
