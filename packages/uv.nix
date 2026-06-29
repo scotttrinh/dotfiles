@@ -4,7 +4,7 @@
 }:
 
 let
-  rustToolchain = rust-bin.stable."1.92.0".default;
+  rustToolchain = rust-bin.stable."1.96.0".default;
   rustPlatform = pkgs.makeRustPlatform {
     cargo = rustToolchain;
     rustc = rustToolchain;
@@ -27,16 +27,16 @@ pkgs.callPackage
 
     rustPlatform.buildRustPackage (finalAttrs: {
       pname = "uv";
-      version = "0.11.6";
+      version = "0.11.23";
 
       src = fetchFromGitHub {
         owner = "astral-sh";
         repo = "uv";
         tag = finalAttrs.version;
-        hash = "sha256-S3D8KjIyUw9cy+y8FCNX4o2CezWWBS1c00f6bLytTrE=";
+        hash = "sha256-MnUPkK611P7Q4hI2iJYV8zA4zNadFzR36cxXJM3dIR0=";
       };
 
-      cargoHash = "sha256-1zKhePStJQx8OiRJo7omJn1w0UdQ9at0c1glsjFPuTo=";
+      cargoHash = "sha256-xyUtEnhO9E+sje2tk/cPPKJUJgC8NQvv6gA/wnGM2Xc=";
 
       buildInputs = [ rust-jemalloc-sys ];
 

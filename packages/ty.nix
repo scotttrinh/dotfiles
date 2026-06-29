@@ -4,7 +4,7 @@
 }:
 
 let
-  rustToolchain = rust-bin.stable."1.93.0".default;
+  rustToolchain = rust-bin.stable."1.96.0".default;
   rustPlatform = pkgs.makeRustPlatform {
     cargo = rustToolchain;
     rustc = rustToolchain;
@@ -25,14 +25,14 @@ pkgs.callPackage
 
     rustPlatform.buildRustPackage (finalAttrs: {
       pname = "ty";
-      version = "0.0.34";
+      version = "0.0.52";
 
       src = fetchFromGitHub {
         owner = "astral-sh";
         repo = "ty";
         tag = finalAttrs.version;
         fetchSubmodules = true;
-        hash = "sha256-pLe25JRy6xrFVuNCQKwp9k3Mvc4pfYKF6Xi17yMgSzw=";
+        hash = "sha256-p9fTzQ4DYvnwrtLdpSTekBV4ZbR1KETR8dfsbp8CDpo=";
       };
 
       postPatch = lib.optionalString stdenv.hostPlatform.isDarwin ''
@@ -44,7 +44,7 @@ pkgs.callPackage
 
       cargoBuildFlags = [ "--package=ty" ];
 
-      cargoHash = "sha256-A/oJeFIY/+Pu9jYp3hwGwkSAXfF0VLTHKGP48wsnheo=";
+      cargoHash = "sha256-NUIdYOeyRsR/ZQueEXshYdWTnSeQiRjZRRi2ag8Dm48=";
 
       nativeBuildInputs = [ installShellFiles ];
 
