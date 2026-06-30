@@ -9,6 +9,8 @@
 let
   inherit (flake) inputs;
   inherit (inputs) self;
+  system = pkgs.stdenv.hostPlatform.system;
+  selfPackages = self.packages.${system};
   secretiveSigningPublicKey = "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBOmJRCvBJwxxTm+LDnWseEJ861NISo8rpCA7Mj7NDdT1XfHCuUmDXAOEZw5NFv+MCnq4LzTyY2CNEH9dVqkm8fg= GitHub-Commit-Signing@secretive.triangle.local";
 
   # Define work repos to clone and setup
@@ -60,6 +62,11 @@ in
   home-manager.users.scotttrinh =
     { lib, config, ... }:
     let
+      fx = pkgs.writeShellScriptBin "fx" ''
+        export AI_GATEWAY_API_KEY="$(tr -d '\r\n' < ${config.sops.secrets.fx_ai_gateway_api_key.path})"
+        exec ${lib.getExe selfPackages.fx} "$@"
+      '';
+
       # Vercel AI Gateway exposed to OMP as a plain OpenAI-responses provider.
       gatewayModels = [
         { id = "openai/gpt-5.5"; name = "GPT-5.5"; }
@@ -109,6 +116,15 @@ in
         key = "OMP_AI_GATEWAY_API_KEY";
         mode = "0400";
       };
+
+      sops.secrets.fx_ai_gateway_api_key = {
+        key = "FX_AI_GATEWAY_API_KEY";
+        mode = "0400";
+      };
+
+      home.packages = [
+        fx
+      ];
 
       claudeCode = {
         enable = true;

@@ -1,4 +1,7 @@
-{ flake, pkgs, ... }:
+{ flake
+, pkgs
+, ...
+}:
 let
   system = pkgs.stdenv.hostPlatform.system;
   selfPackages = flake.inputs.self.packages.${system};
