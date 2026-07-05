@@ -157,6 +157,37 @@ let
         };
   };
 
+  zaiCodingPlanModelCatalog = [
+    {
+      slug = "glm-5.2";
+      inheritFromBundled = "gpt-5.5";
+      displayName = "GLM-5.2";
+      description = "z.ai GLM Coding Plan model for Codex.";
+      defaultReasoningLevel = "medium";
+      supportedReasoningLevels = defaultReasoningLevels;
+      contextWindow = 1000000;
+      inputModalities = [ "text" ];
+      supportsImageDetailOriginal = false;
+      priority = 0;
+    }
+  ];
+
+  zaiCodingPlanProvider = removeNulls {
+    name = "z.ai GLM Coding Plan";
+    baseUrl = "https://api.z.ai/api/coding/paas/v4";
+    wireApi = "chat_completions";
+    auth =
+      if cfg.zaiCodingPlan.apiKeyFile == null then
+        null
+      else
+        {
+          command = "${pkgs.coreutils}/bin/cat";
+          args = [ cfg.zaiCodingPlan.apiKeyFile ];
+          timeoutMs = 5000;
+          refreshIntervalMs = 300000;
+        };
+  };
+
   providerPresets = {
     openai = {
       model = "gpt-5.5";
@@ -170,6 +201,13 @@ let
       modelReasoningEffort = "medium";
       modelProviders.ai-gateway = aiGatewayProvider;
       modelCatalog = aiGatewayModelCatalog;
+    };
+
+    zai-coding-plan = {
+      model = "glm-5.2";
+      modelReasoningEffort = "medium";
+      modelProviders.zai-coding-plan = zaiCodingPlanProvider;
+      modelCatalog = zaiCodingPlanModelCatalog;
     };
   };
 
@@ -769,6 +807,17 @@ in
         description = ''
           Path to a file containing the Vercel AI Gateway API key. Used when
           codex.modelProvider is set to ai-gateway.
+        '';
+      };
+    };
+
+    zaiCodingPlan = {
+      apiKeyFile = mkOption {
+        type = nullable types.str;
+        default = null;
+        description = ''
+          Path to a file containing the z.ai GLM Coding Plan API key. Used when
+          codex.modelProvider is set to zai-coding-plan.
         '';
       };
     };

@@ -29,11 +29,6 @@ in
     package = llm-agents.codex;
   };
 
-  sops.secrets.omp_ai_gateway_api_key = {
-    key = "OMP_AI_GATEWAY_API_KEY";
-    mode = "0400";
-  };
-
   omp = {
     enable = true;
     package = llm-agents.omp;
@@ -45,7 +40,6 @@ in
     };
     interaction.setupWizard = false;
     providers.webSearch = "auto";
-    aiGateway.apiKey = config.sops.placeholder.omp_ai_gateway_api_key;
     plugins.superpowers.package = self.packages.${system}.superpowers;
   };
 

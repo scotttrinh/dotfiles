@@ -256,107 +256,6 @@ let
     };
   };
 
-  gatewayModelType = types.submodule {
-    options = modelOptions // {
-      name = mkOption {
-        type = types.str;
-        description = "Display name shown by OMP.";
-      };
-      contextWindow = mkOption {
-        type = types.int;
-        default = 400000;
-        description = "Model context window used by OMP metadata.";
-      };
-      maxTokens = mkOption {
-        type = types.int;
-        default = 128000;
-        description = "Maximum output tokens used by OMP metadata.";
-      };
-      reasoning = mkOption {
-        type = types.bool;
-        default = true;
-        description = "Whether OMP should treat this model as reasoning-capable.";
-      };
-      input = mkOption {
-        type = types.listOf (
-          types.enum [
-            "text"
-            "image"
-          ]
-        );
-        default = [
-          "text"
-          "image"
-        ];
-        description = "Input modalities supported by the model.";
-      };
-    };
-  };
-
-  defaultGatewayModels = [
-    {
-      id = "openai/gpt-5.5";
-      name = "GPT-5.5";
-    }
-    {
-      id = "openai/gpt-5.4-mini";
-      name = "GPT-5.4 Mini";
-    }
-    {
-      id = "openai/gpt-5.4-nano";
-      name = "GPT-5.4 Nano";
-    }
-    {
-      id = "google/gemini-3.1-pro-preview";
-      name = "Gemini 3.1 Pro";
-    }
-    {
-      id = "moonshotai/kimi-k2.6";
-      name = "Kimi K2.6";
-    }
-    {
-      id = "zai/glm-5.2";
-      name = "GLM-5.2";
-    }
-    {
-      id = "moonshotai/kimi-k2.7-code";
-      name = "Kimi K2.7 Code";
-    }
-    {
-      id = "minimax/minimax-m3";
-      name = "MiniMax M3";
-    }
-    {
-      id = "deepseek/deepseek-v4-pro";
-      name = "DeepSeek V4 Pro";
-    }
-    {
-      id = "deepseek/deepseek-v4-flash";
-      name = "DeepSeek V4 Flash";
-    }
-  ];
-
-  gatewayModelConfig =
-    model:
-    mergeAll [
-      {
-        api = "openai-responses";
-        cost = {
-          input = 0;
-          output = 0;
-          cacheRead = 0;
-          cacheWrite = 0;
-        };
-        compat = {
-          supportsDeveloperRole = true;
-          supportsReasoningEffort = true;
-          supportsStore = true;
-          maxTokensField = "max_completion_tokens";
-        };
-      }
-      (removeNulls model)
-    ];
-
   managedFileType = types.submodule {
     options = {
       text = nullableOption types.lines "Inline file contents.";
@@ -458,13 +357,7 @@ let
     showHardwareCursor = cfg.appearance.showHardwareCursor;
 
     modelTags = cfg.model.tags;
-    modelProviderOrder =
-      if cfg.model.providerOrder != null then
-        cfg.model.providerOrder
-      else if cfg.aiGateway.enable then
-        [ cfg.aiGateway.providerId ]
-      else
-        null;
+    modelProviderOrder = cfg.model.providerOrder;
     cycleOrder = cfg.model.cycleOrder;
     defaultThinkingLevel = cfg.model.defaultThinkingLevel;
     hideThinkingBlock = cfg.model.hideThinkingBlock;
@@ -685,43 +578,7 @@ let
     cfg.extraConfig
   ];
 
-  gatewayProvider = mergeAll [
-    {
-      baseUrl = cfg.aiGateway.baseUrl;
-      apiKey = cfg.aiGateway.apiKey;
-      api = "openai-responses";
-      auth = "apiKey";
-      authHeader = true;
-      models = map gatewayModelConfig cfg.aiGateway.models;
-    }
-    (removeNulls {
-      inherit (cfg.aiGateway)
-        api
-        headers
-        compat
-        authHeader
-        auth
-        discovery
-        modelOverrides
-        disableStrictTools
-        transport
-        ;
-    })
-    cfg.aiGateway.settings
-  ];
-
-  typedProviders = lib.mapAttrs (_: provider: removeNulls provider) cfg.modelProviders;
-
-  providersConfig =
-    if cfg.aiGateway.enable then
-      typedProviders
-      // {
-        ${cfg.aiGateway.providerId} = lib.recursiveUpdate gatewayProvider (
-          typedProviders.${cfg.aiGateway.providerId} or { }
-        );
-      }
-    else
-      typedProviders;
+  providersConfig = lib.mapAttrs (_: provider: removeNulls provider) cfg.modelProviders;
 
   modelsConfig = mergeAll [
     (removeNulls {
@@ -916,51 +773,15 @@ in
 
     setupVersion = nullableOption types.int "Completed OMP setup wizard schema version.";
 
-    defaultModel = mkOption {
-      type = types.str;
-      default = "ai-gateway/google/gemini-3.1-pro-preview";
-      description = "Default OMP model selector.";
-    };
-    planModel = mkOption {
-      type = types.str;
-      default = "ai-gateway/openai/gpt-5.5:xhigh";
-      description = "OMP model selector used for planning.";
-    };
-    smolModel = mkOption {
-      type = types.str;
-      default = "ai-gateway/moonshotai/kimi-k2.7-code";
-      description = "OMP model selector used for small tasks.";
-    };
-    commitModel = mkOption {
-      type = types.str;
-      default = "ai-gateway/openai/gpt-5.4-nano";
-      description = "OMP model selector used for commit generation.";
-    };
-    slowModel = mkOption {
-      type = types.str;
-      default = "ai-gateway/openai/gpt-5.5:xhigh";
-      description = "OMP model selector used for deep reasoning.";
-    };
-    visionModel = mkOption {
-      type = types.str;
-      default = "ai-gateway/google/gemini-3.5-flash";
-      description = "OMP model selector used for image-capable fallback.";
-    };
-    designerModel = mkOption {
-      type = types.str;
-      default = "ai-gateway/anthropic/claude-opus-4.8";
-      description = "OMP model selector used for the designer subagent.";
-    };
-    taskModel = mkOption {
-      type = types.str;
-      default = "ai-gateway/google/gemini-3.1-pro-preview";
-      description = "OMP model selector used for subagent work.";
-    };
-    enabledModels = mkOption {
-      type = stringList;
-      default = [ "ai-gateway/*" ];
-      description = "OMP enabled model patterns.";
-    };
+    defaultModel = nullableOption types.str "Default OMP model selector.";
+    planModel = nullableOption types.str "OMP model selector used for planning.";
+    smolModel = nullableOption types.str "OMP model selector used for small tasks.";
+    commitModel = nullableOption types.str "OMP model selector used for commit generation.";
+    slowModel = nullableOption types.str "OMP model selector used for deep reasoning.";
+    visionModel = nullableOption types.str "OMP model selector used for image-capable fallback.";
+    designerModel = nullableOption types.str "OMP model selector used for the designer subagent.";
+    taskModel = nullableOption types.str "OMP model selector used for subagent work.";
+    enabledModels = nullableOption stringList "OMP enabled model patterns.";
 
     appearance = mkOption {
       type = settingGroup {
@@ -1281,58 +1102,6 @@ in
       };
     };
 
-    aiGateway = {
-      enable = mkOption {
-        type = types.bool;
-        default = true;
-        description = "Enable the built-in Vercel AI Gateway provider preset.";
-      };
-      providerId = mkOption {
-        type = types.str;
-        default = "ai-gateway";
-        description = "Provider ID used for the Vercel AI Gateway preset.";
-      };
-      baseUrl = mkOption {
-        type = types.str;
-        default = "https://ai-gateway.vercel.sh/v1";
-        description = "Vercel AI Gateway API base URL.";
-      };
-      apiKey = nullableOption types.str "Vercel AI Gateway API key or SOPS placeholder.";
-      models = mkOption {
-        type = types.listOf gatewayModelType;
-        default = defaultGatewayModels;
-        description = "Model metadata exposed through the Vercel AI Gateway preset.";
-      };
-      api = nullableOption apiType "Override the preset wire API.";
-      headers = nullableOption stringMap "Additional provider headers.";
-      compat = nullableOption compatType "Provider compatibility overrides.";
-      authHeader = nullableOption types.bool "Override authorization-header behavior.";
-      auth = nullableOption (types.enum [
-        "apiKey"
-        "none"
-        "oauth"
-      ]) "Override the provider authentication mode.";
-      discovery = nullableOption (types.submodule {
-        options.type = mkOption {
-          type = types.enum [
-            "ollama"
-            "llama.cpp"
-            "lm-studio"
-            "openai-models-list"
-            "proxy"
-          ];
-        };
-      }) "Runtime discovery override.";
-      modelOverrides = nullableOption (types.attrsOf modelOverrideType) "Gateway model overrides.";
-      disableStrictTools = nullableOption types.bool "Disable strict tool schemas.";
-      transport = nullableOption (types.enum [ "pi-native" ]) "Gateway transport override.";
-      settings = mkOption {
-        type = json.type;
-        default = { };
-        description = "Raw provider fields recursively merged over the AI Gateway preset.";
-      };
-    };
-
     extraModels = mkOption {
       type = json.type;
       default = { };
@@ -1389,10 +1158,6 @@ in
 
   config = mkIf cfg.enable {
     assertions = [
-      {
-        assertion = !cfg.aiGateway.enable || cfg.aiGateway.apiKey != null;
-        message = "omp.aiGateway.apiKey must be set when omp.aiGateway.enable is true.";
-      }
       {
         assertion = unsafeAgentFileNames == [ ];
         message = "omp.agentFiles paths must be non-empty, relative, and may not contain '..': ${lib.concatStringsSep ", " unsafeAgentFileNames}";

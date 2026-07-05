@@ -59,6 +59,36 @@ in
   # This merges with configurations/home/scotttrinh.nix
   home-manager.users.scotttrinh =
     { lib, config, ... }:
+    let
+      # Vercel AI Gateway exposed to OMP as a plain OpenAI-responses provider.
+      gatewayModels = [
+        { id = "openai/gpt-5.5"; name = "GPT-5.5"; }
+        { id = "openai/gpt-5.4-mini"; name = "GPT-5.4 Mini"; }
+        { id = "openai/gpt-5.4-nano"; name = "GPT-5.4 Nano"; }
+        { id = "google/gemini-3.1-pro-preview"; name = "Gemini 3.1 Pro"; }
+        { id = "moonshotai/kimi-k2.6"; name = "Kimi K2.6"; }
+        { id = "zai/glm-5.2"; name = "GLM-5.2"; }
+        { id = "moonshotai/kimi-k2.7-code"; name = "Kimi K2.7 Code"; }
+        { id = "minimax/minimax-m3"; name = "MiniMax M3"; }
+        { id = "deepseek/deepseek-v4-pro"; name = "DeepSeek V4 Pro"; }
+        { id = "deepseek/deepseek-v4-flash"; name = "DeepSeek V4 Flash"; }
+      ];
+      gatewayModel = m: {
+        inherit (m) id name;
+        api = "openai-responses";
+        contextWindow = 400000;
+        maxTokens = 128000;
+        reasoning = true;
+        input = [ "text" "image" ];
+        cost = { input = 0; output = 0; cacheRead = 0; cacheWrite = 0; };
+        compat = {
+          supportsDeveloperRole = true;
+          supportsReasoningEffort = true;
+          supportsStore = true;
+          maxTokensField = "max_completion_tokens";
+        };
+      };
+    in
     {
       me.gitSigning = {
         publicKey = secretiveSigningPublicKey;
@@ -72,6 +102,11 @@ in
 
       sops.secrets.codex_ai_gateway_api_key = {
         key = "CODEX_AI_GATEWAY_API_KEY";
+        mode = "0400";
+      };
+
+      sops.secrets.omp_ai_gateway_api_key = {
+        key = "OMP_AI_GATEWAY_API_KEY";
         mode = "0400";
       };
 
@@ -194,6 +229,30 @@ in
           "${config.home.homeDirectory}/github.com/scotttrinh/bw-to-op"
           "${config.home.homeDirectory}/github.com/scotttrinh/mru-tab-switcher"
         ];
+      };
+
+      # OMP routes all inference through the Vercel AI Gateway on this machine.
+      omp = {
+        enabledModels = [ "ai-gateway/*" ];
+        defaultModel = "ai-gateway/google/gemini-3.1-pro-preview";
+        planModel = "ai-gateway/openai/gpt-5.5:xhigh";
+        smolModel = "ai-gateway/moonshotai/kimi-k2.7-code";
+        commitModel = "ai-gateway/openai/gpt-5.4-nano";
+        slowModel = "ai-gateway/openai/gpt-5.5:xhigh";
+        visionModel = "ai-gateway/google/gemini-3.5-flash";
+        designerModel = "ai-gateway/anthropic/claude-opus-4.8";
+        taskModel = "ai-gateway/google/gemini-3.1-pro-preview";
+
+        model.providerOrder = [ "ai-gateway" ];
+
+        modelProviders.ai-gateway = {
+          baseUrl = "https://ai-gateway.vercel.sh/v1";
+          apiKey = config.sops.placeholder.omp_ai_gateway_api_key;
+          api = "openai-responses";
+          auth = "apiKey";
+          authHeader = true;
+          models = map gatewayModel gatewayModels;
+        };
       };
 
       # Activation script to clone work repos

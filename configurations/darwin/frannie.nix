@@ -31,7 +31,7 @@ in
   system.stateVersion = 4;
 
   # Machine-specific home-manager configuration
-  home-manager.users.scotttrinh = { lib, config, ... }: {
+  home-manager.users.scotttrinh = { lib, config, pkgs, ... }: {
     me.gitSigning = {
       publicKey = secretiveSigningPublicKey;
       agentKeyCommentPattern = "Frannie-GitHub-Signing-Key";
@@ -59,8 +59,104 @@ in
       };
     };
 
+    codex = {
+      enable = true;
+
+      # Switch the active provider by changing this single line:
+      #   "openai"          -> native bundled Codex models (gpt-5.5, gpt-5.4-mini, ...)
+      #   "zai-coding-plan" -> z.ai GLM Coding Plan (glm-5.2)
+      modelProvider = "openai";
+
+      # z.ai key stays wired so switching to "zai-coding-plan" needs no other change.
+      zaiCodingPlan.apiKeyFile = config.sops.secrets.codex_zai_coding_plan_api_key.path;
+
+      notice = {
+        fastDefaultOptOut = true;
+        modelMigrations = {
+          "gpt-5.2" = "gpt-5.2-codex";
+        };
+      };
+
+      features = {
+        defaultModeRequestUserInput = true;
+        multiAgent = true;
+        preventIdleSleep = true;
+      };
+
+      agents = {
+        maxDepth = 2;
+      };
+
+      mcpServers = {
+        linear.url = "https://mcp.linear.app/mcp";
+      };
+
+      skills = [
+        {
+          path = "${config.home.homeDirectory}/.agents/skills/linear/SKILL.md";
+          enabled = false;
+        }
+        {
+          path = "${config.home.homeDirectory}/.codex/skills/.system/imagegen/SKILL.md";
+          enabled = false;
+        }
+        {
+          path = "${config.home.homeDirectory}/.codex/skills/.system/openai-docs/SKILL.md";
+          enabled = false;
+        }
+        {
+          path = "${config.home.homeDirectory}/.codex/skills/.system/plugin-creator/SKILL.md";
+          enabled = false;
+        }
+        {
+          path = "${config.home.homeDirectory}/.codex/skills/.system/skill-installer/SKILL.md";
+          enabled = false;
+        }
+      ];
+
+      tui = {
+        statusLine = [
+          "model-with-reasoning"
+          "current-dir"
+          "context-used"
+        ];
+        modelAvailabilityNux = {
+          "gpt-5.5" = 4;
+        };
+      };
+
+      plugins = {
+        "forward-roll@forward-roll-local".enable = true;
+      };
+
+      trustedProjects = [
+        "${config.home.homeDirectory}/github.com/vercel"
+        "${config.home.homeDirectory}/github.com/vercel/vercel-py"
+        "${config.home.homeDirectory}/github.com/scotttrinh/changing"
+        "${config.home.homeDirectory}/github.com/scotttrinh/vpi"
+        "${config.home.homeDirectory}/.codex"
+        "${config.home.homeDirectory}/github.com/scotttrinh/subreq"
+        "${config.home.homeDirectory}/github.com/scotttrinh/dotfiles"
+        "${config.home.homeDirectory}/github.com/scotttrinh/forward-roll"
+        "${config.home.homeDirectory}/.config/doom"
+        "${config.home.homeDirectory}/github.com/scotttrinh/jj"
+        "${config.home.homeDirectory}/github.com/scotttrinh/org"
+        "${config.home.homeDirectory}/github.com/openai-early-access/openai-agents-python-preview"
+        "${config.home.homeDirectory}/github.com/scotttrinh/hermes-agent"
+        "${config.home.homeDirectory}/github.com/scotttrinh/chano"
+        "${config.home.homeDirectory}/github.com/vercel-labs/openai-agents-fastapi-starter"
+        "${config.home.homeDirectory}/github.com/scotttrinh/bw-to-op"
+        "${config.home.homeDirectory}/github.com/scotttrinh/mru-tab-switcher"
+      ];
+    };
+
     # Declare the sops secret for this machine
     sops.secrets.claude_code_api_key = {
+      key = "CLAUDE_CODE_API_KEY_FRANNIE";
+      mode = "0400";
+    };
+
+    sops.secrets.codex_zai_coding_plan_api_key = {
       key = "CLAUDE_CODE_API_KEY_FRANNIE";
       mode = "0400";
     };
@@ -68,6 +164,7 @@ in
   homebrew = {
     casks = [
       "orbstack"
+      "openmtp"
     ];
   };
 }
