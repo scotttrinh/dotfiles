@@ -22,21 +22,33 @@ Four providers, each with distinct cost/capability profiles:
 | z.ai (`zai-coding-plan`) | Parallel subagents: task, explore, sonic, librarian | `codex_zai_coding_plan_api_key` (sops) |
 | Google (`google`) | Multimodal + utility: designer, vision, smol, commit, tiny | `GEMINI_API_KEY` |
 
+### Model catalog
+
+| Slug | Family tier | Notes |
+|------|-------------|-------|
+| `gpt-5.5` | OpenAI GPT pro | No `-codex` suffix; the current SOTA OpenAI model |
+| `claude-opus-4.8` | Anthropic Opus | Current SOTA Claude model |
+| `claude-sonnet-5` | Anthropic Sonnet | Mid-tier Claude |
+| `claude-haiku-4.5` | Anthropic Haiku | Budget Claude |
+| `glm-5.2` | Z.ai GLM | Current SOTA GLM model (coding plan) |
+| `gemini-3.5-flash` | Gemini SOTA | The current pro-equivalent in the Gemini family; no separate Pro model exists |
+| `gemini-3.1-flash-lite` | Gemini budget | Cheaper tier Gemini model |
+
 ## Model Role Assignments
 
 Each OMP role is pinned to a specific provider/model:
 
 | Role | Model | Provider | Rationale |
 |------|-------|----------|-----------|
-| `default` | `gpt-5.5-codex` | OpenAI | Top-tier coding model, codex-optimized, strong agentic tool use |
-| `plan` | `gpt-5.5-codex` | OpenAI | Same as default — consistent planning without model-switch friction |
-| `slow` | `claude-opus` | Anthropic | Best deep reasoning; complementary to GPT-5.5-Codex for hard debugging |
-| `task` | `glm-5.2` | z.ai | Cheap parallel fan-out; main session supervises quality |
-| `designer` | `gemini-3.5-pro` | Google | Strong multimodal for UI/UX work |
-| `vision` | `gemini-3.5-pro` | Google | Best image understanding for screenshots/diagrams |
-| `commit` | `gemini-3.5-flash` | Google | Fast, cheap commit messages |
-| `smol` | `gemini-3.5-flash` | Google | Lightweight tasks, quick lookups |
-| `tiny` | `gemini-3.5-flash` | Google | Background: session titles, memory, auto-thinking classification |
+| `default` | `openai/gpt-5.5` | OpenAI | SOTA coding model, strong agentic tool use |
+| `plan` | `openai/gpt-5.5` | OpenAI | Same as default — consistent planning without model-switch friction |
+| `slow` | `anthropic/claude-opus-4.8` | Anthropic | Best deep reasoning; complementary to GPT-5.5 for hard debugging |
+| `task` | `zai-coding-plan/glm-5.2` | z.ai | Cheap parallel fan-out; main session supervises quality |
+| `designer` | `google/gemini-3.5-flash` | Google | SOTA Gemini — strong multimodal for UI/UX work |
+| `vision` | `google/gemini-3.5-flash` | Google | SOTA Gemini — best image understanding for screenshots/diagrams |
+| `commit` | `google/gemini-3.1-flash-lite` | Google | Budget tier — fast, cheap commit messages |
+| `smol` | `google/gemini-3.1-flash-lite` | Google | Budget tier — lightweight tasks, quick lookups |
+| `tiny` | `google/gemini-3.1-flash-lite` | Google | Budget tier — background: session titles, memory, classification |
 
 ### Per-Agent Model Overrides
 
@@ -44,10 +56,10 @@ Subagents that deviate from the default `task` role:
 
 | Agent | Model | Rationale |
 |-------|-------|-----------|
-| `reviewer` | `gpt-5.5-codex` (OpenAI) | Quality-critical code review needs strong reasoning |
-| `explore` | `glm-5.2` (z.ai) | Read-only scout — cheap is fine |
-| `sonic` | `glm-5.2` (z.ai) | Mechanical updates — cheap is fine |
-| `librarian` | `glm-5.2` (z.ai) | Library research — cheap is fine |
+| `reviewer` | `openai/gpt-5.5` | Quality-critical code review needs SOTA reasoning |
+| `explore` | `zai-coding-plan/glm-5.2` | Read-only scout — cheap is fine |
+| `sonic` | `zai-coding-plan/glm-5.2` | Mechanical updates — cheap is fine |
+| `librarian` | `zai-coding-plan/glm-5.2` | Library research — cheap is fine |
 
 All other agents (Tester, task, plan, designer) inherit their role default or
 agent frontmatter model.
@@ -63,33 +75,34 @@ retry:
   enabled: true
   modelFallback: true
   fallbackChains:
-    "openai/gpt-5.5-codex":
-      - "anthropic/claude-opus"
-      - "google/gemini-3.5-pro"
-    "anthropic/claude-opus":
-      - "openai/gpt-5.5-codex"
-      - "google/gemini-3.5-pro"
+    "openai/gpt-5.5":
+      - "anthropic/claude-opus-4.8"
+      - "google/gemini-3.5-flash"
+    "anthropic/claude-opus-4.8":
+      - "openai/gpt-5.5"
+      - "google/gemini-3.5-flash"
     "zai-coding-plan/glm-5.2":
-      - "openai/gpt-5.5-codex"
-      - "anthropic/claude-sonnet"
-    "google/gemini-3.5-pro":
-      - "anthropic/claude-sonnet"
-      - "openai/gpt-5.5-codex"
+      - "openai/gpt-5.5"
+      - "anthropic/claude-sonnet-5"
     "google/gemini-3.5-flash":
+      - "anthropic/claude-sonnet-5"
+      - "openai/gpt-5.5"
+    "google/gemini-3.1-flash-lite":
       - "zai-coding-plan/glm-5.2"
-      - "openai/gpt-5.4"
+      - "anthropic/claude-haiku-4.5"
   # Leave fallbackRevertPolicy unset → runtime default (cooldown-expiry)
 ```
 
 ### Chain rationale
 
-- **GPT-5.5-Codex ↔ Claude Opus:** Two top-tier models back each other up.
-  Gemini Pro is the third diverse provider.
-- **GLM-5.2:** Steps up to GPT-5.5-Codex (stronger, different provider), then
-  Claude Sonnet (second diverse provider).
-- **Gemini Pro:** Falls to Claude Sonnet (strong multimodal peer), then OpenAI.
-- **Gemini Flash:** Falls to GLM-5.2 (cheap peer, different provider), then
-  GPT-5.4 (reliable fallback).
+- **GPT-5.5 ↔ Claude Opus 4.8:** Two SOTA models back each other up.
+  Gemini 3.5 Flash (Gemini SOTA) is the third diverse provider.
+- **GLM-5.2:** Steps up to GPT-5.5 (stronger, different provider), then
+  Claude Sonnet 5 (second diverse provider).
+- **Gemini 3.5 Flash:** Falls to Claude Sonnet 5 (strong multimodal peer), then
+  GPT-5.5.
+- **Gemini 3.1 Flash Lite:** Falls to GLM-5.2 (cheap peer, different provider),
+  then Claude Haiku 4.5 (budget-tier Anthropic).
 
 ### Revert policy
 
@@ -109,27 +122,33 @@ complexity of defining promotion targets across heterogeneous providers.
 The configuration will be added to `configurations/darwin/frannie.nix` under the
 `home-manager.users.scotttrinh` block, using the `omp` module options:
 
-```
+```nix
 omp = {
   enable = true;
 
   # Model roles
-  defaultModel = "openai/gpt-5.5-codex";
-  planModel    = "openai/gpt-5.5-codex";
-  slowModel    = "anthropic/claude-opus";   # exact canonical ID TBD
-  taskModel    = "zai-coding-plan/glm-5.2";
-  designerModel = "google/gemini-3.5-pro";  # exact ID TBD
-  visionModel  = "google/gemini-3.5-pro";
-  commitModel  = "google/gemini-3.5-flash";
-  smolModel    = "google/gemini-3.5-flash";
+  defaultModel  = "openai/gpt-5.5";
+  planModel     = "openai/gpt-5.5";
+  slowModel     = "anthropic/claude-opus-4.8";
+  taskModel     = "zai-coding-plan/glm-5.2";
+  designerModel = "google/gemini-3.5-flash";
+  visionModel   = "google/gemini-3.5-flash";
+  commitModel   = "google/gemini-3.1-flash-lite";
+  smolModel     = "google/gemini-3.1-flash-lite";
 
-  # tiny role (not top-level option — via settings)
-  settings.modelRoles.tiny = "google/gemini-3.5-flash";
+  # tiny role (not a top-level option — via raw settings)
+  settings.modelRoles.tiny = "google/gemini-3.1-flash-lite";
 
-  # Retry fallback chains
+  # Retry fallback chains (quality-preserved resilience)
   model = {
     modelFallback = true;
-    fallbackChains = { ... };  # as specified above
+    fallbackChains = {
+      "openai/gpt-5.5"             = [ "anthropic/claude-opus-4.8" "google/gemini-3.5-flash" ];
+      "anthropic/claude-opus-4.8"  = [ "openai/gpt-5.5" "google/gemini-3.5-flash" ];
+      "zai-coding-plan/glm-5.2"   = [ "openai/gpt-5.5" "anthropic/claude-sonnet-5" ];
+      "google/gemini-3.5-flash"    = [ "anthropic/claude-sonnet-5" "openai/gpt-5.5" ];
+      "google/gemini-3.1-flash-lite" = [ "zai-coding-plan/glm-5.2" "anthropic/claude-haiku-4.5" ];
+    };
   };
 
   # Context promotion disabled
@@ -137,9 +156,9 @@ omp = {
 
   # Per-agent overrides
   tasks.agentModelOverrides = {
-    reviewer = "openai/gpt-5.5-codex";
-    explore  = "zai-coding-plan/glm-5.2";
-    sonic    = "zai-coding-plan/glm-5.2";
+    reviewer  = "openai/gpt-5.5";
+    explore   = "zai-coding-plan/glm-5.2";
+    sonic     = "zai-coding-plan/glm-5.2";
     librarian = "zai-coding-plan/glm-5.2";
   };
 
@@ -150,10 +169,9 @@ omp = {
 
 ## Open Items
 
-1. **Exact model IDs:** Confirm canonical model identifiers for Claude Opus,
-   Claude Sonnet, Gemini Pro, and Gemini Flash against the omp bundled catalog
-   (`omp models` output). The spec uses family names; implementation must use
-   exact `provider/modelId` selectors.
+1. **Provider IDs:** Confirm exact provider IDs in the omp catalog for each model
+   (e.g., is GPT-5.5 under `openai` or `openai-codex`?). Verify with `omp models`
+   before finalizing selectors.
 2. **Provider credentials:** Add `GEMINI_API_KEY` to sops secrets. Confirm
    OpenAI and Anthropic keys are available to omp (not just to claudeCode/codex).
    z.ai key is already wired.
