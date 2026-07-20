@@ -9,19 +9,19 @@ let
     {
       aarch64-darwin = {
         name = "macos-aarch64";
-        hash = "sha256-+H3vXmfU/P7TITuf0XcfGQFaKrdTIW1DII0CsTB+c+w=";
+        hash = "sha256-Afxiu/yXUo93mCYHMo+WP/ODx/ZJc1uR1WMugGfpaYY=";
       };
       x86_64-darwin = {
         name = "macos-x86_64";
-        hash = "sha256-h2QEt8HbKASu2BPYDAZV23hn/U92vVTM/IceAueAM2Q=";
+        hash = "sha256-6toFL8pqsWxCHQM9VYndZkEJw5/pBTdGywWOQbA3rwE=";
       };
       aarch64-linux = {
         name = "linux-aarch64";
-        hash = "sha256-ZldlgH4yuTDpoZpAS4D/0y8HWeBkhtBYPOGHdGl4Bzw=";
+        hash = "sha256-f6qQ/8Bn8/cjQrv59oV5hbI16fmq3PIsUz3a8VWQTNQ=";
       };
       x86_64-linux = {
         name = "linux-x86_64";
-        hash = "sha256-D75Q8zR0PyV08oWNPoFhToP/Yw/PMPhRLMG3+zut9gQ=";
+        hash = "sha256-8j48IWvG2XOwLhdeve2iQlhBoKaR5v/8hbsQZR0/vSw=";
       };
     }
     .${stdenvNoCC.hostPlatform.system}
@@ -29,7 +29,7 @@ let
 in
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "fx";
-  version = "0.3.35";
+  version = "0.3.51";
 
   src = fetchurl {
     url = "https://ugiwefobuo4tac0m.public.blob.vercel-storage.com/cli/v${finalAttrs.version}/fx-${platform.name}.tar.gz";
