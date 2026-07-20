@@ -150,6 +150,49 @@ in
       ];
     };
 
+    omp = {
+      enable = true;
+
+      # Model roles
+      defaultModel  = "openai-codex/gpt-5.6-sol:low";
+      planModel     = "openai-codex/gpt-5.6-sol:medium";
+      slowModel     = "openai-codex/gpt-5.6-sol:max";
+      taskModel     = "zai/glm-5.2:max";
+      designerModel = "openai-codex/gpt-5.6-luna:max";
+      visionModel   = "openai-codex/gpt-5.6-luna:max";
+      commitModel   = "openai-codex/gpt-5.6-luna:none";
+      smolModel     = "openai-codex/gpt-5.6-luna:medium";
+
+      # Z.ai static credential (only provider needing one)
+      modelProviders.zai = {
+        apiKey = "!cat ${config.sops.secrets.codex_zai_coding_plan_api_key.path}";
+      };
+
+      # Retry fallback chains — no OpenAI model falls back to another OpenAI model
+      model = {
+        modelFallback = true;
+        fallbackChains = {
+          "openai-codex/gpt-5.6-sol"  = [ "anthropic/claude-opus-4-8" "google-antigravity/gemini-3.5-flash" ];
+          "openai-codex/gpt-5.6-luna" = [ "zai/glm-5.2" "anthropic/claude-sonnet-5" "google-antigravity/gemini-3.5-flash" ];
+          "zai/glm-5.2"               = [ "anthropic/claude-sonnet-5" "google-antigravity/gemini-3.5-flash" ];
+        };
+      };
+
+      # Disable context promotion — rely on compaction
+      context.promotionEnabled = false;
+
+      # Per-agent model overrides
+      tasks.agentModelOverrides = {
+        reviewer   = "openai-codex/gpt-5.6-sol:medium";
+        explore    = "openai-codex/gpt-5.6-luna:xhigh";
+        librarian  = "openai-codex/gpt-5.6-luna:xhigh";
+        oracle     = "openai-codex/gpt-5.6-sol:xhigh";
+        task       = "zai/glm-5.2:max";
+        plan       = "openai-codex/gpt-5.6-sol:medium";
+        quick_task = "openai-codex/gpt-5.6-luna:high";
+      };
+    };
+
     # Declare the sops secret for this machine
     sops.secrets.claude_code_api_key = {
       key = "CLAUDE_CODE_API_KEY_FRANNIE";
