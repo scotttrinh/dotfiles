@@ -9,7 +9,7 @@ This repository distinguishes between two types of configuration:
 | Aspect | Secrets | Settings |
 |--------|---------|----------|
 | **Sensitivity** | Confidential (API keys, tokens) | Not sensitive (preferences, feature flags) |
-| **Storage** | Encrypted in `secrets.yaml` | Plain text in Nix config |
+| **Storage** | Encrypted in `secrets/<machine>.yaml` | Plain text in Nix config |
 | **Version control** | Encrypted values only | Fully readable |
 | **Injection method** | sops-nix decryption at runtime | Generated at build time |
 | **Examples** | `ANTHROPIC_API_KEY`, `CLAUDE_CODE_AUTH_TOKEN` | Model selection, timeouts, UI preferences |

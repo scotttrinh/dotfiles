@@ -42,7 +42,7 @@ dotfiles/
 │   │   └── orbstack.nix      # OrbStack-specific settings
 │   └── flake/                # Flake infrastructure
 ├── packages/                 # Custom package definitions
-├── secrets.yaml              # SOPS-encrypted secrets
+├── secrets/                  # Per-machine SOPS-encrypted secrets
 └── .sops.yaml                # SOPS configuration with age keys
 ```
 

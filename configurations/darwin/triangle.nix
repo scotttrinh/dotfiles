@@ -63,7 +63,7 @@ in
     { lib, config, ... }:
     let
       fx = pkgs.writeShellScriptBin "fx" ''
-        export AI_GATEWAY_API_KEY="$(tr -d '\r\n' < ${config.sops.secrets.fx_ai_gateway_api_key.path})"
+        export AI_GATEWAY_API_KEY="$(tr -d '\r\n' < ${config.sops.secrets.ai_gateway_api_key.path})"
         exec ${lib.getExe selfPackages.fx} "$@"
       '';
 
@@ -101,24 +101,16 @@ in
         publicKey = secretiveSigningPublicKey;
       };
 
-      # Declare the sops secret for this machine
-      sops.secrets.claude_code_auth_token = {
-        key = "CLAUDE_CODE_AUTH_TOKEN_TRIANGLE";
+      sops.defaultSopsFile = ../../secrets/triangle.yaml;
+
+      sops.secrets.emacs_authinfo = {
+        key = "EMACS_AUTHINFO";
+        path = "${config.home.homeDirectory}/.authinfo";
         mode = "0400";
       };
 
-      sops.secrets.codex_ai_gateway_api_key = {
-        key = "CODEX_AI_GATEWAY_API_KEY";
-        mode = "0400";
-      };
-
-      sops.secrets.omp_ai_gateway_api_key = {
-        key = "OMP_AI_GATEWAY_API_KEY";
-        mode = "0400";
-      };
-
-      sops.secrets.fx_ai_gateway_api_key = {
-        key = "FX_AI_GATEWAY_API_KEY";
+      sops.secrets.ai_gateway_api_key = {
+        key = "AI_GATEWAY_API_KEY";
         mode = "0400";
       };
 
@@ -130,7 +122,7 @@ in
         enable = true;
         auth = {
           type = "oauth";
-          secret = config.sops.placeholder.claude_code_auth_token;
+          secret = config.sops.placeholder.ai_gateway_api_key;
         };
         baseUrl = "https://ai-gateway.vercel.sh";
         model = "claude-fable-5";
@@ -144,7 +136,7 @@ in
         smallModel = "vercel/deepseek/deepseek-v4-flash";
         enabledProviders = [ "vercel" "openai" ];
         providers.vercel = {
-          auth.secret = config.sops.placeholder.claude_code_auth_token;
+          auth.secret = config.sops.placeholder.ai_gateway_api_key;
           timeoutMs = 3000000; # 50 minutes
           models = {
             "zai/glm-5.2".name = "GLM-5.2";
@@ -164,7 +156,7 @@ in
       codex = {
         modelProvider = "openai";
         aiGateway = {
-          apiKeyFile = config.sops.secrets.codex_ai_gateway_api_key.path;
+          apiKeyFile = config.sops.secrets.ai_gateway_api_key.path;
         };
 
         notice = {
@@ -263,7 +255,7 @@ in
 
         modelProviders.ai-gateway = {
           baseUrl = "https://ai-gateway.vercel.sh/v1";
-          apiKey = config.sops.placeholder.omp_ai_gateway_api_key;
+          apiKey = config.sops.placeholder.ai_gateway_api_key;
           api = "openai-responses";
           auth = "apiKey";
           authHeader = true;

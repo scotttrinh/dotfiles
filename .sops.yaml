@@ -1,5 +1,4 @@
-# sops configuration for encrypting secrets with multiple device-specific keys
-# Each device should have its own age key, and all secrets are encrypted to all devices
+# sops configuration for encrypting secrets with machine-specific keys
 keys:
   # frannie (personal mac)
   - &age_frannie age19g7cg3tkz2p47psy79usywnsv89mf5mpmet99l7nz6tgtaex54mq6m574s
@@ -11,10 +10,17 @@ keys:
   - &age_nooks age1gksfefdf7t6v07t8f6klqff2v5rz97wxwn8jd5kk3zg65j9hqesqt8q37m
 
 creation_rules:
-  - path_regex: secrets\.ya?ml$
-    # Encrypt to all device keys - add new devices here
+  - path_regex: secrets/frannie\.ya?ml$
     key_groups:
       - age:
           - *age_frannie
+
+  - path_regex: secrets/triangle\.ya?ml$
+    key_groups:
+      - age:
           - *age_triangle
+
+  - path_regex: secrets/nooks\.ya?ml$
+    key_groups:
+      - age:
           - *age_nooks

@@ -29,7 +29,7 @@ modules/home/                 -> homeModules (auto-imported)
 modules/darwin/               -> darwinModules
 modules/nixos/                -> nixosModules
 packages/                     -> custom packages
-secrets.yaml                  -> SOPS-encrypted secrets (if present)
+secrets/<machine>.yaml        -> machine-specific SOPS-encrypted secrets (if present)
 .sops.yaml                    -> SOPS key configuration (if present)
 ```
 
@@ -269,7 +269,8 @@ After updating, always run `nix flake check` to verify nothing broke.
    }
    ```
 
-4. **If the machine needs secrets**: Generate an age key, add its public key to `.sops.yaml`, and re-encrypt secrets with `sops updatekeys secrets.yaml`.
+4. **If the machine needs secrets**: Generate an age key, add its public key to
+   `.sops.yaml`, create `secrets/<machine>.yaml`, and encrypt it for that machine.
 
 5. The configuration is auto-discovered by nixos-unified — no manual registration in `flake.nix`.
 
@@ -311,19 +312,20 @@ After `fh add`, review the generated input in `flake.nix` and:
 
 ### Manage Secrets
 
-Prerequisites: `sops-nix` input and `sops.nix` home module must exist. Check for `.sops.yaml` and `secrets.yaml`.
+Prerequisites: `sops-nix` input and `sops.nix` home module must exist. Check for
+`.sops.yaml` and the relevant `secrets/<machine>.yaml` file.
 
 1. **Add a new secret**:
    ```bash
-   # Edit secrets file (decrypts, opens editor, re-encrypts)
-   sops secrets.yaml
+   # Edit the current machine's secrets file (decrypts, opens editor, re-encrypts)
+   sops secrets/<machine>.yaml
    ```
    Add the key-value pair in YAML format.
 
 2. **Declare the secret** in a module or host config:
    ```nix
    sops.secrets.<secret_name> = {
-     key = "SECRET_KEY_NAME";  # key in secrets.yaml
+     key = "SECRET_KEY_NAME";  # key in secrets/<machine>.yaml
      mode = "0400";
    };
    ```
@@ -346,7 +348,7 @@ Prerequisites: `sops-nix` input and `sops.nix` home module must exist. Check for
    ```bash
    age-keygen -o ~/.config/sops/age/keys.txt  # on the new machine
    # Add public key to .sops.yaml
-   sops updatekeys secrets.yaml
+   sops updatekeys secrets/<machine>.yaml
    ```
 
 ### Add a Per-Machine Override
@@ -467,7 +469,7 @@ nix flake update <name>               # Update a specific input
 nix fmt                               # Format all .nix files
 nix flake check                       # Verify evaluation
 nix flake show                        # Show all outputs
-sops secrets.yaml                     # Edit encrypted secrets
+sops secrets/<machine>.yaml           # Edit encrypted machine secrets
 nix search nixpkgs --json <term>      # Search for packages
 nix-locate --whole-name bin/<name>    # Find package by binary name
 nix run nixpkgs#fh -- search <query>  # Search for flakes on FlakeHub

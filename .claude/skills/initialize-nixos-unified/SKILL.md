@@ -250,7 +250,8 @@ mkdir -p ~/.config/sops/age
 age-keygen -o ~/.config/sops/age/keys.txt
 ```
 
-4. Create `.sops.yaml` with the public key and `secrets.yaml` with encrypted values.
+4. Create `.sops.yaml` with the machine public key and
+   `secrets/<machine>.yaml` with encrypted values.
 
 Walk the user through each step — secrets management is the most error-prone part.
 

@@ -44,7 +44,7 @@ Work machine with Vercel-specific tooling:
 - gh (GitHub CLI)
 
 **Claude Code Configuration** (see [settings.md](./settings.md)):
-- Auth: OAuth via `CLAUDE_CODE_AUTH_TOKEN_TRIANGLE` secret
+- Auth: OAuth via `AI_GATEWAY_API_KEY` secret
 - Base URL: `https://ai-gateway.vercel.sh` (Vercel's AI gateway)
 - Model: opus
 - Status line: enabled
@@ -59,7 +59,7 @@ Auto-clones `vercel/front` repository with `pnpm install`
 Minimal personal machine:
 
 **Claude Code Configuration**:
-- Auth: API Key via `CLAUDE_CODE_API_KEY_FRANNIE` secret
+- Auth: z.ai Coding Plan via `ZAI_CODING_PLAN_API_KEY` secret
 - Base URL: `https://api.z.ai/api/anthropic` (z.ai proxy)
 - Model: opus
 
@@ -86,7 +86,7 @@ OrbStack NixOS VM running isolated AI agent containers:
 
 **Key Components**:
 - **nooks module**: Creates systemd-nspawn containers with network isolation
-- **sops-nix**: Decrypts `ANTHROPIC_API_KEY_NOOKS` for API access
+- **sops-nix**: Decrypts `AI_GATEWAY_API_KEY` for API access
 - **OrbStack module**: VM-specific settings (DNS, networking, watchdogs)
 
 **Nook Configuration**:
@@ -163,7 +163,7 @@ All machines inherit from `self.darwinModules.default`, which provides:
 
 2. Add the machine's age public key to `.sops.yaml` if it needs secrets
 
-3. Re-encrypt secrets if needed: `sops updatekeys secrets.yaml`
+3. Create or update `secrets/<hostname>.yaml` using that machine's SOPS rule
 
 4. Run `nix run .#activate` on the new machine
 
@@ -199,7 +199,7 @@ in
 
   # sops-nix for secrets
   sops = {
-    defaultSopsFile = ../../secrets.yaml;
+    defaultSopsFile = ../../secrets/myhost.yaml;
     age.keyFile = "/home/scotttrinh/.config/sops/age/keys.txt";
   };
 
@@ -217,7 +217,7 @@ in
 
 3. Add the public key to `.sops.yaml`
 
-4. Re-encrypt secrets: `sops updatekeys secrets.yaml`
+4. Encrypt the machine file to its age recipient and verify it locally
 
 5. Create OrbStack VM: `orb create nixos <hostname>`
 

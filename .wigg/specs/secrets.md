@@ -4,7 +4,7 @@ Secrets are managed using **sops-nix** with **age** encryption keys.
 
 ## Overview
 
-- Secrets are stored encrypted in `secrets.yaml`
+- Secrets are stored in per-machine files under `secrets/`
 - Each machine has its own age key pair
 - `.sops.yaml` defines which keys can decrypt which secrets
 - Secrets are decrypted at activation time
@@ -24,25 +24,27 @@ keys:
   - &nooks age1...    # nooks VM's public key
 
 creation_rules:
-  - path_regex: secrets\.yaml$
+  - path_regex: secrets/triangle\.ya?ml$
+    key_groups:
+      - age:
+          - *triangle
+  - path_regex: secrets/frannie\.ya?ml$
     key_groups:
       - age:
           - *frannie
-          - *triangle
+  - path_regex: secrets/nooks\.ya?ml$
+    key_groups:
+      - age:
           - *nooks
 ```
 
-### `secrets.yaml`
+### `secrets/<machine>.yaml`
 
-Encrypted secrets file. Structure:
+Each machine has a flat encrypted file containing only its own credentials. For example:
 
 ```yaml
-# Darwin machines
-CLAUDE_CODE_AUTH_TOKEN_TRIANGLE: ENC[...]
-CLAUDE_CODE_API_KEY_FRANNIE: ENC[...]
-
-# NixOS machines
-ANTHROPIC_API_KEY_NOOKS: ENC[...]
+AI_GATEWAY_API_KEY: ENC[...]
+EMACS_AUTHINFO: ENC[...]
 ```
 
 ## How Secrets Are Used
@@ -52,7 +54,7 @@ ANTHROPIC_API_KEY_NOOKS: ENC[...]
 ```nix
 # In machine config or module:
 sops.secrets.claude_code_auth_token = {
-  key = "CLAUDE_CODE_AUTH_TOKEN_TRIANGLE";
+  key = "AI_GATEWAY_API_KEY";
   mode = "0400";
 };
 ```
@@ -76,11 +78,11 @@ environment.variables.SECRET_FILE = config.sops.secrets.my_secret.path;
 
 ### 3. Default Settings
 
-**Home Manager (Darwin)** - from `modules/home/sops.nix`:
+**Home Manager (Darwin)** - set in each machine configuration:
 
 ```nix
 sops = {
-  defaultSopsFile = ../../secrets.yaml;
+  defaultSopsFile = ../../secrets/triangle.yaml;
   age.keyFile = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
 };
 ```
@@ -89,7 +91,7 @@ sops = {
 
 ```nix
 sops = {
-  defaultSopsFile = ../../secrets.yaml;
+  defaultSopsFile = ../../secrets/nooks.yaml;
   age.keyFile = "/home/scotttrinh/.config/sops/age/keys.txt";
 };
 ```
@@ -101,7 +103,7 @@ Nook containers receive secrets via the nooks module:
 ```nix
 # Decrypt secret on the NixOS host
 sops.secrets.anthropic_api_key = {
-  key = "ANTHROPIC_API_KEY_NOOKS";
+  key = "AI_GATEWAY_API_KEY";
 };
 
 # Inject into all nook containers as environment variable
@@ -155,30 +157,30 @@ creation_rules:
 After updating `.sops.yaml`:
 
 ```bash
-sops updatekeys secrets.yaml
+sops updatekeys secrets/<machine>.yaml
 ```
 
 ## Editing Secrets
 
 ```bash
-# Edit secrets (decrypts, opens editor, re-encrypts on save)
-sops secrets.yaml
+# Edit secrets for one machine (decrypts, opens editor, re-encrypts on save)
+sops secrets/<machine>.yaml
 
 # View decrypted secrets (for debugging)
-sops -d secrets.yaml
+sops -d secrets/<machine>.yaml
 ```
 
 ## Per-Machine Secrets
 
-Secrets can be machine-specific by using different keys:
+Each machine has a separate flat file encrypted only to its own age recipient:
 
 ```yaml
-# In secrets.yaml:
-CLAUDE_CODE_AUTH_TOKEN_TRIANGLE: "token-for-triangle"
-CLAUDE_CODE_API_KEY_FRANNIE: "key-for-frannie"
+# In secrets/triangle.yaml:
+AI_GATEWAY_API_KEY: ENC[...]
+EMACS_AUTHINFO: ENC[...]
 ```
 
-Each machine references only its own secrets in its configuration.
+Each machine references only its own file in its configuration.
 
 ## Security Notes
 

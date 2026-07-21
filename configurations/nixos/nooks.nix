@@ -88,6 +88,8 @@ in
         inputs.sops-nix.homeManagerModules.sops
       ];
 
+      sops.defaultSopsFile = ../../secrets/nooks.yaml;
+
       # User info for home modules
       me = {
         username = "scotttrinh";
@@ -97,7 +99,7 @@ in
 
       # Declare the sops secret for Claude Code auth
       sops.secrets.claude_code_auth_token = {
-        key = "ANTHROPIC_API_KEY_NOOKS";
+        key = "AI_GATEWAY_API_KEY";
       };
 
       # Claude Code configuration
@@ -127,12 +129,12 @@ in
   #   cp /mnt/mac/Users/scotttrinh/.config/sops/age/nooks.key ~/.config/sops/age/keys.txt
 
   sops = {
-    defaultSopsFile = ../../secrets.yaml;
+    defaultSopsFile = ../../secrets/nooks.yaml;
     age.keyFile = "/home/scotttrinh/.config/sops/age/keys.txt";
 
     secrets = {
       anthropic-api-key = {
-        key = "ANTHROPIC_API_KEY_NOOKS";
+        key = "AI_GATEWAY_API_KEY";
         owner = "scotttrinh";
         group = "users";
       };

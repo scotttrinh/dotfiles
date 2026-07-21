@@ -32,6 +32,14 @@ in
 
   # Machine-specific home-manager configuration
   home-manager.users.scotttrinh = { lib, config, pkgs, ... }: {
+    sops.defaultSopsFile = ../../secrets/frannie.yaml;
+
+    sops.secrets.emacs_authinfo = {
+      key = "EMACS_AUTHINFO";
+      path = "${config.home.homeDirectory}/.authinfo";
+      mode = "0400";
+    };
+
     me.gitSigning = {
       publicKey = secretiveSigningPublicKey;
       agentKeyCommentPattern = "Frannie-GitHub-Signing-Key";
@@ -40,11 +48,6 @@ in
     # Claude Code configuration using z.ai proxy
     claudeCode = {
       enable = true;
-      # auth = {
-      #   type = "apiKey";
-      #   secret = config.sops.placeholder.claude_code_api_key;
-      # };
-      # baseUrl = "https://api.z.ai/api/anthropic";
       model = "opus";
       timeoutMs = 3000000; # 50 minutes
     };
@@ -193,14 +196,8 @@ in
       };
     };
 
-    # Declare the sops secret for this machine
-    sops.secrets.claude_code_api_key = {
-      key = "CLAUDE_CODE_API_KEY_FRANNIE";
-      mode = "0400";
-    };
-
     sops.secrets.codex_zai_coding_plan_api_key = {
-      key = "CLAUDE_CODE_API_KEY_FRANNIE";
+      key = "ZAI_CODING_PLAN_API_KEY";
       mode = "0400";
     };
   };

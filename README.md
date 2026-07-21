@@ -12,7 +12,10 @@ dotfiles/
 ├── flake.nix                    # Entry point: inputs, outputs, and nixos-unified wiring
 ├── flake.lock                   # Pinned dependency versions
 ├── .sops.yaml                   # SOPS age key mapping (which keys decrypt which secrets)
-├── secrets.yaml                 # Encrypted secrets (API keys, tokens)
+├── secrets/                     # Per-machine SOPS-encrypted secrets
+│   ├── frannie.yaml
+│   ├── nooks.yaml
+│   └── triangle.yaml
 │
 ├── configurations/
 │   ├── darwin/                  # One file per macOS host
@@ -72,7 +75,7 @@ configurations then layer on machine-specific settings:
 | Host | Platform | Notable Differences |
 |------|----------|---------------------|
 | **frankie** | aarch64-darwin | Minimal — just the shared defaults |
-| **frannie** | aarch64-darwin | Claude Code via API key (secret: `CLAUDE_CODE_API_KEY_FRANNIE`) |
+| **frannie** | aarch64-darwin | Claude Code and OMP via z.ai (secret: `ZAI_CODING_PLAN_API_KEY`) |
 | **triangle** | aarch64-darwin | Work machine — Claude Code and MiMo-Code via OAuth-backed AI Gateway, Vercel CLI, git-lfs, work repo cloning activation script, extra Homebrew casks (1Password, Slack, Cursor, OrbStack) |
 | **nooks** | aarch64-linux | OrbStack NixOS VM — runs `nook` containers for AI agent development, injects Claude Code config into containers |
 
@@ -121,26 +124,29 @@ Secrets are managed with [sops-nix](https://github.com/Mic92/sops-nix) using
 
 ### How It Works
 
-1. **`.sops.yaml`** maps age public keys to devices. Each machine has its own
-   age keypair, and all secrets are encrypted to all device keys so any machine
-   can decrypt them.
+1. **`.sops.yaml`** maps each machine's age public key to its secret file. A
+   machine can decrypt only its own file.
 
-2. **`secrets.yaml`** is the encrypted secrets file. It contains API keys and
-   tokens as SOPS-encrypted YAML values. Edit with `sops secrets.yaml`.
+2. **`secrets/<machine>.yaml`** contains that machine's flat set of API keys and
+   tokens as SOPS-encrypted YAML values. Edit with, for example,
+   `sops secrets/triangle.yaml`.
 
-3. **Home module** (`modules/home/sops.nix`) imports sops-nix and points it at
-   the secrets file and the local age key (`~/.config/sops/age/keys.txt`).
+3. **Host configurations** set `sops.defaultSopsFile` to the machine's file.
+   The shared home module imports sops-nix and points it at the local age key
+   (`~/.config/sops/age/keys.txt`).
 
 4. **Usage in modules** — secrets are declared and then referenced via SOPS
    templates or placeholders:
    ```nix
    # Declare a secret
-   sops.secrets.CLAUDE_CODE_API_KEY_FRANNIE = {};
+   sops.secrets.zai_coding_plan_api_key = {
+     key = "ZAI_CODING_PLAN_API_KEY";
+   };
 
    # Use it in a generated file via sops.templates
    sops.templates."settings.json".content = builtins.toJSON {
      env = {
-       ANTHROPIC_API_KEY = config.sops.placeholder.CLAUDE_CODE_API_KEY_FRANNIE;
+       ANTHROPIC_API_KEY = config.sops.placeholder.zai_coding_plan_api_key;
      };
    };
    ```
@@ -151,9 +157,9 @@ Secrets are managed with [sops-nix](https://github.com/Mic92/sops-nix) using
 # Generate age key
 age-keygen -o ~/.config/sops/age/keys.txt
 
-# Add the public key to .sops.yaml under the creation_rules keys list
-# Then re-encrypt secrets so the new key can decrypt them:
-sops updatekeys secrets.yaml
+# Add the public key to .sops.yaml under the machine's creation rule
+# Then re-encrypt that machine's file:
+sops updatekeys secrets/<machine>.yaml
 ```
 
 ## Git Commit Signing
@@ -298,8 +304,8 @@ Review changes in `flake.lock` before committing.
   `modules/darwin/default.nix`. Per-host overrides go in the host's
   configuration file.
 - **Secrets errors**: Ensure `~/.config/sops/age/keys.txt` exists and contains
-  the correct age private key for this machine. Run `sops secrets.yaml` to
-  verify you can decrypt.
+  the correct age private key for this machine. Run `sops secrets/<machine>.yaml`
+  to verify you can decrypt the machine's file.
 
 Refer to [nixos-unified.org](https://nixos-unified.org) for upstream
 documentation.

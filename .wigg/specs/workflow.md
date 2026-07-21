@@ -117,9 +117,9 @@ See [machines.md](./machines.md) for instructions.
 
 ### New Secret
 
-1. Edit `secrets.yaml`:
+1. Edit the target machine's `secrets/<machine>.yaml`:
    ```bash
-   sops secrets.yaml
+   sops secrets/<machine>.yaml
    ```
 
 2. Add the secret key and value
@@ -181,7 +181,7 @@ Remove conflicting `.nixos-unified-template-backup` files if needed.
 
 1. Verify age key exists: `ls ~/.config/sops/age/keys.txt`
 2. Check key is authorized in `.sops.yaml`
-3. Re-encrypt if needed: `sops updatekeys secrets.yaml`
+3. Re-encrypt if needed: `sops updatekeys secrets/<machine>.yaml`
 
 ### Flake Evaluation Errors
 

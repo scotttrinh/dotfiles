@@ -23,8 +23,8 @@ A NixOS configuration for an OrbStack VM that runs isolated AI agent containers
 mkdir -p ~/.config/sops/age
 age-keygen -o ~/.config/sops/age/nooks.key
 
-# Add the public key to .sops.yaml and re-encrypt:
-# sops updatekeys secrets.yaml
+# Add the public key to the nooks rule in .sops.yaml and re-encrypt:
+# sops updatekeys secrets/nooks.yaml
 
 # Create the OrbStack NixOS VM
 orb create nixos nooks
@@ -76,7 +76,7 @@ The NixOS configuration (`nooks.nix`) sets up:
 
 - **User**: `scotttrinh` with UID 501 (matches macOS for OrbStack file sharing)
 - **Nook service**: 5 containers managed by `services.nook`
-- **Secrets**: SOPS-nix decrypts `ANTHROPIC_API_KEY_NOOKS` at activation
+- **Secrets**: SOPS-nix decrypts `AI_GATEWAY_API_KEY` at activation
 - **Injected files**: Claude Code settings and context files are written into
   each nook container via `services.nook.settings.files`
 - **Networking**: systemd-networkd with DHCP, SSH with GitHub host key
