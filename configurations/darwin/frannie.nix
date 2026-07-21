@@ -157,14 +157,14 @@ in
       enable = true;
 
       # Model roles
-      defaultModel  = "openai-codex/gpt-5.6-sol:low";
-      planModel     = "openai-codex/gpt-5.6-sol:medium";
-      slowModel     = "openai-codex/gpt-5.6-sol:max";
-      taskModel     = "zai/glm-5.2:max";
+      defaultModel = "openai-codex/gpt-5.6-sol:low";
+      planModel = "openai-codex/gpt-5.6-sol:medium";
+      slowModel = "openai-codex/gpt-5.6-sol:max";
+      taskModel = "zai/glm-5.2:max";
       designerModel = "openai-codex/gpt-5.6-luna:max";
-      visionModel   = "openai-codex/gpt-5.6-luna:max";
-      commitModel   = "openai-codex/gpt-5.6-luna:none";
-      smolModel     = "openai-codex/gpt-5.6-luna:medium";
+      visionModel = "openai-codex/gpt-5.6-luna:max";
+      commitModel = "openai-codex/gpt-5.6-luna:none";
+      smolModel = "openai-codex/gpt-5.6-luna:medium";
 
       # Z.ai static credential (only provider needing one)
       modelProviders.zai = {
@@ -175,9 +175,9 @@ in
       model = {
         modelFallback = true;
         fallbackChains = {
-          "openai-codex/gpt-5.6-sol"  = [ "anthropic/claude-opus-4-8" "google-antigravity/gemini-3.5-flash" ];
+          "openai-codex/gpt-5.6-sol" = [ "anthropic/claude-opus-4-8" "google-antigravity/gemini-3.5-flash" ];
           "openai-codex/gpt-5.6-luna" = [ "zai/glm-5.2" "anthropic/claude-sonnet-5" "google-antigravity/gemini-3.5-flash" ];
-          "zai/glm-5.2"               = [ "anthropic/claude-sonnet-5" "google-antigravity/gemini-3.5-flash" ];
+          "zai/glm-5.2" = [ "anthropic/claude-sonnet-5" "google-antigravity/gemini-3.5-flash" ];
         };
       };
 
@@ -186,12 +186,12 @@ in
 
       # Per-agent model overrides
       tasks.agentModelOverrides = {
-        reviewer   = "openai-codex/gpt-5.6-sol:medium";
-        explore    = "openai-codex/gpt-5.6-luna:xhigh";
-        librarian  = "openai-codex/gpt-5.6-luna:xhigh";
-        oracle     = "openai-codex/gpt-5.6-sol:xhigh";
-        task       = "zai/glm-5.2:max";
-        plan       = "openai-codex/gpt-5.6-sol:medium";
+        reviewer = "openai-codex/gpt-5.6-sol:medium";
+        explore = "openai-codex/gpt-5.6-luna:xhigh";
+        librarian = "openai-codex/gpt-5.6-luna:xhigh";
+        oracle = "openai-codex/gpt-5.6-sol:xhigh";
+        task = "zai/glm-5.2:max";
+        plan = "openai-codex/gpt-5.6-sol:medium";
         quick_task = "openai-codex/gpt-5.6-luna:high";
       };
     };

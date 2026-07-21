@@ -1,6 +1,6 @@
-{
-  pkgs,
-  rust-bin,
+{ pkgs
+, rust-bin
+,
 }:
 
 let
@@ -12,17 +12,17 @@ let
 in
 pkgs.callPackage
   (
-    {
-      fetchFromGitHub,
-      lib,
-      rustPlatform,
-      stdenv,
-      versionCheckHook,
-      installShellFiles,
-      buildPackages,
-      python3Packages,
-      nix-update-script,
-      rust-jemalloc-sys,
+    { fetchFromGitHub
+    , lib
+    , rustPlatform
+    , stdenv
+    , versionCheckHook
+    , installShellFiles
+    , buildPackages
+    , python3Packages
+    , nix-update-script
+    , rust-jemalloc-sys
+    ,
     }:
 
     rustPlatform.buildRustPackage (finalAttrs: {
@@ -99,4 +99,4 @@ pkgs.callPackage
       };
     })
   )
-  { inherit rustPlatform; }
+{ inherit rustPlatform; }

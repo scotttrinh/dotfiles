@@ -17,7 +17,7 @@ flake.inputs.home-manager.lib.homeManagerConfiguration {
           baseUrl = "https://example.invalid";
           apiKey = "secret";
           api = "invalid-api";
-          models = [ { id = "invalid"; } ];
+          models = [{ id = "invalid"; }];
         };
       };
     }

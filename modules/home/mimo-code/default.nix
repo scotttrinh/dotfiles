@@ -17,24 +17,26 @@ let
     provider:
     let
       providerOptions =
-        removeNulls {
-          apiKey = provider.auth.secret;
-          baseURL = provider.baseUrl;
-          timeout = provider.timeoutMs;
-        }
+        removeNulls
+          {
+            apiKey = provider.auth.secret;
+            baseURL = provider.baseUrl;
+            timeout = provider.timeoutMs;
+          }
         // provider.options;
     in
-    removeNulls {
-      inherit (provider)
-        api
-        env
-        name
-        npm
-        whitelist
-        blacklist
-        ;
-      id = provider.serializedId;
-    }
+    removeNulls
+      {
+        inherit (provider)
+          api
+          env
+          name
+          npm
+          whitelist
+          blacklist
+          ;
+        id = provider.serializedId;
+      }
     // optionalNonEmpty "options" providerOptions
     // optionalNonEmpty "models" provider.models;
 

@@ -1,7 +1,7 @@
-{
-  lib,
-  stdenvNoCC,
-  fetchurl,
+{ lib
+, stdenvNoCC
+, fetchurl
+,
 }:
 
 let
@@ -23,8 +23,7 @@ let
         name = "linux-x86_64";
         hash = "sha256-8j48IWvG2XOwLhdeve2iQlhBoKaR5v/8hbsQZR0/vSw=";
       };
-    }
-    .${stdenvNoCC.hostPlatform.system}
+    }.${stdenvNoCC.hostPlatform.system}
       or (throw "fx is not supported on ${stdenvNoCC.hostPlatform.system}");
 in
 stdenvNoCC.mkDerivation (finalAttrs: {

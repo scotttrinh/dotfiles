@@ -1,8 +1,7 @@
-{
-  config,
-  lib,
-  pkgs,
-  ...
+{ config
+, lib
+, pkgs
+, ...
 }:
 let
   inherit (lib)
@@ -32,9 +31,10 @@ let
   removeNulls =
     value:
     if builtins.isAttrs value then
-      lib.filterAttrs (_: item: item != null && !(builtins.isAttrs item && item == { })) (
-        lib.mapAttrs (_: removeNulls) value
-      )
+      lib.filterAttrs (_: item: item != null && !(builtins.isAttrs item && item == { }))
+        (
+          lib.mapAttrs (_: removeNulls) value
+        )
     else if builtins.isList value then
       map removeNulls value
     else
@@ -67,7 +67,8 @@ let
       "medium"
       "high"
       "xhigh"
-    ] (name: nullableOption types.str "Provider value for the ${name} reasoning effort.");
+    ]
+      (name: nullableOption types.str "Provider value for the ${name} reasoning effort.");
   };
 
   thinkingType = types.submodule {
@@ -193,12 +194,13 @@ let
     baseUrl = nullableOption types.str "Model-specific API base URL.";
     reasoning = nullableOption types.bool "Whether the model supports reasoning.";
     thinking = nullableOption thinkingType "Thinking controls.";
-    input = nullableOption (types.listOf (
-      types.enum [
-        "text"
-        "image"
-      ]
-    )) "Supported input modalities.";
+    input = nullableOption
+      (types.listOf (
+        types.enum [
+          "text"
+          "image"
+        ]
+      )) "Supported input modalities.";
     cost = nullableOption modelCostType "Token costs.";
     premiumMultiplier = nullableOption types.number "Premium usage multiplier.";
     contextWindow = nullableOption types.ints.positive "Context window size.";
@@ -237,18 +239,19 @@ let
         "none"
         "oauth"
       ] "Provider authentication mode.";
-      discovery = nullableOption (types.submodule {
-        options.type = mkOption {
-          type = types.enum [
-            "ollama"
-            "llama.cpp"
-            "lm-studio"
-            "openai-models-list"
-            "proxy"
-          ];
-          description = "Runtime model discovery protocol.";
-        };
-      }) "Runtime model discovery configuration.";
+      discovery = nullableOption
+        (types.submodule {
+          options.type = mkOption {
+            type = types.enum [
+              "ollama"
+              "llama.cpp"
+              "lm-studio"
+              "openai-models-list"
+              "proxy"
+            ];
+            description = "Runtime model discovery protocol.";
+          };
+        }) "Runtime model discovery configuration.";
       models = nullableOption (types.listOf modelType) "Provider model catalog.";
       modelOverrides = nullableOption (types.attrsOf modelOverrideType) "Overrides for bundled or discovered models.";
       disableStrictTools = nullableOption types.bool "Disable strict tool schemas for this provider.";
@@ -601,12 +604,14 @@ let
     "AGENTS.md" = cfg.prompts.agents;
   };
 
-  generatedThemeFiles = lib.mapAttrs' (
-    name: value:
-    lib.nameValuePair ".omp/agent/themes/${name}.json" {
-      text = builtins.toJSON value;
-    }
-  ) cfg.themes;
+  generatedThemeFiles = lib.mapAttrs'
+    (
+      name: value:
+        lib.nameValuePair ".omp/agent/themes/${name}.json" {
+          text = builtins.toJSON value;
+        }
+    )
+    cfg.themes;
 
   fileConfig =
     file:
@@ -619,19 +624,25 @@ let
         ;
     };
 
-  generatedPromptFiles = lib.mapAttrs' (
-    name: value: lib.nameValuePair ".omp/agent/${name}" (fileConfig value)
-  ) promptFiles;
+  generatedPromptFiles = lib.mapAttrs'
+    (
+      name: value: lib.nameValuePair ".omp/agent/${name}" (fileConfig value)
+    )
+    promptFiles;
 
-  generatedAgentFiles = lib.mapAttrs' (
-    name: value: lib.nameValuePair ".omp/agent/${name}" (fileConfig value)
-  ) cfg.agentFiles;
+  generatedAgentFiles = lib.mapAttrs'
+    (
+      name: value: lib.nameValuePair ".omp/agent/${name}" (fileConfig value)
+    )
+    cfg.agentFiles;
   pluginName = attrName: plugin: if plugin.name != null then plugin.name else attrName;
 
-  configuredPlugins = lib.mapAttrsToList (attrName: plugin: {
-    name = pluginName attrName plugin;
-    inherit attrName plugin;
-  }) cfg.plugins;
+  configuredPlugins = lib.mapAttrsToList
+    (attrName: plugin: {
+      name = pluginName attrName plugin;
+      inherit attrName plugin;
+    })
+    cfg.plugins;
 
   packagedPlugins = lib.filter (entry: entry.plugin.package != null) configuredPlugins;
 
@@ -652,36 +663,46 @@ let
   };
 
   pluginLockJson = {
-    plugins = lib.mapAttrs (_: plugin: {
-      version = pluginVersion plugin;
-      enabledFeatures = plugin.features;
-      enabled = plugin.enable;
-    }) pluginsByName;
+    plugins = lib.mapAttrs
+      (_: plugin: {
+        version = pluginVersion plugin;
+        enabledFeatures = plugin.features;
+        enabled = plugin.enable;
+      })
+      pluginsByName;
     settings = lib.mapAttrs (_: plugin: plugin.settings) pluginsByName;
   };
 
   generatedPluginFiles = lib.optionalAttrs (pluginsByName != { }) ({
     ".omp/plugins/package.json".text = builtins.toJSON pluginPackageJson;
     ".omp/plugins/omp-plugins.lock.json".text = builtins.toJSON pluginLockJson;
-  } // lib.mapAttrs' (name: plugin: lib.nameValuePair ".omp/plugins/node_modules/${name}" {
-    source = plugin.package;
-  }) pluginsByName);
+  } // lib.mapAttrs'
+    (name: plugin: lib.nameValuePair ".omp/plugins/node_modules/${name}" {
+      source = plugin.package;
+    })
+    pluginsByName);
 
   effectivePluginNames = map (entry: entry.name) configuredPlugins;
-  duplicatePluginNames = lib.filter (
-    name: builtins.length (lib.filter (candidate: candidate == name) effectivePluginNames) > 1
-  ) (lib.unique effectivePluginNames);
-  unsafePluginNames = lib.filter (
-    name:
-    name == "" || lib.hasPrefix "/" name || lib.any (part: part == "..") (lib.splitString "/" name)
-  ) effectivePluginNames;
+  duplicatePluginNames = lib.filter
+    (
+      name: builtins.length (lib.filter (candidate: candidate == name) effectivePluginNames) > 1
+    )
+    (lib.unique effectivePluginNames);
+  unsafePluginNames = lib.filter
+    (
+      name:
+      name == "" || lib.hasPrefix "/" name || lib.any (part: part == "..") (lib.splitString "/" name)
+    )
+    effectivePluginNames;
 
 
   agentFileNames = builtins.attrNames cfg.agentFiles;
-  unsafeAgentFileNames = lib.filter (
-    name:
-    name == "" || lib.hasPrefix "/" name || lib.any (part: part == "..") (lib.splitString "/" name)
-  ) agentFileNames;
+  unsafeAgentFileNames = lib.filter
+    (
+      name:
+      name == "" || lib.hasPrefix "/" name || lib.any (part: part == "..") (lib.splitString "/" name)
+    )
+    agentFileNames;
 
   reservedPaths = [
     "config.yml"
@@ -697,62 +718,75 @@ let
   pathsCollide =
     left: right: left == right || lib.hasPrefix "${left}/" right || lib.hasPrefix "${right}/" left;
 
-  collidingAgentFileNames = lib.filter (
-    name: lib.any (reservedPath: pathsCollide name reservedPath) reservedPaths
-  ) agentFileNames;
+  collidingAgentFileNames = lib.filter
+    (
+      name: lib.any (reservedPath: pathsCollide name reservedPath) reservedPaths
+    )
+    agentFileNames;
 
-  invalidManagedFiles = lib.filter (
-    name:
-    let
-      file = cfg.agentFiles.${name};
-    in
-    (file.text == null) == (file.source == null)
-  ) agentFileNames;
+  invalidManagedFiles = lib.filter
+    (
+      name:
+      let
+        file = cfg.agentFiles.${name};
+      in
+      (file.text == null) == (file.source == null)
+    )
+    agentFileNames;
 
-  invalidPromptFiles = lib.filter (
-    name:
-    let
-      file = promptFiles.${name};
-    in
-    (file.text == null) == (file.source == null)
-  ) (builtins.attrNames promptFiles);
+  invalidPromptFiles = lib.filter
+    (
+      name:
+      let
+        file = promptFiles.${name};
+      in
+      (file.text == null) == (file.source == null)
+    )
+    (builtins.attrNames promptFiles);
 
   providerValidationErrors = lib.concatLists (
-    lib.mapAttrsToList (
-      name: provider:
-      let
-        value = removeNulls provider;
-        models = value.models or [ ];
-        hasModels = models != [ ];
-        hasApiKey = value ? apiKey;
-        auth = value.auth or "apiKey";
-        hasOverride = lib.any (field: value ? ${field}) [
-          "baseUrl"
-          "apiKey"
-          "headers"
-          "compat"
-          "disableStrictTools"
-          "modelOverrides"
-          "discovery"
-        ];
-        modelsMissingApi = lib.any (model: !(model ? api) && !(value ? api)) models;
-      in
-      lib.optional (
-        hasModels && !(value ? baseUrl)
-      ) "omp.modelProviders.${name}.baseUrl is required when models are configured."
-      ++ lib.optional (
-        hasModels && !hasApiKey && auth != "none"
-      ) "omp.modelProviders.${name}.apiKey is required unless auth = \"none\"."
-      ++ lib.optional (
-        hasModels && modelsMissingApi
-      ) "omp.modelProviders.${name} must set api or set api on every model."
-      ++ lib.optional (
-        !hasModels && !hasOverride
-      ) "omp.modelProviders.${name} must configure models or at least one provider override."
-      ++ lib.optional (
-        value ? discovery && value.discovery.type != "proxy" && !(value ? api)
-      ) "omp.modelProviders.${name}.api is required for non-proxy discovery."
-    ) cfg.modelProviders
+    lib.mapAttrsToList
+      (
+        name: provider:
+          let
+            value = removeNulls provider;
+            models = value.models or [ ];
+            hasModels = models != [ ];
+            hasApiKey = value ? apiKey;
+            auth = value.auth or "apiKey";
+            hasOverride = lib.any (field: value ? ${field}) [
+              "baseUrl"
+              "apiKey"
+              "headers"
+              "compat"
+              "disableStrictTools"
+              "modelOverrides"
+              "discovery"
+            ];
+            modelsMissingApi = lib.any (model: !(model ? api) && !(value ? api)) models;
+          in
+          lib.optional
+            (
+              hasModels && !(value ? baseUrl)
+            ) "omp.modelProviders.${name}.baseUrl is required when models are configured."
+          ++ lib.optional
+            (
+              hasModels && !hasApiKey && auth != "none"
+            ) "omp.modelProviders.${name}.apiKey is required unless auth = \"none\"."
+          ++ lib.optional
+            (
+              hasModels && modelsMissingApi
+            ) "omp.modelProviders.${name} must set api or set api on every model."
+          ++ lib.optional
+            (
+              !hasModels && !hasOverride
+            ) "omp.modelProviders.${name} must configure models or at least one provider override."
+          ++ lib.optional
+            (
+              value ? discovery && value.discovery.type != "proxy" && !(value ? api)
+            ) "omp.modelProviders.${name}.api is required for non-proxy discovery."
+      )
+      cfg.modelProviders
   );
 
   settingGroup =
@@ -824,10 +858,11 @@ in
         tags = nullableOption json.type "Model tag definitions.";
         providerOrder = nullableOption stringList "Canonical provider precedence.";
         cycleOrder = nullableOption stringList "Model cycling order.";
-        defaultThinkingLevel = nullableOption (types.oneOf [
-          effortType
-          (types.enum [ "auto" ])
-        ]) "Default thinking level.";
+        defaultThinkingLevel = nullableOption
+          (types.oneOf [
+            effortType
+            (types.enum [ "auto" ])
+          ]) "Default thinking level.";
         hideThinkingBlock = nullableOption types.bool "Hide model thinking blocks.";
         repeatToolDescriptions = nullableOption types.bool "Repeat tool descriptions in prompts.";
         includeModelInPrompt = nullableOption types.bool "Include the model identity in prompts.";
@@ -1196,9 +1231,10 @@ in
     };
 
     home.file =
-      lib.optionalAttrs (cfg.keybindings != { }) {
-        ".omp/agent/keybindings.yml".text = builtins.toJSON cfg.keybindings;
-      }
+      lib.optionalAttrs (cfg.keybindings != { })
+        {
+          ".omp/agent/keybindings.yml".text = builtins.toJSON cfg.keybindings;
+        }
       // generatedThemeFiles
       // generatedPromptFiles
       // generatedAgentFiles

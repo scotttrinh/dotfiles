@@ -1,6 +1,6 @@
-{
-  flake,
-  case,
+{ flake
+, case
+,
 }:
 let
   invalidFile =
