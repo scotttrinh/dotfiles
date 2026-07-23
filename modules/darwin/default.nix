@@ -89,7 +89,7 @@ in
 
   homebrew = {
     enable = true;
-    onActivation.cleanup = "zap";
+    onActivation.cleanup = "uninstall";
     taps = [
       "mas-cli/tap"
     ];
