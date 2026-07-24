@@ -9,26 +9,26 @@ let
     {
       aarch64-darwin = {
         name = "macos-aarch64";
-        hash = "sha256-IVU5XvZMyF6Rtk+C/9V4nLXohycHPxomUzD+4tA7XlU=";
+        hash = "sha256-nLpvqK0tfWlJiKFbQNHcF9Rfa9e8MFibYuEuwBcvYZo=";
       };
       x86_64-darwin = {
         name = "macos-x86_64";
-        hash = "sha256-oZVt9eOZWkcxhTO3IfALyhDZCrm6oqRZKKYxi+rVBZI=";
+        hash = "sha256-GX0xmhMGXtMKObIX+ulS6sVAELjoXVXpJWZvG1zfzYU=";
       };
       aarch64-linux = {
         name = "linux-aarch64";
-        hash = "sha256-Beo0BLWWFIYWNq9oOHRwJq1ijaPE3vXR/k0Ax823Ku4=";
+        hash = "sha256-hj1HnRfUJAaoR2UB/bkKdFnMo2Bqdzb5f+4+Lucep7o=";
       };
       x86_64-linux = {
         name = "linux-x86_64";
-        hash = "sha256-hnSadgsOww+ezkIQTFe4qbyh32j9oKjJ3h6DvdWahKk=";
+        hash = "sha256-vZrSlxMSM26TcvbRfKGG6Z4yCafXle0cxgX+aF/mwXE=";
       };
     }.${stdenvNoCC.hostPlatform.system}
       or (throw "fx is not supported on ${stdenvNoCC.hostPlatform.system}");
 in
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "fx";
-  version = "0.3.54";
+  version = "0.3.55";
 
   src = fetchurl {
     url = "https://ugiwefobuo4tac0m.public.blob.vercel-storage.com/cli/v${finalAttrs.version}/fx-${platform.name}.tar.gz";
