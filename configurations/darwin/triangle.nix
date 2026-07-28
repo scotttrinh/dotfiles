@@ -278,6 +278,7 @@ in
   homebrew = {
     masApps = {
       OktaVerify = 490179405;
+      Xcode = 497799835;
     };
     casks = [
       "slack"
