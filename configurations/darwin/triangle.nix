@@ -101,6 +101,11 @@ in
         publicKey = secretiveSigningPublicKey;
       };
 
+      # Work laptop only: Socket Firewall registry proxy (MDM stores Keychain
+      # creds; home-manager owns configs + zshenv source so init cannot fight
+      # the managed ~/.zshenv symlink).
+      socketFirewall.enable = true;
+
       sops.defaultSopsFile = ../../secrets/triangle.yaml;
 
       sops.secrets.emacs_authinfo = {
