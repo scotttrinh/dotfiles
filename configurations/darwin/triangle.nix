@@ -121,6 +121,7 @@ in
 
       home.packages = [
         fx
+        selfPackages.devbox
       ];
 
       claudeCode = {
