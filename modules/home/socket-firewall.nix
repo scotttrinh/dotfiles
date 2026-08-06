@@ -17,8 +17,22 @@ let
   # (npmrc/pip/uv/go) stay unmanaged so tools like `pnpm login` can write them.
   envHelperText = ''
     # Source this file before using npm, pnpm, or bun with Socket Firewall.
-    export SOCKET_AUTH_B64="$(security find-generic-password -a "${keychainAccount}" -s "${keychainServiceB64}" -w)"
-    export SOCKET_PASSWORD_B64="$(security find-generic-password -a "${keychainAccount}" -s "${keychainServicePassword}" -w | tr -d '\n' | base64)"
+    # Preserve credentials inherited from the shell that launched Codex. Its
+    # Seatbelt sandbox cannot query Keychain, but it can use inherited values.
+    if [ -z "''${SOCKET_AUTH_B64:-}" ] && [ -z "''${CODEX_SANDBOX:-}" ]; then
+      if socket_auth_b64="$(security find-generic-password -a "${keychainAccount}" -s "${keychainServiceB64}" -w)"; then
+        export SOCKET_AUTH_B64="$socket_auth_b64"
+      fi
+      unset socket_auth_b64
+    fi
+
+    if [ -z "''${SOCKET_PASSWORD_B64:-}" ] && [ -z "''${CODEX_SANDBOX:-}" ]; then
+      if socket_password="$(security find-generic-password -a "${keychainAccount}" -s "${keychainServicePassword}" -w)"; then
+        export SOCKET_PASSWORD_B64="$(printf '%s' "$socket_password" | base64)"
+      fi
+      unset socket_password
+    fi
+
     export UV_PREVIEW_FEATURES=native-auth
   '';
 in
