@@ -6,6 +6,118 @@ let
   inherit (flake) inputs;
   inherit (inputs) self;
   secretiveSigningPublicKey = "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBHPTx4gM8No07bfV2bY1JdGrJKdq1/H+fn8rvHTxddxZFPrYR6uyKIbUmxNq59GpMinEoitaVHSA606DH4GuqVQ= Frannie-GitHub-Signing-Key @secretive.Scott’s-MacBook-Air.local";
+  # Vercel AI Gateway exposed to OMP as a plain OpenAI-responses provider.
+  # Per-model context/output/cost/modality metadata sourced from models.dev (2026-07-31).
+  gatewayModels = [
+    {
+      id = "openai/gpt-5.6-sol";
+      name = "GPT 5.6 Sol";
+      contextWindow = 1050000;
+      maxTokens = 128000;
+      input = [
+        "text"
+        "image"
+      ];
+      cost = {
+        input = 5;
+        output = 30;
+        cacheRead = 0.5;
+        cacheWrite = 6.25;
+      };
+    }
+    {
+      id = "openai/gpt-5.6-luna";
+      name = "GPT 5.6 Luna";
+      contextWindow = 1050000;
+      maxTokens = 128000;
+      input = [
+        "text"
+        "image"
+      ];
+      cost = {
+        input = 0.2;
+        output = 1.2;
+        cacheRead = 0.02;
+        cacheWrite = 0.25;
+      };
+    }
+    {
+      id = "google/gemini-3.6-flash";
+      name = "Gemini 3.6 Flash";
+      contextWindow = 1048576;
+      maxTokens = 65536;
+      input = [
+        "text"
+        "image"
+      ];
+      cost = {
+        input = 1.5;
+        output = 7.5;
+        cacheRead = 0.15;
+        cacheWrite = 0;
+      };
+    }
+    {
+      id = "deepseek/deepseek-v4-pro";
+      name = "DeepSeek V4 Pro";
+      contextWindow = 1000000;
+      maxTokens = 384000;
+      input = [ "text" ];
+      cost = {
+        input = 0.435;
+        output = 0.87;
+        cacheRead = 0.003625;
+        cacheWrite = 0;
+      };
+    }
+    {
+      id = "deepseek/deepseek-v4-flash-0731";
+      name = "DeepSeek V4 Flash";
+      contextWindow = 1000000;
+      maxTokens = 384000;
+      input = [ "text" ];
+      cost = {
+        input = 0.14;
+        output = 0.28;
+        cacheRead = 0.0028;
+        cacheWrite = 0;
+      };
+    }
+    {
+      id = "xai/grok-4.5";
+      name = "Grok 4.5";
+      contextWindow = 500000;
+      maxTokens = 500000;
+      input = [
+        "text"
+        "image"
+      ];
+      cost = {
+        input = 2;
+        output = 6;
+        cacheRead = 0.3;
+        cacheWrite = 0;
+      };
+    }
+  ];
+  gatewayModel = m: {
+    inherit (m)
+      id
+      name
+      contextWindow
+      maxTokens
+      input
+      cost
+      ;
+    api = "openai-responses";
+    reasoning = true;
+    compat = {
+      supportsDeveloperRole = true;
+      supportsReasoningEffort = true;
+      supportsStore = true;
+      maxTokensField = "max_completion_tokens";
+    };
+  };
 in
 {
   imports = [
@@ -157,47 +269,46 @@ in
       enable = true;
 
       # Model roles
-      defaultModel = "openai-codex/gpt-5.6-sol:low";
+      defaultModel = "openai-codex/gpt-5.6-luna:high";
+      smolModel = "openai-codex/gpt-5.6-luna:medium";
       planModel = "openai-codex/gpt-5.6-sol:medium";
       slowModel = "openai-codex/gpt-5.6-sol:max";
-      taskModel = "zai/glm-5.2:max";
+      taskModel = "openai-codex/gpt-5.6-luna:medium";
       designerModel = "openai-codex/gpt-5.6-luna:max";
       visionModel = "openai-codex/gpt-5.6-luna:max";
       commitModel = "openai-codex/gpt-5.6-luna:none";
-      smolModel = "openai-codex/gpt-5.6-luna:medium";
 
       # Z.ai static credential (only provider needing one)
       modelProviders.zai = {
         apiKey = "!cat ${config.sops.secrets.codex_zai_coding_plan_api_key.path}";
       };
+      modelProviders.ai-gateway = {
+        baseUrl = "https://ai-gateway.vercel.sh/v1";
+        apiKey = config.sops.placeholder.ai_gateway_api_key;
+        api = "openai-responses";
+        auth = "apiKey";
+        authHeader = true;
+        models = map gatewayModel gatewayModels;
+      };
 
-      # Retry fallback chains — no OpenAI model falls back to another OpenAI model
       model = {
         modelFallback = true;
         fallbackChains = {
-          "openai-codex/gpt-5.6-sol" = [ "anthropic/claude-opus-4-8" "google-antigravity/gemini-3.5-flash" ];
-          "openai-codex/gpt-5.6-luna" = [ "zai/glm-5.2" "anthropic/claude-sonnet-5" "google-antigravity/gemini-3.5-flash" ];
-          "zai/glm-5.2" = [ "anthropic/claude-sonnet-5" "google-antigravity/gemini-3.5-flash" ];
+          "openai-codex/gpt-5.6-sol" = [ "anthropic/claude-opus-5" ];
+          "openai-codex/gpt-5.6-luna" = [ "zai/glm-5.2" "google-antigravity/gemini-3.6-flash" "ai-gateway/deepseek/deepseek-v4-flash" ];
         };
       };
 
       # Disable context promotion — rely on compaction
       context.promotionEnabled = false;
-
-      # Per-agent model overrides
-      tasks.agentModelOverrides = {
-        reviewer = "openai-codex/gpt-5.6-sol:medium";
-        explore = "openai-codex/gpt-5.6-luna:xhigh";
-        librarian = "openai-codex/gpt-5.6-luna:xhigh";
-        oracle = "openai-codex/gpt-5.6-sol:xhigh";
-        task = "zai/glm-5.2:max";
-        plan = "openai-codex/gpt-5.6-sol:medium";
-        quick_task = "openai-codex/gpt-5.6-luna:high";
-      };
     };
 
     sops.secrets.codex_zai_coding_plan_api_key = {
       key = "ZAI_CODING_PLAN_API_KEY";
+      mode = "0400";
+    };
+    sops.secrets.ai_gateway_api_key = {
+      key = "AI_GATEWAY_API_KEY";
       mode = "0400";
     };
   };
