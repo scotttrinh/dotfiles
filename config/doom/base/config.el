@@ -154,6 +154,7 @@
 
 (load! "modules/org")
 (load! "modules/caldav")
+(load! "modules/benedict")
 
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an

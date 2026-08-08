@@ -54,9 +54,35 @@
 ;; (unpin! t)
 (package! doric-themes)
 (package! majutsu :recipe (:host github :repo "0WD0/majutsu"))
-
+(package! vui :recipe (:host github :repo "d12frosted/vui.el") :pin "9101db52a29c4276b45f85e63924008f0e41c39c") ;; 1.3.0
 (package! shell-maker)
 (package! acp)
 (package! agent-shell)
 
 (package! org-caldav)
+
+;; Benedict is built from a local checkout rather than fetched from a remote.
+;; Guarded on the tree existing so `doom sync' still succeeds on a machine that
+;; does not have it.  Keep the path in step with `scott/benedict-root' in
+;; modules/benedict.el; `package!' quotes its :recipe, so the literal cannot be
+;; shared with a variable.
+;;
+;;   :type nil     registers no-op VC methods for clone, fetch, and
+;;                 check-out-commit, so `doom upgrade' never touches a working
+;;                 tree it does not own.
+;;   :build        (:not compile) keeps .elc files from going stale against a
+;;                 tree that is still moving.  The autoloads step still runs,
+;;                 which is what puts Benedict's ;;;###autoload commands on the
+;;                 leader map without declaring them by hand.
+;;   :files        mandatory here.  straight's default spec globs only
+;;                 top-level *.el and every Benedict source file lives in a
+;;                 subdirectory; without this the package builds empty.  The
+;;                 six directories flatten into one build directory safely
+;;                 because Benedict keeps file name prefixes globally unique.
+(when (file-directory-p (expand-file-name "~/github.com/scotttrinh/benedict"))
+  (package! benedict
+    :recipe (:local-repo "/Users/scotttrinh/github.com/scotttrinh/benedict"
+             :type nil
+             :build (:not compile)
+             :files ("core/*.el" "support/*.el" "api/*.el"
+                     "providers/*.el" "ext/*.el" "ui/*.el"))))
