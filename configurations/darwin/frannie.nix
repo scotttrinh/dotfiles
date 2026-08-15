@@ -42,6 +42,22 @@ let
       };
     }
     {
+      id = "google/gemini-3.7-flash";
+      name = "Gemini 3.7 Flash";
+      contextWindow = 1048576;
+      maxTokens = 65536;
+      input = [
+        "text"
+        "image"
+      ];
+      cost = {
+        input = 1.5;
+        output = 7.5;
+        cacheRead = 0.15;
+        cacheWrite = 0;
+      };
+    }
+    {
       id = "google/gemini-3.6-flash";
       name = "Gemini 3.6 Flash";
       contextWindow = 1048576;
