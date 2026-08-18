@@ -1,102 +1,93 @@
-{ pkgs
-, rust-bin
-,
+{
+  lib,
+  stdenvNoCC,
+  fetchurl,
+  installShellFiles,
+  buildPackages,
+  versionCheckHook,
+  nix-update-script,
 }:
 
 let
-  rustToolchain = rust-bin.stable."1.96.0".default;
-  rustPlatform = pkgs.makeRustPlatform {
-    cargo = rustToolchain;
-    rustc = rustToolchain;
-  };
+  platform =
+    {
+      aarch64-darwin = {
+        name = "aarch64-apple-darwin";
+        hash = "sha256-Bh/wcMgwvYLJYMVTUuD0vOBdkJO0Tv2hauL+7uoAMqU=";
+      };
+      x86_64-darwin = {
+        name = "x86_64-apple-darwin";
+        hash = "sha256-iOHjRNj4bwX3BBojO1jZOm/3qwgCMmEaXePqUh8Y2DM=";
+      };
+      # Static musl builds run anywhere, including NixOS, without patchelf.
+      aarch64-linux = {
+        name = "aarch64-unknown-linux-musl";
+        hash = "sha256-Ljzs8jx8D0emx7xrkTWX93AUUs6eCB3xeCpG367zY1U=";
+      };
+      x86_64-linux = {
+        name = "x86_64-unknown-linux-musl";
+        hash = "sha256-Cg+AJcrDN79JOfZf6k9xZS2OKiurEsOi5FsVvN0b5iY=";
+      };
+    }.${stdenvNoCC.hostPlatform.system}
+      or (throw "ty is not supported on ${stdenvNoCC.hostPlatform.system}");
 in
-pkgs.callPackage
-  (
-    { lib
-    , stdenv
-    , rustPlatform
-    , fetchFromGitHub
-    , installShellFiles
-    , buildPackages
-    , versionCheckHook
-    , nix-update-script
-    ,
-    }:
+stdenvNoCC.mkDerivation (finalAttrs: {
+  pname = "ty";
+  version = "0.0.72";
 
-    rustPlatform.buildRustPackage (finalAttrs: {
-      pname = "ty";
-      version = "0.0.52";
+  src = fetchurl {
+    url = "https://github.com/astral-sh/ty/releases/download/${finalAttrs.version}/ty-${platform.name}.tar.gz";
+    inherit (platform) hash;
+  };
 
-      src = fetchFromGitHub {
-        owner = "astral-sh";
-        repo = "ty";
-        tag = finalAttrs.version;
-        fetchSubmodules = true;
-        hash = "sha256-p9fTzQ4DYvnwrtLdpSTekBV4ZbR1KETR8dfsbp8CDpo=";
-      };
+  sourceRoot = ".";
 
-      postPatch = lib.optionalString stdenv.hostPlatform.isDarwin ''
-        rm ${finalAttrs.cargoRoot}/crates/ty/tests/file_watching.rs
-      '';
+  nativeBuildInputs = [ installShellFiles ];
 
-      cargoRoot = "ruff";
-      buildAndTestSubdir = finalAttrs.cargoRoot;
+  installPhase = ''
+    runHook preInstall
 
-      cargoBuildFlags = [ "--package=ty" ];
+    install -Dm755 ty-${platform.name}/ty "$out/bin/ty"
 
-      cargoHash = "sha256-NUIdYOeyRsR/ZQueEXshYdWTnSeQiRjZRRi2ag8Dm48=";
+    runHook postInstall
+  '';
 
-      nativeBuildInputs = [ installShellFiles ];
+  nativeInstallCheckInputs = [ versionCheckHook ];
+  doInstallCheck = true;
 
-      preCheck = ''
-        export CARGO_BIN_EXE_ty="$PWD"/target/${stdenv.hostPlatform.rust.cargoShortTarget}/release/ty
-      '';
+  postInstall = lib.optionalString (stdenvNoCC.hostPlatform.emulatorAvailable buildPackages) (
+    let
+      emulator = stdenvNoCC.hostPlatform.emulator buildPackages;
+    in
+    ''
+      installShellCompletion --cmd ty \
+        --bash <(${emulator} $out/bin/ty generate-shell-completion bash) \
+        --fish <(${emulator} $out/bin/ty generate-shell-completion fish) \
+        --zsh <(${emulator} $out/bin/ty generate-shell-completion zsh)
+    ''
+  );
 
-      cargoTestFlags = [
-        "--package=ty"
-        "--package=ty_python_semantic"
-        "--package=ty_test"
-      ];
+  passthru = {
+    updateScript = nix-update-script { };
+  };
 
-      checkFlags = [
-        "--skip=python_environment::ty_environment_and_active_environment"
-        "--skip=python_environment::ty_environment_and_discovered_venv"
-        "--skip=python_environment::ty_environment_is_only_environment"
-        "--skip=python_environment::ty_environment_is_system_not_virtual"
-        "--skip=mdtest::generics/pep695/functions.md"
-      ];
-
-      nativeInstallCheckInputs = [ versionCheckHook ];
-      doInstallCheck = true;
-
-      postInstall = lib.optionalString (stdenv.hostPlatform.emulatorAvailable buildPackages) (
-        let
-          emulator = stdenv.hostPlatform.emulator buildPackages;
-        in
-        ''
-          installShellCompletion --cmd ty \
-            --bash <(${emulator} $out/bin/ty generate-shell-completion bash) \
-            --fish <(${emulator} $out/bin/ty generate-shell-completion fish) \
-            --zsh <(${emulator} $out/bin/ty generate-shell-completion zsh)
-        ''
-      );
-
-      passthru = {
-        updateScript = nix-update-script { };
-      };
-
-      meta = {
-        description = "Extremely fast Python type checker and language server, written in Rust";
-        homepage = "https://github.com/astral-sh/ty";
-        changelog = "https://github.com/astral-sh/ty/blob/${finalAttrs.version}/CHANGELOG.md";
-        license = lib.licenses.mit;
-        mainProgram = "ty";
-        maintainers = with lib.maintainers; [
-          bengsparks
-          figsoda
-          GaetanLepage
-        ];
-      };
-    })
-  )
-{ inherit rustPlatform; }
+  meta = {
+    description = "Extremely fast Python type checker and language server, written in Rust";
+    homepage = "https://github.com/astral-sh/ty";
+    changelog = "https://github.com/astral-sh/ty/blob/${finalAttrs.version}/CHANGELOG.md";
+    license = lib.licenses.mit;
+    mainProgram = "ty";
+    sourceProvenance = [ lib.sourceTypes.binaryNativeCode ];
+    platforms = [
+      "aarch64-darwin"
+      "x86_64-darwin"
+      "aarch64-linux"
+      "x86_64-linux"
+    ];
+    maintainers = with lib.maintainers; [
+      bengsparks
+      figsoda
+      GaetanLepage
+    ];
+  };
+})
