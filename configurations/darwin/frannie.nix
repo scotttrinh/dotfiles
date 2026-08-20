@@ -327,6 +327,13 @@ in
       key = "AI_GATEWAY_API_KEY";
       mode = "0400";
     };
+
+    home.packages = [
+      (pkgs.writeShellScriptBin "fx" ''
+        export AI_GATEWAY_API_KEY="$(cat ${config.sops.secrets.ai_gateway_api_key.path})"
+        exec ${lib.getExe self.packages.${pkgs.stdenv.hostPlatform.system}.fx} "$@"
+      '')
+    ];
   };
   homebrew = {
     casks = [
