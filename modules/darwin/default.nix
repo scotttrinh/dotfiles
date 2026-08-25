@@ -13,6 +13,21 @@ in
   # Let Determinate Nix manage nix.conf
   nix.enable = false;
 
+  # Keep Nix-owned Codex defaults in the low-precedence system layer. Codex can
+  # continue writing user preferences and trusted projects to ~/.codex/config.toml.
+  environment.etc."codex/config.toml".text = ''
+    [features]
+    default_mode_request_user_input = true
+    multi_agent = true
+    prevent_idle_sleep = true
+
+    [agents]
+    max_depth = 2
+
+    [tui]
+    status_line = ["model-with-reasoning", "current-dir", "context-used"]
+  '';
+
   # Custom nix settings written to /etc/nix/nix.custom.conf
   determinateNix = {
     enable = true;
