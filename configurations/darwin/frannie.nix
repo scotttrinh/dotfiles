@@ -220,13 +220,14 @@ in
 
       # Model roles
       defaultModel = "openai-codex/gpt-5.6-luna:high";
-      smolModel = "openai-codex/gpt-5.6-luna:medium";
+      smolModel = "openai-codex/gpt-5.6-luna:high";     # Prewalk execution handoff target
       planModel = "openai-codex/gpt-5.6-sol:medium";
       slowModel = "openai-codex/gpt-5.6-sol:max";
-      taskModel = "openai-codex/gpt-5.6-luna:medium";
+      taskModel = "openai-codex/gpt-5.6-sol:medium";    # Task subagent starts on Sol for plan/setup
       designerModel = "openai-codex/gpt-5.6-luna:max";
       visionModel = "openai-codex/gpt-5.6-luna:max";
       commitModel = "openai-codex/gpt-5.6-luna:none";
+      advisorModel = "github-copilot/claude-opus-5";
 
       # Z.ai static credential (only provider needing one)
       modelProviders.zai = {
@@ -249,8 +250,51 @@ in
         };
       };
 
-      # Disable context promotion — rely on compaction
-      context.promotionEnabled = false;
+      # Context limits and compaction behavior
+      context = {
+        promotionEnabled = false;
+        extendedContext = false;
+        compactionAsyncEnabled = false;
+        compactionMidTurnEnabled = false;
+      };
+
+      # Editing and AST validation
+      files = {
+        enforceSeenLines = true;
+        editAutoRepairEnabled = true;
+      };
+
+      # Shell, minimizer, and direnv integration
+      shell = {
+        bashDirenv = "auto";
+        shellMinimizerEnabled = true;
+      };
+
+      # Tasks, prewalk, and subagent advisor
+      tasks = {
+        taskPrewalk = true;
+        advisorEnabled = false;
+        taskAgentAdvisor = {
+          task = "on";
+        };
+      };
+
+      # Interaction and spelling
+      interaction = {
+        spellingAutocomplete = false;
+        spellingAutocorrect = false;
+        spellingTypoDetection = true;
+      };
+
+      # Appearance and rendering
+      appearance = {
+        renderMermaid = true;
+      };
+
+      # Providers protocol
+      providers = {
+        cacheRetention = "auto";
+      };
     };
 
     sops.secrets.codex_zai_coding_plan_api_key = {
