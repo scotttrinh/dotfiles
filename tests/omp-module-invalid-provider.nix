@@ -12,7 +12,6 @@ flake.inputs.home-manager.lib.homeManagerConfiguration {
       };
       omp = {
         enable = true;
-        aiGateway.enable = false;
         modelProviders.invalid = {
           baseUrl = "https://example.invalid";
           apiKey = "secret";

@@ -35,7 +35,6 @@ flake.inputs.home-manager.lib.homeManagerConfiguration {
       };
       omp = {
         enable = true;
-        aiGateway.enable = false;
         agentFiles = invalidFile;
       };
     }

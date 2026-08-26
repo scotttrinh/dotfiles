@@ -37,7 +37,6 @@ let
 
         omp = {
           enable = true;
-          aiGateway.enable = false;
           setupVersion = 1;
 
           appearance = {
