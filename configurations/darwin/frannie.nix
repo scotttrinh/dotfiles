@@ -244,8 +244,8 @@ in
       model = {
         modelFallback = true;
         fallbackChains = {
-          "openai-codex/gpt-5.6-sol" = [ "anthropic/claude-opus-5" ];
-          "openai-codex/gpt-5.6-luna" = [ "zai/glm-5.2" "google-antigravity/gemini-3.6-flash" "ai-gateway/deepseek/deepseek-v4-flash" ];
+          "openai-codex/gpt-5.6-sol" = [ "github-copilot/gpt-5.6-sol" "github-copilot/claude-opus-5" ];
+          "openai-codex/gpt-5.6-luna" = [ "github-copilot/gpt-5.6-luna" "zai/glm-5.3" "google-antigravity/gemini-3.7-flash" "ai-gateway/deepseek/deepseek-v4-flash-0731" ];
         };
       };
 
