@@ -1,7 +1,7 @@
-{ lib
-, stdenvNoCC
-, fetchurl
-,
+{
+  lib,
+  stdenvNoCC,
+  fetchurl,
 }:
 
 let
@@ -9,29 +9,31 @@ let
     {
       aarch64-darwin = {
         name = "macos-aarch64";
-        hash = "sha256-n8GNXDQpraslTMK2JslnnoZr4mSW4J1764dU9sHFhsk=";
+        hash = "sha256-7AdRYFnSz0Dl6Vytr0Mli8kT9d9omZuP3empCsSnDE0=";
       };
       x86_64-darwin = {
         name = "macos-x86_64";
-        hash = "sha256-7vDya/QZ0w4Hv8TDROU3TdFw0McR+ZZcsLCK/HTk4/w=";
+        hash = "sha256-UFQ2/oUp5WY2HIPb4mWw9xZN8o+yDuPdyhJVI81f8Po=";
       };
       aarch64-linux = {
         name = "linux-aarch64";
-        hash = "sha256-Df1TIkxezt5gG7jOZJ+E+rbbBaOa+81bOeYJGDP2xNc=";
+        hash = "sha256-lYsb/eZKe8BuMQ5I8NH+8iyWnsSFHR8Tfo4Vayx+kgI=";
       };
       x86_64-linux = {
         name = "linux-x86_64";
-        hash = "sha256-Eg+pkt+Mr5guF8qenjlmx5Cw0VBIBRHq9ROS5moPC4Q=";
+        hash = "sha256-LSIaJ3ir2sU1tGrxy6YLk1+Ad5Q+Ihr6XTPTyO6Pryg=";
       };
-    }.${stdenvNoCC.hostPlatform.system}
+    }
+    .${stdenvNoCC.hostPlatform.system}
       or (throw "fx is not supported on ${stdenvNoCC.hostPlatform.system}");
 in
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "fx";
   version = "0.0.6";
+  rev = "fcebd11aac21b9c440d1460d4a395e16ddbea23e";
 
   src = fetchurl {
-    url = "https://ugiwefobuo4tac0m.public.blob.vercel-storage.com/cli/v${finalAttrs.version}/fx-${platform.name}.tar.gz";
+    url = "https://releases.fx.sh/dev/${finalAttrs.rev}/fx-${platform.name}.tar.gz";
     inherit (platform) hash;
   };
 
