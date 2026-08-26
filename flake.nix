@@ -23,6 +23,7 @@
     herdr.url = "github:herdrdev/herdr/v0.8.0";
     sops-nix.url = "github:Mic92/sops-nix";
     sops-nix.inputs.nixpkgs.follows = "nixpkgs";
+    devenv.url = "github:cachix/devenv";
 
     # Local development inputs for OrbStack nooks VM
     nook.url = "github:scotttrinh/nook/15073811fbbf2155b4ad384768570656bfa810c1";

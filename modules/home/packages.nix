@@ -8,6 +8,7 @@ let
   jj = flake.inputs.jj.packages.${system}.default;
   herdr = flake.inputs.herdr.packages.${system}.default;
   llm-agents = flake.inputs.llm-agents.packages.${system};
+  devenv = flake.inputs.devenv.packages.${system}.default;
 in
 {
   # Nix packages to install to $HOME
