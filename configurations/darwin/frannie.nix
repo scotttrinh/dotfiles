@@ -160,6 +160,8 @@ in
 
   # Machine-specific home-manager configuration
   home-manager.users.scotttrinh = { lib, config, pkgs, ... }: {
+    doomConfig.caldav.enable = true;
+
     sops.defaultSopsFile = ../../secrets/frannie.yaml;
 
     sops.secrets.emacs_authinfo = {

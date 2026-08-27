@@ -105,6 +105,7 @@ in
       # + Keychain; home-manager only sources the Keychain helper from zshenv
       # so init cannot fight the managed ~/.zshenv symlink).
       socketFirewall.enable = true;
+      doomConfig.caldav.enable = true;
 
       sops.defaultSopsFile = ../../secrets/triangle.yaml;
 

@@ -1,8 +1,6 @@
 { config, lib, pkgs, ... }:
 let
   cfg = config.doomConfig;
-  doomLocalDir = "${config.xdg.configHome}/doom-local";
-  caldavPrivateFile = "${doomLocalDir}/caldav.el";
 in
 {
   options.doomConfig = {
@@ -28,14 +26,7 @@ in
       };
     };
 
-    caldav = {
-      enable = lib.mkEnableOption "Doom Emacs CalDAV integration";
-      secretKey = lib.mkOption {
-        type = lib.types.str;
-        default = "EMACS_DOOM_CALDAV_ELISP";
-        description = "SOPS key containing private Elisp consumed by Doom CalDAV config.";
-      };
-    };
+    caldav.enable = lib.mkEnableOption "Doom Emacs CalDAV integration";
   };
 
   config = {
@@ -47,16 +38,7 @@ in
 
         (defvar scott/doom-org-directory ${builtins.toJSON cfg.orgDirectory})
         (defvar scott/doom-caldav-enabled ${if cfg.caldav.enable then "t" else "nil"})
-        (defvar scott/doom-caldav-private-file ${builtins.toJSON caldavPrivateFile})
       '';
-    };
-
-    sops.secrets = lib.mkIf cfg.caldav.enable {
-      doom_caldav_elisp = {
-        key = cfg.caldav.secretKey;
-        path = caldavPrivateFile;
-        mode = "0400";
-      };
     };
 
     home.activation.syncDoomOrgRepo = lib.mkIf cfg.orgRepo.enable (
@@ -65,6 +47,7 @@ in
         repo_url=${lib.escapeShellArg cfg.orgRepo.url}
         branch=${lib.escapeShellArg cfg.orgRepo.branch}
         git=${lib.escapeShellArg "${pkgs.git}/bin/git"}
+        export PATH=${lib.escapeShellArg (lib.makeBinPath [ pkgs.openssh ])}:$PATH
 
         if [ ! -e "$org_dir" ]; then
           echo "Cloning Org repository to $org_dir..."
