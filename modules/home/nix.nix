@@ -1,12 +1,14 @@
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, flake, ... }:
 {
-  nix.package = pkgs.nix;
+  imports = [ flake.inputs.determinate.homeManagerModules.default ];
 
-  # Dynamically configure GitHub access token via `gh auth token` on activation
-  # and write it to ~/.config/nix/nix.conf
-  nix.extraOptions = ''
+  nix.enable = false;
+  xdg.configFile."nix/nix.conf".text = ''
     !include nix.custom.conf
   '';
+
+  # Dynamically configure GitHub access token via `gh auth token` on activation
+  # and write it to ~/.config/nix/nix.custom.conf
 
   home.activation.setupNixGithubAccessToken = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     $DRY_RUN_CMD mkdir -p "$HOME/.config/nix"

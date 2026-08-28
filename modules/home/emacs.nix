@@ -60,7 +60,7 @@ in
             "$git" -C "$org_dir" merge --ff-only "origin/$branch" || \
               echo "Warning: Org repository could not fast-forward to origin/$branch."
           else
-            echo "Warning: Org repository has local changes; fetched origin only."
+            echo "Org repository has local changes; fetched origin without merging."
           fi
         else
           echo "Warning: $org_dir exists but is not a Git repository; skipping Org sync."
