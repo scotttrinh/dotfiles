@@ -1,0 +1,13 @@
+{
+  "packages": {
+    "amp": "0.0.1787888254-g2bce74",
+    "antigravity-cli": "1.1.22",
+    "claude-code": "2.1.250",
+    "codex": "0.150.1",
+    "codex-acp": "1.7.0",
+    "mimo-code": "0.1.13",
+    "omp": "18.0.8",
+    "opencode": "1.18.25"
+  },
+  "revision": "1c66a00ce5a9a98e7bfc94647cfbd49e1b8d30cd"
+}

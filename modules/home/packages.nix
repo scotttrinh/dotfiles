@@ -8,9 +8,15 @@ let
   jj = flake.inputs.jj.packages.${system}.default;
   herdr = flake.inputs.herdr.packages.${system}.default;
   llm-agents = flake.inputs.llm-agents.packages.${system};
+  llmAgentsManifest = import ../../scripts/llm-agents-manifest.nix {
+    input = flake.inputs.llm-agents;
+    inherit system;
+  };
   devenv = flake.inputs.devenv.packages.${system}.default;
 in
 {
+  xdg.stateFile."llm-agents/versions.json".text = builtins.toJSON llmAgentsManifest;
+
   # Nix packages to install to $HOME
   #
   # Search for packages here: https://search.nixos.org/packages

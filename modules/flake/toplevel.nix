@@ -21,5 +21,11 @@
 
     # Enables 'nix run' to activate.
     packages.default = self'.packages.activate;
+
+    packages.update-llm-agents = pkgs.writeShellApplication {
+      name = "update-llm-agents";
+      runtimeInputs = [ pkgs.git pkgs.jq ];
+      text = builtins.readFile ../../scripts/update-llm-agents.sh;
+    };
   };
 }
