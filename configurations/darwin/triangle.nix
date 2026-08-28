@@ -11,7 +11,7 @@ let
   inherit (inputs) self;
   system = pkgs.stdenv.hostPlatform.system;
   selfPackages = self.packages.${system};
-  secretiveSigningPublicKey = "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBOmJRCvBJwxxTm+LDnWseEJ861NISo8rpCA7Mj7NDdT1XfHCuUmDXAOEZw5NFv+MCnq4LzTyY2CNEH9dVqkm8fg= GitHub-Commit-Signing@secretive.triangle.local";
+  onePasswordSigningPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMKUljVm2Oqpt2ooRpDncG3pgbaS5IJ3TMrb5d21zgL4 scott@scotttrinh.com";
 
   # Define work repos to clone and setup
   # Each entry: { url, path, postClone (optional) }
@@ -97,8 +97,34 @@ in
       };
     in
     {
+      me.secretive.enable = false;
+
+      home.sessionVariables.SSH_AUTH_SOCK =
+        "${config.home.homeDirectory}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock";
+
+      programs.ssh = {
+        enable = true;
+        enableDefaultConfig = false;
+        settings."*" = {
+          ForwardAgent = false;
+          AddKeysToAgent = "no";
+          Compression = false;
+          ServerAliveInterval = 0;
+          ServerAliveCountMax = 3;
+          HashKnownHosts = false;
+          UserKnownHostsFile = "~/.ssh/known_hosts";
+          ControlMaster = "no";
+          ControlPath = "~/.ssh/master-%r@%n:%p";
+          ControlPersist = "no";
+          IdentityAgent =
+            "\"${config.home.homeDirectory}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock\"";
+        };
+      };
+
       me.gitSigning = {
-        publicKey = secretiveSigningPublicKey;
+        publicKey = onePasswordSigningPublicKey;
+        agentSocket =
+          "${config.home.homeDirectory}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock";
       };
 
       # Work laptop only: Socket Firewall shell env (MDM/init owns registry files
