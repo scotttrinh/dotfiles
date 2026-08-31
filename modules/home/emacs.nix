@@ -68,6 +68,8 @@ in
       ''
     );
 
+    selectedPackages.emacs = pkgs.emacs;
+
     programs.emacs = {
       enable = true;
       extraPackages = epkgs: with epkgs; [

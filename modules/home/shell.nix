@@ -1,5 +1,9 @@
-{ ... }:
+{ pkgs, ... }:
 {
+  selectedPackages = {
+    inherit (pkgs) zsh zoxide starship;
+  };
+
   home.shellAliases = {
     ll = "eza -lha";
   };

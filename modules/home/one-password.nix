@@ -9,6 +9,7 @@ in
   };
 
   config = lib.mkIf config.me.onePassword.enable {
+    selectedPackages.openssh = pkgs.openssh;
     home.sessionVariables.SSH_AUTH_SOCK = onePasswordAgentSocket;
 
     programs.ssh = {

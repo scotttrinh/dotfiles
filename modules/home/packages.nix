@@ -5,95 +5,79 @@
 let
   system = pkgs.stdenv.hostPlatform.system;
   selfPackages = flake.inputs.self.packages.${system};
-  jj = flake.inputs.jj.packages.${system}.default;
-  herdr = flake.inputs.herdr.packages.${system}.default;
-  llm-agents = flake.inputs.llm-agents.packages.${system};
-  llmAgentsManifest = import ../../scripts/llm-agents-manifest.nix {
-    input = flake.inputs.llm-agents;
-    inherit system;
+  llmAgents = flake.inputs.llm-agents.packages.${system};
+  selectedPackages = with pkgs; {
+    ty = selfPackages.ty;
+    uv = selfPackages.uv;
+    inherit
+      age
+      sops
+      ffmpeg
+      unar
+      nodejs_24
+      corepack_24
+      python312
+      git-credential-manager
+      bun
+      vsce
+      cmake
+      fontconfig
+      symbola
+      inetutils
+      typescript
+      typescript-language-server
+      vscode-langservers-extracted
+      prettier
+      nix-tree
+      graphviz
+      nixfmt
+      parinfer-rust-emacs
+      hyperfine
+      gh
+      git-lfs
+      omnix
+      ripgrep
+      fd
+      sd
+      tree
+      gnumake
+      cachix
+      nil
+      nix-info
+      nixpkgs-fmt
+      less
+      ;
+    geist-font = geist-font;
+    nerd-fonts-symbols-only = nerd-fonts.symbols-only;
+    nerd-fonts-geist-mono = nerd-fonts.geist-mono;
+    eza = flake.inputs.eza.packages.${system}.default;
+    devenv = flake.inputs.devenv.packages.${system}.default;
+    jj = flake.inputs.jj.packages.${system}.default;
+    herdr = flake.inputs.herdr.packages.${system}.default;
+    claude-code = llmAgents.claude-code;
+    codex-acp = llmAgents.codex-acp;
+    opencode = llmAgents.opencode;
+    antigravity-cli = llmAgents.antigravity-cli;
+    amp = llmAgents.amp;
+    mimo-code = llmAgents.mimo-code;
   };
-  devenv = flake.inputs.devenv.packages.${system}.default;
 in
 {
-  xdg.stateFile."llm-agents/versions.json".text = builtins.toJSON llmAgentsManifest;
+  selectedPackages = selectedPackages // {
+    inherit (pkgs) bat fzf jq btop tmate;
+  };
 
-  # Nix packages to install to $HOME
-  #
-  # Search for packages here: https://search.nixos.org/packages
-  home.packages = with pkgs; [
-    selfPackages.ty
-    selfPackages.uv
-    age
-    sops
-    ffmpeg
-    unar
-    nodejs_24
-    corepack_24
-    python312
-    git-credential-manager
-    bun
-    vsce
-    cmake
-    fontconfig
-    geist-font
-    nerd-fonts.symbols-only
-    nerd-fonts.geist-mono
-    symbola
-    inetutils
-    typescript
-    typescript-language-server
-    vscode-langservers-extracted
-    prettier
-    flake.inputs.eza.packages.${system}.default
-    nix-tree
-    devenv
-    graphviz
-    nixfmt
-    parinfer-rust-emacs
-    hyperfine
-    jj
-    herdr
-    gh
-    git-lfs
-    llm-agents.claude-code
-    llm-agents.codex-acp
-    llm-agents.opencode
-    llm-agents.antigravity-cli
-    llm-agents.amp
-    llm-agents.mimo-code
-
-    # From template
-    omnix
-    ripgrep # Better `grep`
-    fd
-    sd
-    tree
-    gnumake
-    cachix
-    nil # Nix language server
-    nix-info
-    nixpkgs-fmt
-    less
-  ];
+  home.packages = builtins.attrValues selectedPackages;
 
   # Doom's doctor uses fc-list even on macOS. Generate a Fontconfig catalog
   # that includes fonts installed through the Home Manager profile.
   fonts.fontconfig.enable = true;
 
-  # Programs natively supported by home-manager.
-  # They can be configured in `programs.*` instead of using home.packages.
   programs = {
-    # Better `cat`
     bat.enable = true;
-    # Type `<ctrl> + r` to fuzzy search your shell history
     fzf.enable = true;
     jq.enable = true;
-    # Install btop https://github.com/aristocratos/btop
     btop.enable = true;
-    # Tmate terminal sharing.
-    tmate = {
-      enable = true;
-      #host = ""; #In case you wish to use a server other than tmate.io
-    };
+    tmate.enable = true;
   };
 }

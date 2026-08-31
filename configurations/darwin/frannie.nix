@@ -194,10 +194,10 @@ in
 
       # Model roles
       defaultModel = "openai-codex/gpt-5.6-luna:high";
-      smolModel = "openai-codex/gpt-5.6-luna:high";     # Prewalk execution handoff target
+      smolModel = "openai-codex/gpt-5.6-luna:high"; # Prewalk execution handoff target
       planModel = "openai-codex/gpt-5.6-sol:medium";
       slowModel = "openai-codex/gpt-5.6-sol:max";
-      taskModel = "openai-codex/gpt-5.6-sol:medium";    # Task subagent starts on Sol for plan/setup
+      taskModel = "openai-codex/gpt-5.6-sol:medium"; # Task subagent starts on Sol for plan/setup
       designerModel = "openai-codex/gpt-5.6-luna:max";
       visionModel = "openai-codex/gpt-5.6-luna:max";
       commitModel = "openai-codex/gpt-5.6-luna:none";
@@ -280,10 +280,12 @@ in
       mode = "0400";
     };
 
+    selectedPackages.fx = self.packages.${pkgs.stdenv.hostPlatform.system}.fx;
+
     home.packages = [
       (pkgs.writeShellScriptBin "fx" ''
         export AI_GATEWAY_API_KEY="$(cat ${config.sops.secrets.ai_gateway_api_key.path})"
-        exec ${lib.getExe self.packages.${pkgs.stdenv.hostPlatform.system}.fx} "$@"
+        exec ${lib.getExe config.selectedPackages.fx} "$@"
       '')
     ];
   };

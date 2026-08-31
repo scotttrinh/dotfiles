@@ -118,9 +118,14 @@ in
         mode = "0400";
       };
 
+      selectedPackages = {
+        fx = selfPackages.fx;
+        devbox = selfPackages.devbox;
+      };
+
       home.packages = [
         fx
-        selfPackages.devbox
+        config.selectedPackages.devbox
       ];
 
       claudeCode = {

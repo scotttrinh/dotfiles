@@ -57,6 +57,8 @@ let
     );
 in
 {
+  selectedPackages.git = pkgs.git;
+
   # https://nixos.asia/en/git
   programs = {
     git = {

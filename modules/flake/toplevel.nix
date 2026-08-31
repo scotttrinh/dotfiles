@@ -22,6 +22,18 @@
     # Enables 'nix run' to activate.
     packages.default = self'.packages.activate;
 
+    packages.update = lib.mkForce (pkgs.writeShellApplication {
+      name = "update-main-flake-inputs";
+      runtimeInputs = [ pkgs.git pkgs.jq ];
+      text = builtins.readFile ../../scripts/update-main-flake-inputs.sh;
+    });
+
+    packages.package-versions = pkgs.writeShellApplication {
+      name = "package-versions";
+      runtimeInputs = [ pkgs.git pkgs.jq ];
+      text = builtins.readFile ../../scripts/refresh-package-versions.sh;
+    };
+
     packages.update-llm-agents = pkgs.writeShellApplication {
       name = "update-llm-agents";
       runtimeInputs = [ pkgs.git pkgs.jq ];
