@@ -78,5 +78,7 @@ in
         all-the-icons-nerd-fonts
       ];
     };
+
+    services.emacs.enable = true;
   };
 }
