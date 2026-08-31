@@ -189,6 +189,8 @@
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
 
+(setq initial-buffer-choice #'magit-status)
+
 (add-to-list 'initial-frame-alist '(fullscreen . maximized))
 (after! doom-cli-env
   (add-to-list 'doom-env-allow "^SSH_AUTH_SOCK$"))
