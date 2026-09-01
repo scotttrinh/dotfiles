@@ -80,5 +80,7 @@ in
     };
 
     services.emacs.enable = true;
+
+    launchd.agents.emacs.config.EnvironmentVariables.COLORTERM = "truecolor";
   };
 }
