@@ -86,3 +86,12 @@
              :build (:not compile)
              :files ("core/*.el" "support/*.el" "api/*.el"
                      "providers/*.el" "ext/*.el" "ui/*.el"))))
+
+;; Muster: CLI/TUI coding agents in projectile projects (event-driven).
+(when (file-directory-p (expand-file-name "~/github.com/scotttrinh/shepherd"))
+  (package! muster
+    :recipe (:local-repo "/Users/scotttrinh/github.com/scotttrinh/shepherd"
+             :type nil
+             :build (:not compile)
+             :files ("*.el"))))
+
