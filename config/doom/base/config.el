@@ -282,3 +282,16 @@
                        :new-shell t)))
 
 (setq xterm-extra-capabilities '(getSelection setSelection modifyOtherKeys))
+
+(setq read-process-output-max (* 1024 1024))
+
+(after! vterm
+  (setq vterm-timer-delay 0.01
+        vterm-max-scrollback 10000)
+  (add-hook 'vterm-mode-hook
+            (lambda ()
+              (setq-local display-line-numbers nil)
+              (when (bound-and-true-p hl-line-mode)
+                (hl-line-mode -1)))))
+
+
