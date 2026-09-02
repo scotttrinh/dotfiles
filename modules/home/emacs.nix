@@ -81,6 +81,12 @@ in
 
     services.emacs.enable = true;
 
-    launchd.agents.emacs.config.EnvironmentVariables.COLORTERM = "truecolor";
+    launchd.agents.emacs.config = {
+      ProgramArguments = lib.mkForce [
+        "${config.programs.emacs.finalPackage}/Applications/Emacs.app/Contents/MacOS/Emacs"
+        "--fg-daemon"
+      ];
+      EnvironmentVariables.COLORTERM = "truecolor";
+    };
   };
 }
