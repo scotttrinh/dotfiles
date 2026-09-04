@@ -278,6 +278,33 @@ in
         exec ${lib.getExe config.selectedPackages.fx} "$@"
       '')
     ];
+
+    launchd.agents.antigravity-remote-control = {
+      enable = true;
+      config = {
+        ProgramArguments = [
+          (lib.getExe (pkgs.writeShellScriptBin "agy-remote-control" ''
+            PORT=4400
+            while (( PORT < 4500 )) && (exec 3<>"/dev/tcp/127.0.0.1/''${PORT}") 2>/dev/null; do
+              PORT=$((PORT + 1))
+            done
+
+            exec ${lib.getExe config.selectedPackages.antigravity-cli} \
+              --remote-control \
+              --hub-port "$PORT" \
+              --remote-control-name "frannie" \
+              "$@"
+          ''))
+        ];
+        KeepAlive = true;
+        RunAtLoad = true;
+        StandardOutPath = "${config.home.homeDirectory}/.antigravity/agy_daemon.log";
+        StandardErrorPath = "${config.home.homeDirectory}/.antigravity/agy_daemon.log";
+        EnvironmentVariables = {
+          AGY_CLI_DISABLE_AUTO_UPDATE = "true";
+        };
+      };
+    };
   };
   homebrew = {
     casks = [
