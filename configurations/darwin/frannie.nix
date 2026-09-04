@@ -179,21 +179,11 @@ in
       timeoutMs = 3000000; # 50 minutes
     };
 
-    mimoCode = {
-      enable = true;
-      model = "zai-coding-plan/glm-5.2";
-      enabledProviders = [ "zai-coding-plan" "openai" ];
-      providers.openai.models."gpt-5.5-codex" = {
-        id = "gpt-5.5";
-        name = "GPT-5.5";
-      };
-    };
-
     omp = {
       enable = true;
 
       # Model roles
-      defaultModel = "openai-codex/gpt-5.6-luna:high";
+      defaultModel = "google-antigravity/gemini-3.8-flash";
       smolModel = "openai-codex/gpt-5.6-luna:high"; # Prewalk execution handoff target
       planModel = "openai-codex/gpt-5.6-sol:medium";
       slowModel = "openai-codex/gpt-5.6-sol:max";
@@ -220,7 +210,7 @@ in
         modelFallback = true;
         fallbackChains = {
           "openai-codex/gpt-5.6-sol" = [ "github-copilot/gpt-5.6-sol" "github-copilot/claude-opus-5" ];
-          "openai-codex/gpt-5.6-luna" = [ "github-copilot/gpt-5.6-luna" "zai/glm-5.3" "google-antigravity/gemini-3.7-flash" "ai-gateway/deepseek/deepseek-v4-flash-0731" ];
+          "openai-codex/gpt-5.6-luna" = [ "github-copilot/gpt-5.6-luna" "zai/glm-5.3-flash" "google-antigravity/gemini-3.8-flash" "ai-gateway/deepseek/deepseek-v4-flash-0731" ];
         };
       };
 
