@@ -35,6 +35,7 @@ dotfiles/
 │   │   ├── claude-code/         #   Claude Code settings + auth module
 │   │   ├── mimo-code/           #   MiMo-Code settings + auth module
 │   │   ├── aerospace/           #   Tiling window manager config
+│   │   ├── sketchybar/          #   Status bar config and plugins
 │   │   ├── direnv.nix           #   nix-direnv integration
 │   │   ├── emacs.nix            #   Emacs with tree-sitter
 │   │   ├── sops.nix             #   Secrets integration (age key path)
@@ -229,7 +230,10 @@ All Darwin hosts inherit `modules/darwin/default.nix`, which configures:
 - **Finder**: Full POSIX path in title, show all extensions, quit menu enabled
 - **Keyboard**: Caps Lock remapped to Control
 - **Trackpad**: Tap-to-click, secondary click enabled
-- **Homebrew**: Ghostty, Raycast, OpenCode Desktop, Secretive (casks), Dato (App Store)
+- **Menu bar**: Native menu bar auto-hidden; SketchyBar shows AeroSpace workspaces,
+  the front app, volume, battery, and date/time
+- **Homebrew**: AeroSpace, Ghostty, Raycast, OpenCode Desktop, Secretive (casks),
+  Dato (App Store)
 
 Individual hosts can add more Homebrew packages or system settings on top.
 

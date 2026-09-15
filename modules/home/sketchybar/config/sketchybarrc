@@ -1,0 +1,77 @@
+#!/bin/sh
+
+PLUGIN_DIR="$CONFIG_DIR/plugins"
+. "$CONFIG_DIR/colors.sh"
+
+FONT="GeistMono Nerd Font"
+
+sketchybar --bar \
+  position=top \
+  height=34 \
+  topmost=window \
+  blur_radius=24 \
+  color="$BAR_COLOR" \
+  border_width=1 \
+  border_color="$BORDER_COLOR" \
+  padding_left=8 \
+  padding_right=8
+
+sketchybar --default \
+  icon.font="$FONT:Semibold:14.0" \
+  icon.color="$MUTED_COLOR" \
+  icon.padding_left=7 \
+  icon.padding_right=5 \
+  label.font="$FONT:Semibold:13.0" \
+  label.color="$TEXT_COLOR" \
+  label.padding_left=5 \
+  label.padding_right=7 \
+  background.height=24 \
+  background.corner_radius=7 \
+  background.color="$ITEM_BG_COLOR" \
+  background.drawing=on \
+  padding_left=3 \
+  padding_right=3
+
+sketchybar --add event aerospace_workspace_change
+
+for workspace in 1 2 3 4 5; do
+  sketchybar --add item "space.$workspace" left \
+    --set "space.$workspace" \
+      icon.drawing=off \
+      label="$workspace" \
+      label.padding_left=9 \
+      label.padding_right=9 \
+      click_script="aerospace workspace $workspace" \
+      script="$PLUGIN_DIR/space.sh $workspace" \
+    --subscribe "space.$workspace" aerospace_workspace_change
+done
+
+sketchybar --add item front_app left \
+  --set front_app \
+    icon="󰣆" \
+    label="Finder" \
+    background.drawing=off \
+    script="$PLUGIN_DIR/front_app.sh" \
+  --subscribe front_app front_app_switched
+
+sketchybar --add item clock right \
+  --set clock \
+    icon="󰃭" \
+    update_freq=10 \
+    click_script="open -a Dato" \
+    script="$PLUGIN_DIR/clock.sh"
+
+sketchybar --add item battery right \
+  --set battery \
+    update_freq=60 \
+    click_script="open 'x-apple.systempreferences:com.apple.Battery-Settings.extension'" \
+    script="$PLUGIN_DIR/battery.sh" \
+  --subscribe battery system_woke power_source_change
+
+sketchybar --add item volume right \
+  --set volume \
+    click_script="open 'x-apple.systempreferences:com.apple.Sound-Settings.extension'" \
+    script="$PLUGIN_DIR/volume.sh" \
+  --subscribe volume volume_change
+
+sketchybar --update

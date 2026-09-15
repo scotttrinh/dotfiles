@@ -11,6 +11,13 @@ after-login-command = []
 # Available commands : https://nikitabobko.github.io/AeroSpace/commands
 after-startup-command = []
 
+# Keep SketchyBar's workspace indicator in sync with AeroSpace.
+exec-on-workspace-change = [
+    '/bin/sh',
+    '-c',
+    '/etc/profiles/per-user/scotttrinh/bin/sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE="$AEROSPACE_FOCUSED_WORKSPACE"',
+]
+
 # Start AeroSpace at login
 start-at-login = true
 
@@ -54,7 +61,7 @@ inner.horizontal = 8
 inner.vertical = 8
 outer.left = 0
 outer.bottom = 0
-outer.top = 0
+outer.top = 42
 outer.right = 0
 
 # 'main' binding mode declaration

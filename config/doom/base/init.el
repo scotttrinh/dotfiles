@@ -138,7 +138,7 @@
        ;;fsharp            ; ML stands for Microsoft's Language
        ;;fstar             ; (dependent) types and (monadic) effects and Z3
        ;;gdscript          ; the language you waited for
-       ;;(go +lsp)         ; the hipster dialect
+       (go +lsp)         ; the hipster dialect
        ;;(graphql +lsp)    ; Give queries a REST
        ;;(haskell +lsp)    ; a language that's lazier than I am
        ;;hy                ; readability of scheme w/ speed of python
@@ -179,7 +179,7 @@
        ;;terra             ; Earth and Moon in alignment for performance.
        ;;web               ; the tubes
        yaml              ; JSON, but readable
-       ;;zig               ; C, but simpler
+       zig               ; C, but simpler
 
        :email
        ;;(mu4e +org +gmail)

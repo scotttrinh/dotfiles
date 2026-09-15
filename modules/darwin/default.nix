@@ -84,6 +84,7 @@ in
       NSGlobalDomain = {
         NSAutomaticPeriodSubstitutionEnabled = false;
         NSAutomaticSpellingCorrectionEnabled = false;
+        _HIHideMenuBar = true;
       };
 
       finder = {
@@ -107,9 +108,11 @@ in
     onActivation.cleanup = "uninstall";
     taps = [
       "mas-cli/tap"
+      "nikitabobko/tap"
     ];
     casks = [
       "1password"
+      "nikitabobko/tap/aerospace"
       "ghostty"
       "raycast"
       "opencode-desktop"
