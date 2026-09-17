@@ -3,21 +3,24 @@
 PLUGIN_DIR="$CONFIG_DIR/plugins"
 . "$CONFIG_DIR/colors.sh"
 
-FONT="GeistMono Nerd Font"
+FONT="Geist"
+ICON_FONT="Symbols Nerd Font Mono"
 
 sketchybar --bar \
   position=top \
   height=34 \
-  topmost=window \
+  topmost=true \
   blur_radius=24 \
   color="$BAR_COLOR" \
   border_width=1 \
   border_color="$BORDER_COLOR" \
   padding_left=8 \
-  padding_right=8
+  padding_right=8 \
+  margin=4 \
+  corner_radius=4
 
 sketchybar --default \
-  icon.font="$FONT:Semibold:14.0" \
+  icon.font="$ICON_FONT:14.0" \
   icon.color="$MUTED_COLOR" \
   icon.padding_left=7 \
   icon.padding_right=5 \
@@ -70,7 +73,8 @@ sketchybar --add item battery right \
 
 sketchybar --add item volume right \
   --set volume \
-    click_script="open 'x-apple.systempreferences:com.apple.Sound-Settings.extension'" \
+    update_freq=10 \
+    click_script="$PLUGIN_DIR/sound_panel.sh" \
     script="$PLUGIN_DIR/volume.sh" \
   --subscribe volume volume_change
 

@@ -107,6 +107,7 @@ in
     enable = true;
     onActivation.cleanup = "uninstall";
     taps = [
+      "Helmi/homebrew-tap"
       "mas-cli/tap"
       "nikitabobko/tap"
     ];
@@ -118,7 +119,9 @@ in
       "opencode-desktop"
     ];
     brews = [
+      "Helmi/homebrew-tap/acal"
       "mas-cli/tap/mas"
+      "switchaudio-osx"
     ];
     masApps = {
       Dato = 1470584107;

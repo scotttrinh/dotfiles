@@ -53,6 +53,7 @@
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;; (unpin! t)
 (package! doric-themes)
+(package! dimmer)
 (package! majutsu :recipe (:host github :repo "0WD0/majutsu"))
 (package! vui :recipe (:host github :repo "d12frosted/vui.el") :pin "9101db52a29c4276b45f85e63924008f0e41c39c") ;; 1.3.0
 (package! shell-maker)
@@ -94,4 +95,3 @@
              :type nil
              :build (:not compile)
              :files ("*.el"))))
-
