@@ -27,6 +27,11 @@ let
     machine ${host}
       login ${cfg.username}
       password ${netrcPasswordToken}
+    ${lib.optionalString (host != "registry.k8s.vercel-security.com") ''
+    machine registry.k8s.vercel-security.com
+      login ${cfg.username}
+      password ${netrcPasswordToken}
+    ''}
   '';
 
   # Mirrors socket-firewall-init.sh write_socket_env_helper (+ UV preview flag
@@ -37,14 +42,20 @@ let
     # Preserve credentials inherited from the shell that launched Codex. Its
     # Seatbelt sandbox cannot query Keychain, but it can use inherited values.
     if [ -z "''${SOCKET_AUTH_B64:-}" ] && [ -z "''${CODEX_SANDBOX:-}" ]; then
-      if socket_auth_b64="$(security find-generic-password -a "${keychainAccount}" -s "${keychainServiceB64}" -w)"; then
+      if ! socket_auth_b64="$(security find-generic-password -a "${keychainAccount}" -s "${keychainServiceB64}" -w 2>/dev/null)"; then
+        socket_auth_b64="$(security find-generic-password -a "${keychainAccount}" -s "socket-firewall:registry.k8s.vercel-security.com:auth-b64" -w 2>/dev/null || true)"
+      fi
+      if [ -n "$socket_auth_b64" ]; then
         export SOCKET_AUTH_B64="$socket_auth_b64"
       fi
       unset socket_auth_b64
     fi
 
     if [ -z "''${SOCKET_PASSWORD_B64:-}" ] && [ -z "''${CODEX_SANDBOX:-}" ]; then
-      if socket_password="$(security find-generic-password -a "${keychainAccount}" -s "${keychainServicePassword}" -w)"; then
+      if ! socket_password="$(security find-generic-password -a "${keychainAccount}" -s "${keychainServicePassword}" -w 2>/dev/null)"; then
+        socket_password="$(security find-generic-password -a "${keychainAccount}" -s "socket-firewall:registry.k8s.vercel-security.com:password" -w 2>/dev/null || true)"
+      fi
+      if [ -n "$socket_password" ]; then
         export SOCKET_PASSWORD_B64="$(printf '%s' "$socket_password" | base64)"
       fi
       unset socket_password
@@ -68,7 +79,7 @@ let
     if [ -n "''${SOCKET_PASSWORD_B64:-}" ] && [ -f "${netrcTemplatePath}" ]; then
       if socket_netrc_pw="$(printf '%s' "''${SOCKET_PASSWORD_B64}" | base64 -d 2>/dev/null)" \
         && [ -n "$socket_netrc_pw" ]; then
-        socket_netrc_new="$(sed "s|${netrcPasswordToken}|$socket_netrc_pw|" "${netrcTemplatePath}")"
+        socket_netrc_new="$(sed "s|${netrcPasswordToken}|$socket_netrc_pw|g" "${netrcTemplatePath}")"
         if [ "$socket_netrc_new" != "$(cat "${netrcPath}" 2>/dev/null)" ]; then
           (
             umask 077
@@ -87,7 +98,7 @@ in
 
     host = lib.mkOption {
       type = lib.types.str;
-      default = "registry.k8s.vercel-security.com";
+      default = "registry.k8s.vercel.security";
       description = "Socket Firewall hostname (no scheme); used for Keychain service names.";
     };
 

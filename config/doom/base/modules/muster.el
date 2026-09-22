@@ -1,11 +1,13 @@
 ;;; modules/muster.el -*- lexical-binding: t; -*-
 
-;; Muster runs CLI/TUI coding agents (codex, fx, claude) in projectile-managed
-;; projects inside vterm, tracking lifecycle events via side channels.
+;; Muster presents Projectile's known projects and their Git worktrees in a
+;; persistent persp-mode sidebar.  Agent TUIs run in Ghostel buffers attached
+;; to the Doom workspace for their concrete checkout.
 
 (map! :leader
       (:prefix ("m" . "muster")
-       :desc "Herd (roll call)"      "m" #'muster-herd
+       :desc "Project sidebar"       "m" #'muster-sidebar-toggle
+       :desc "Project sidebar"       "b" #'muster-sidebar-toggle
        :desc "Herd (roll call)"      "h" #'muster-herd
        :desc "Next attention"        "n" #'muster-next-attention
        :desc "Spawn agent"           "s" #'muster-spawn-agent

@@ -1,6 +1,15 @@
 { flake, pkgs, ... }:
 {
-  home.file.".config/aerospace/aerospace.toml".source = ./aerospace.toml;
+  home.file.".config/aerospace/aerospace.toml" = {
+    source = ./aerospace.toml;
+    onChange = ''
+      PATH="/run/current-system/sw/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
+      if command -v aerospace >/dev/null 2>&1 && pgrep -x AeroSpace >/dev/null 2>&1; then
+        echo "Reloading AeroSpace config..."
+        aerospace reload-config || true
+      fi
+    '';
+  };
 
   # Monitor -> root layout map. apply (no args) restores the layout last used
   # on the focused monitor, falling back to tiles on external displays and

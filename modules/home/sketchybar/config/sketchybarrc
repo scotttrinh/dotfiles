@@ -9,7 +9,6 @@ ICON_FONT="Symbols Nerd Font Mono"
 sketchybar --bar \
   position=top \
   height=34 \
-  topmost=true \
   blur_radius=24 \
   color="$BAR_COLOR" \
   border_width=1 \
@@ -54,6 +53,7 @@ sketchybar --add item front_app left \
     icon="󰣆" \
     label="Finder" \
     background.drawing=off \
+    click_script="open 'raycast://extensions/raycast/navigation/search-menu-items'" \
     script="$PLUGIN_DIR/front_app.sh" \
   --subscribe front_app front_app_switched
 
@@ -63,6 +63,52 @@ sketchybar --add item clock right \
     update_freq=10 \
     click_script="open -a Dato" \
     script="$PLUGIN_DIR/clock.sh"
+
+sketchybar --add item vercel_spend right \
+  --set vercel_spend \
+    icon="▲" \
+    label="…" \
+    update_freq=0 \
+    popup.align=right \
+    popup.height=28 \
+    popup.background.color="$BAR_COLOR" \
+    popup.background.border_width=1 \
+    popup.background.border_color="$BORDER_COLOR" \
+    click_script="sketchybar --set vercel_spend popup.drawing=toggle" \
+    script="$PLUGIN_DIR/vercel_spend.sh"
+
+sketchybar --add item vercel_spend.status popup.vercel_spend \
+  --set vercel_spend.status \
+    icon.drawing=off \
+    label="Loading today's usage…" \
+    label.color="$MUTED_COLOR" \
+    background.drawing=off
+
+for row in 1 2 3 4 5; do
+  sketchybar --add item "vercel_spend.model.$row" popup.vercel_spend \
+    --set "vercel_spend.model.$row" \
+      drawing=off \
+      icon.drawing=off \
+      background.drawing=off
+done
+
+sketchybar --add item vercel_spend.refresh popup.vercel_spend \
+  --set vercel_spend.refresh \
+    icon="↻" \
+    icon.color="$ACCENT_COLOR" \
+    label="Refresh usage" \
+    label.color="$ACCENT_COLOR" \
+    background.drawing=off \
+    click_script="sketchybar --set vercel_spend.status label='Refreshing…'; NAME=vercel_spend '$PLUGIN_DIR/vercel_spend.sh' &"
+
+sketchybar --add item vercel_spend.dashboard popup.vercel_spend \
+  --set vercel_spend.dashboard \
+    icon="↗" \
+    icon.color="$ACCENT_COLOR" \
+    label="Open AI Gateway dashboard" \
+    label.color="$ACCENT_COLOR" \
+    background.drawing=off \
+    click_script="open 'https://vercel.com/ai-gateway'; sketchybar --set vercel_spend popup.drawing=off"
 
 sketchybar --add item battery right \
   --set battery \
