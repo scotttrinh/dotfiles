@@ -60,6 +60,14 @@
 (package! acp)
 (package! agent-shell)
 
+(package! ghostel)
+(package! evil-ghostel
+  :recipe (:host github :repo "dakra/ghostel"
+           :files ("extensions/evil-ghostel/evil-ghostel.el")))
+(package! consult-ghostel
+  :recipe (:host github :repo "dakra/ghostel"
+           :files ("extensions/consult-ghostel/consult-ghostel.el")))
+
 (package! org-caldav)
 
 ;; Benedict is built from a local checkout rather than fetched from a remote.

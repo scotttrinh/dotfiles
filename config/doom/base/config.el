@@ -156,6 +156,7 @@
 (load! "modules/caldav")
 (load! "modules/benedict")
 (load! "modules/muster")
+(load! "modules/ghostel")
 
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
@@ -293,72 +294,3 @@
 
 (setq read-process-output-max (* 1024 1024))
 
-(after! vterm
-  (setq vterm-timer-delay 0.01
-        vterm-max-scrollback 10000)
-  (add-hook 'vterm-mode-hook
-            (lambda ()
-              (setq-local display-line-numbers nil)
-              (when (bound-and-true-p hl-line-mode)
-                (hl-line-mode -1)))))
-
-;; Transient windows (which-key, the minibuffer, popups) shrink and regrow the
-;; vterm window, and every window-configuration change propagates that size to
-;; the vterm pty via `window--adjust-process-windows' ->
-;; `vterm--window-adjust-process-window-size'.  Each propagation redraws the
-;; terminal and SIGWINCHes the shell, which is the scroll bounce.  Debounce it:
-;; resize the pty only once the layout has settled and only when the size
-;; really differs from what the shell already sees.  While a transient window
-;; is up, the extra terminal rows are simply hidden instead of being reflowed.
-(defvar my-vterm-resize-delay 0.5
-  "Seconds of window-layout quiet before a vterm pty is resized.")
-
-(defvar-local my-vterm--resize-timer nil)
-(defvar-local my-vterm--last-pty-size nil)
-
-(defun my-vterm--resize-settled (buffer)
-  "Resize the pty of vterm BUFFER once its window layout has settled."
-  (when (buffer-live-p buffer)
-    (with-current-buffer buffer
-      (setq my-vterm--resize-timer nil)
-      (let ((window (get-buffer-window buffer)))
-        (cond
-         ((or (not vterm--term)
-              (not (process-live-p vterm--process))
-              vterm-copy-mode
-              (not window)))
-         ((not (eq (window-buffer) (current-buffer)))
-          ;; The vterm window is currently squeezed by something transient;
-          ;; retry after the delay rather than chasing every resize.
-          (setq my-vterm--resize-timer
-                (run-with-idle-timer my-vterm-resize-delay nil
-                                     #'my-vterm--resize-settled buffer)))
-         ((let* ((size (window-adjust-process-window-size-smallest
-                        vterm--process
-                        (list (get-buffer-window buffer t))))
-                 (width (and size (max (- (car size) (vterm--get-margin-width))
-                                       vterm-min-window-width)))
-                 (height (cdr size)))
-            (when (and size (> height 0) (> width 0)
-                       (not (equal (cons height width) my-vterm--last-pty-size)))
-              (setq my-vterm--last-pty-size (cons height width))
-              (let ((inhibit-read-only t))
-                (vterm--set-size vterm--term height width))
-              (set-process-window-size vterm--process height width)))))))))
-
-(defun my-vterm--defer-resize (process _windows)
-  "Defer pty resizes for PROCESS until the window layout settles."
-  (when my-vterm--resize-timer
-    (cancel-timer my-vterm--resize-timer))
-  (setq my-vterm--resize-timer
-        (run-with-idle-timer my-vterm-resize-delay nil
-                             #'my-vterm--resize-settled (process-buffer process)))
-  nil)
-
-;; vterm registers `vterm--window-adjust-process-window-size' as its
-;; process's `adjust-window-size-function', which Emacs consults on every
-;; window-configuration change; replace it with the debounced version.
-(add-hook 'vterm-mode-hook
-          (lambda ()
-            (process-put vterm--process 'adjust-window-size-function
-                         #'my-vterm--defer-resize)))
