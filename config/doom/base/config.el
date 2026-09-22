@@ -211,6 +211,12 @@
 (after! doom-cli-env
   (add-to-list 'doom-env-allow "^SSH_AUTH_SOCK$"))
 
+(use-package! exec-path-from-shell
+  :when (or (daemonp) (memq window-system '(mac ns x)))
+  :init
+  (setq exec-path-from-shell-check-startup-files nil)
+  :config
+  (exec-path-from-shell-initialize))
 
 
 (use-package! majutsu

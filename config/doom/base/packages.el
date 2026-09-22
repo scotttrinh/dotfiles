@@ -59,6 +59,7 @@
 (package! shell-maker)
 (package! acp)
 (package! agent-shell)
+(package! exec-path-from-shell)
 
 (package! ghostel)
 (package! evil-ghostel
