@@ -69,20 +69,31 @@ fetch_event() {
   return 1
 }
 
+format_interval() {
+  interval=$1
+
+  if [ "$interval" -gt 43200 ]; then
+    interval_label="$(( (interval + 43200) / 86400 ))d"
+  elif [ "$interval" -ge 3600 ]; then
+    interval_label="$(( (interval + 1800) / 3600 ))h"
+  else
+    rounded_minutes=$(( (interval + 30) / 60 ))
+    [ "$rounded_minutes" -lt 1 ] && rounded_minutes=1
+    [ "$rounded_minutes" -eq 1 ] && unit=minute || unit=minutes
+    interval_label="$rounded_minutes $unit"
+  fi
+}
+
 event_label=""
 read_cached_event || { fetch_event || true; read_cached_event || true; }
 
 if [ -n "${e_start:-}" ] && [ "$e_start" != "0" ]; then
   if [ "$now" -lt "$e_start" ]; then
-    minutes=$(( (e_start - now + 59) / 60 ))
-    if [ "$minutes" -lt 60 ]; then
-      [ "$minutes" -eq 1 ] && unit=minute || unit=minutes
-      event_label=" · $e_title - in $minutes $unit"
-    else
-      event_label=" · $e_title - in $((minutes / 60))h $((minutes % 60))m"
-    fi
+    format_interval "$((e_start - now))"
+    event_label=" · $e_title - in $interval_label"
   else
-    event_label=" · $e_title - now"
+    format_interval "$((e_end - now))"
+    event_label=" · $e_title - $interval_label left"
   fi
 fi
 
