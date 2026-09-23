@@ -158,6 +158,27 @@
 (load! "modules/muster")
 (load! "modules/ghostel")
 
+(defun scott/workspaces-skip-file-prompt-for-existing-project (fn &optional dir)
+  "Run FN without prompting for a file when DIR already has a workspace."
+  (let* ((project-root (file-truename (or dir default-directory)))
+         (existing-workspace
+          (and persp-mode
+               (cl-find-if
+                (lambda (workspace)
+                  (when-let ((workspace-root
+                              (persp-parameter '+workspace-project workspace)))
+                    (ignore-errors
+                      (file-equal-p workspace-root project-root))))
+                (+workspace-list))))
+         ;; Doom uses a prefix argument to suppress its post-switch file
+         ;; prompt.  Preserve an explicit prefix argument, and synthesize one
+         ;; only when the target workspace already exists.
+         (current-prefix-arg (or current-prefix-arg existing-workspace)))
+    (funcall fn dir)))
+
+(advice-add #'+workspaces-switch-to-project-h :around
+            #'scott/workspaces-skip-file-prompt-for-existing-project)
+
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
@@ -299,4 +320,3 @@
 (setq xterm-extra-capabilities '(getSelection setSelection modifyOtherKeys))
 
 (setq read-process-output-max (* 1024 1024))
-
