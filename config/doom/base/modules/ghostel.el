@@ -76,7 +76,7 @@ If prefix ARG is non-nil, cd into `default-directory' instead of project root."
       (:prefix ("o" . "open")
        :desc "Toggle ghostel popup" "t" #'+ghostel/toggle
        :desc "Open ghostel here"    "T" #'+ghostel/here)
-      (:prefix ("p" . "project")
+      (:prefix-map ("p" . "project")
        :desc "Ghostel in project"   "t" #'ghostel-project))
 
 ;;; ghostel.el ends here
