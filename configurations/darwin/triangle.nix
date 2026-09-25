@@ -104,6 +104,7 @@ in
       # so init cannot fight the managed ~/.zshenv symlink).
       socketFirewall.enable = true;
       doomConfig.caldav.enable = true;
+      doomConfig.muster.enable = true;
 
       sops.defaultSopsFile = ../../secrets/triangle.yaml;
 

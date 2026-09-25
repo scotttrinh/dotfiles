@@ -98,7 +98,16 @@
                      "providers/*.el" "ext/*.el" "ui/*.el"))))
 
 ;; Muster: CLI/TUI coding agents in projectile projects (event-driven).
-(when (file-directory-p (expand-file-name "~/github.com/scotttrinh/shepherd"))
+(let* ((scott/xdg-config-home (or (getenv "XDG_CONFIG_HOME")
+                                  (expand-file-name "~/.config")))
+       (doom-local-options (expand-file-name "doom-local/options.el"
+                                             scott/xdg-config-home)))
+  (when (file-readable-p doom-local-options)
+    (load doom-local-options nil 'nomessage)))
+(defvar scott/doom-muster-enabled nil)
+
+(when (and scott/doom-muster-enabled
+           (file-directory-p (expand-file-name "~/github.com/scotttrinh/shepherd")))
   (package! muster
     :recipe (:local-repo "/Users/scotttrinh/github.com/scotttrinh/shepherd"
              :type nil

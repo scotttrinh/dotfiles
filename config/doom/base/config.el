@@ -155,7 +155,8 @@
 (load! "modules/org")
 (load! "modules/caldav")
 (load! "modules/benedict")
-(load! "modules/muster")
+(when scott/doom-muster-enabled
+  (load! "modules/muster"))
 (load! "modules/ghostel")
 
 (defun scott/workspaces-skip-file-prompt-for-existing-project (fn &optional dir)

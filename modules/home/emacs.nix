@@ -27,6 +27,7 @@ in
     };
 
     caldav.enable = lib.mkEnableOption "Doom Emacs CalDAV integration";
+    muster.enable = lib.mkEnableOption "Doom Emacs Muster integration";
   };
 
   config = {
@@ -38,6 +39,7 @@ in
 
         (defvar scott/doom-org-directory ${builtins.toJSON cfg.orgDirectory})
         (defvar scott/doom-caldav-enabled ${if cfg.caldav.enable then "t" else "nil"})
+        (defvar scott/doom-muster-enabled ${if cfg.muster.enable then "t" else "nil"})
       '';
     };
 
