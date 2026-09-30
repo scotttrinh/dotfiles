@@ -6,7 +6,9 @@
   :commands (ghostel ghostel-project ghostel-create)
   :init
   ;; Auto-download pre-built binary without prompting
-  (setq ghostel-module-auto-install 'download)
+  (setq ghostel-module-auto-install 'download
+        ;; Reduce retained terminal history and its associated heap cost.
+        ghostel-max-scrollback (* 1024 1024))
   :hook ((ghostel-mode . doom-disable-line-numbers-h)
          (ghostel-mode . mode-line-invisible-mode))
   :config

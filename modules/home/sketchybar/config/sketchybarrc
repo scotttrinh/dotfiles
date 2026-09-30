@@ -59,10 +59,16 @@ sketchybar --add item front_app left \
 
 sketchybar --add item clock right \
   --set clock \
-    icon="󰃭" \
+    icon="󰥔" \
+    label.font="$FONT:Bold:13.0" \
     update_freq=10 \
     click_script="open -a Dato" \
-    script="$PLUGIN_DIR/clock.sh"
+    script="$PLUGIN_DIR/clock.sh" \
+  --add item clock.event right \
+  --set clock.event \
+    icon="󰃭" \
+    label.font="$FONT:Semibold:13.0" \
+    click_script="open -a Dato"
 
 sketchybar --add item vercel_spend right \
   --set vercel_spend \
@@ -80,7 +86,7 @@ sketchybar --add item vercel_spend right \
 sketchybar --add item vercel_spend.status popup.vercel_spend \
   --set vercel_spend.status \
     icon.drawing=off \
-    label="Loading today's usage…" \
+    label="Loading usage…" \
     label.color="$MUTED_COLOR" \
     background.drawing=off
 
@@ -92,14 +98,41 @@ for row in 1 2 3 4 5; do
       background.drawing=off
 done
 
-sketchybar --add item vercel_spend.refresh popup.vercel_spend \
-  --set vercel_spend.refresh \
-    icon="↻" \
+sketchybar --add item vercel_spend.period.today popup.vercel_spend \
+  --set vercel_spend.period.today \
+    icon="●" \
     icon.color="$ACCENT_COLOR" \
-    label="Refresh usage" \
+    label="Today" \
     label.color="$ACCENT_COLOR" \
     background.drawing=off \
-    click_script="sketchybar --set vercel_spend.status label='Refreshing…'; NAME=vercel_spend '$PLUGIN_DIR/vercel_spend.sh' &"
+    click_script="sketchybar --set vercel_spend.status label='Refreshing today…'; NAME=vercel_spend '$PLUGIN_DIR/vercel_spend.sh' today &"
+
+sketchybar --add item vercel_spend.period.week popup.vercel_spend \
+  --set vercel_spend.period.week \
+    icon="○" \
+    icon.color="$MUTED_COLOR" \
+    label="This calendar week" \
+    label.color="$MUTED_COLOR" \
+    background.drawing=off \
+    click_script="sketchybar --set vercel_spend.status label='Refreshing this calendar week…'; NAME=vercel_spend '$PLUGIN_DIR/vercel_spend.sh' week &"
+
+sketchybar --add item vercel_spend.period.month popup.vercel_spend \
+  --set vercel_spend.period.month \
+    icon="○" \
+    icon.color="$MUTED_COLOR" \
+    label="Month to date" \
+    label.color="$MUTED_COLOR" \
+    background.drawing=off \
+    click_script="sketchybar --set vercel_spend.status label='Refreshing month to date…'; NAME=vercel_spend '$PLUGIN_DIR/vercel_spend.sh' month &"
+
+sketchybar --add item vercel_spend.period.last_month popup.vercel_spend \
+  --set vercel_spend.period.last_month \
+    icon="○" \
+    icon.color="$MUTED_COLOR" \
+    label="Last month" \
+    label.color="$MUTED_COLOR" \
+    background.drawing=off \
+    click_script="sketchybar --set vercel_spend.status label='Refreshing last month…'; NAME=vercel_spend '$PLUGIN_DIR/vercel_spend.sh' last_month &"
 
 sketchybar --add item vercel_spend.dashboard popup.vercel_spend \
   --set vercel_spend.dashboard \
@@ -123,5 +156,12 @@ sketchybar --add item volume right \
     click_script="$PLUGIN_DIR/sound_panel.sh" \
     script="$PLUGIN_DIR/volume.sh" \
   --subscribe volume volume_change
+
+sketchybar --add item go_probe right \
+  --set go_probe \
+    icon="Go" \
+    label="Loading" \
+    update_freq=0 \
+    script="$PLUGIN_DIR/go_probe.sh"
 
 sketchybar --update

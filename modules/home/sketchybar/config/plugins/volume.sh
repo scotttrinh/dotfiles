@@ -1,8 +1,10 @@
 #!/bin/sh
 
-# Volume icon + current output device name. The 10-second poll catches device
-# switches and mute toggles; the volume_change subscription makes volume keys
-# feel instant.
+# Volume icon + level. The 10-second poll catches device switches and mute
+# toggles; the volume_change subscription makes volume keys feel instant.
+# Displays a headphone icon for headphones/AirPods, and speaker icons otherwise.
+
+SWITCH_AUDIO="${SWITCH_AUDIO:-$(command -v SwitchAudioSource 2>/dev/null || echo /opt/homebrew/bin/SwitchAudioSource)}"
 
 state="$(osascript \
   -e 'set v to output volume of (get volume settings)' \
@@ -13,15 +15,32 @@ muted="${state#*|}"
 
 case "$volume" in ''|*[!0-9]*) volume=0 ;; esac
 
-if [ "$muted" = "true" ] || [ "$volume" -eq 0 ]; then
-  icon="󰖁"
-elif [ "$volume" -lt 50 ]; then
-  icon="󰕿"
+device="$("$SWITCH_AUDIO" -c -t output 2>/dev/null)"
+device_lower="$(printf '%s' "$device" | tr '[:upper:]' '[:lower:]')"
+
+case "$device_lower" in
+  *airpod*|*headphone*|*headset*|*earpod*|*earbud*|*earphone*|*beats*|app[0-9]*|*wh-*|*wf-*|*quietcomfort*)
+    is_headphone=1
+    ;;
+  *)
+    is_headphone=0
+    ;;
+esac
+
+if [ "$is_headphone" -eq 1 ]; then
+  if [ "$muted" = "true" ] || [ "$volume" -eq 0 ]; then
+    icon="󰟎"
+  else
+    icon="󰋋"
+  fi
 else
-  icon="󰕾"
+  if [ "$muted" = "true" ] || [ "$volume" -eq 0 ]; then
+    icon="󰖁"
+  elif [ "$volume" -lt 50 ]; then
+    icon="󰕿"
+  else
+    icon="󰕾"
+  fi
 fi
 
-device="$(SwitchAudioSource -c -t output 2>/dev/null)"
-device="${device#MacBook Pro }"
-
-sketchybar --set "$NAME" icon="$icon" label="${device:-unknown}"
+sketchybar --set "$NAME" icon="$icon" label="${volume}%"

@@ -22,4 +22,15 @@
        :desc "View ingest log"       "l" #'muster-log))
 
 (after! muster
+  (defun scott/muster-route-codex-escape-to-evil (_agent-id harness _command)
+    "Make ESC leave insert state in Muster Codex buffers.
+Other harnesses retain evil-ghostel's automatic terminal routing."
+    (when (and (eq harness 'codex)
+               (boundp 'evil-ghostel--escape-mode))
+      (setq-local evil-ghostel--escape-mode 'evil)))
+
+  (unless (advice-member-p #'scott/muster-route-codex-escape-to-evil
+                           #'muster-agent--start-ghostel)
+    (advice-add #'muster-agent--start-ghostel :after
+                #'scott/muster-route-codex-escape-to-evil))
   (muster-mode 1))

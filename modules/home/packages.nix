@@ -17,6 +17,8 @@ let
       nodejs_24
       corepack_24
       python312
+      go
+      gopls
       git-credential-manager
       bun
       vsce

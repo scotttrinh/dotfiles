@@ -84,18 +84,51 @@ format_interval() {
   fi
 }
 
+MAX_TITLE_LEN="${MAX_TITLE_LEN:-25}"
+
+truncate_title() {
+  title="$1"
+  if [ "${#title}" -gt "$MAX_TITLE_LEN" ]; then
+    title="${title:0:$MAX_TITLE_LEN}"
+    title="${title%"${title##*[! ]}"}…"
+  fi
+  printf '%s' "$title"
+}
+
 event_label=""
 read_cached_event || { fetch_event || true; read_cached_event || true; }
 
 if [ -n "${e_start:-}" ] && [ "$e_start" != "0" ]; then
+  title="$(truncate_title "$e_title")"
   if [ "$now" -lt "$e_start" ]; then
     format_interval "$((e_start - now))"
-    event_label=" · $e_title - in $interval_label"
+    event_label="$title - in $interval_label"
   else
     format_interval "$((e_end - now))"
-    event_label=" · $e_title - $interval_label left"
+    event_label="$title - $interval_label left"
   fi
 fi
 
 clock="$(/bin/date +%a | cut -c1-2) $(/bin/date +%-m/%-d) $(/bin/date '+%-I:%M %p')"
-sketchybar --set "$NAME" label="$clock$event_label"
+
+if [ -n "$event_label" ]; then
+  sketchybar \
+    --set clock.event \
+      drawing=on \
+      icon.padding_left=7 \
+      icon.padding_right=5 \
+      label="$event_label" \
+      label.drawing=on \
+    --set clock \
+      label="$clock"
+else
+  sketchybar \
+    --set clock.event \
+      drawing=on \
+      icon.padding_left=8 \
+      icon.padding_right=8 \
+      label="" \
+      label.drawing=off \
+    --set clock \
+      label="$clock"
+fi

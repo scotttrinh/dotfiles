@@ -1,14 +1,30 @@
 { config, lib, pkgs, ... }:
+let
+  goPlugins = pkgs.callPackage ./go/package.nix { };
+  sketchybarConfig = pkgs.runCommand "sketchybar-config" { } ''
+    cp -R ${./config} "$out"
+    chmod u+w "$out/plugins"
+    cat > "$out/plugins/go_probe.sh" <<'EOF'
+    #!/bin/sh
+    if [ -x "$HOME/.local/bin/sketchybar-plugins" ]; then
+      exec "$HOME/.local/bin/sketchybar-plugins" probe
+    fi
+    exec ${goPlugins}/bin/sketchybar-plugins probe
+    EOF
+    chmod +x "$out/plugins/go_probe.sh"
+  '';
+in
 {
   config = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {
     selectedPackages.sketchybar = pkgs.sketchybar;
+    selectedPackages.sketchybar-plugins = goPlugins;
 
     programs.sketchybar = {
       enable = true;
       package = config.selectedPackages.sketchybar;
       configType = "bash";
       config = {
-        source = ./config;
+        source = sketchybarConfig;
         recursive = true;
       };
     };
