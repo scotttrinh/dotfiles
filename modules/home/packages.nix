@@ -19,6 +19,7 @@ let
       python312
       go
       gopls
+      gnupg
       git-credential-manager
       bun
       vsce

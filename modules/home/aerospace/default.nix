@@ -21,6 +21,10 @@
     STATE="$HOME/.config/aerospace/monitor-layouts.tsv"
 
     record() {
+      current_ws=$(aerospace list-workspaces --focused 2>/dev/null)
+      case "$current_ws" in
+        1|2) return 0 ;;
+      esac
       monitor=$(aerospace list-monitors --focused --format '%{monitor-name}') || return 0
       layout=$(aerospace list-windows --focused --format '%{workspace-root-container-layout}') || return 0
       [ -n "$monitor" ] && [ -n "$layout" ] || return 0
@@ -32,6 +36,19 @@
     }
 
     apply() {
+      target_ws="$AEROSPACE_FOCUSED_WORKSPACE"
+      [ -n "$target_ws" ] || target_ws=$(aerospace list-workspaces --focused 2>/dev/null)
+      case "$target_ws" in
+        1)
+          aerospace layout --workspace 1 --root h_accordion >/dev/null 2>&1 || true
+          return 0
+          ;;
+        2)
+          aerospace layout --workspace 2 --root h_tiles >/dev/null 2>&1 || true
+          return 0
+          ;;
+      esac
+
       monitor=$(aerospace list-monitors --focused --format '%{monitor-name}') || return 0
       case "$monitor" in
         *Built-in*) layout=h_accordion ;;
@@ -39,8 +56,8 @@
       esac
       recorded=$(awk -F '\t' -v m="$monitor" '$1 == m { print $2 }' "$STATE" 2>/dev/null)
       [ -n "$recorded" ] || recorded=$layout
-      if [ -n "$AEROSPACE_FOCUSED_WORKSPACE" ]; then
-        aerospace layout --workspace "$AEROSPACE_FOCUSED_WORKSPACE" --root "$recorded" >/dev/null 2>&1 || true
+      if [ -n "$target_ws" ]; then
+        aerospace layout --workspace "$target_ws" --root "$recorded" >/dev/null 2>&1 || true
       else
         aerospace layout --root "$recorded" >/dev/null 2>&1 || true
       fi

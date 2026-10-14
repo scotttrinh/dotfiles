@@ -9,7 +9,11 @@ persistent-workspaces = ['1', '2', '3', '4', '5']
 
 # You can use it to add commands that run after AeroSpace startup.
 # Available commands : https://nikitabobko.github.io/AeroSpace/commands
-after-startup-command = ['exec-and-forget $HOME/.config/aerospace/monitor-layout.sh']
+after-startup-command = [
+    'exec-and-forget $HOME/.config/aerospace/monitor-layout.sh',
+    'layout --workspace 1 --root h_accordion',
+    'layout --workspace 2 --root h_tiles',
+]
 
 # Keep SketchyBar's workspace indicator in sync with AeroSpace, and apply the
 # monitor-appropriate root layout to the new workspace.
@@ -62,7 +66,10 @@ inner.horizontal = 8
 inner.vertical = 8
 outer.left = 0
 outer.bottom = 0
-outer.top = 36
+outer.top = [
+    { monitor."built-in" = 4 },
+    36,
+]
 outer.right = 0
 
 # 'main' binding mode declaration
