@@ -76,10 +76,82 @@
        (:prefix ("a" . "org agenda")
         :desc "Today sidebar" "s" #'scott/toggle-org-agenda-sidebar)))
 
+(defun scott/org-file-changed-on-disk-p ()
+  "Non-nil when the visited file no longer matches the buffer's record."
+  (and buffer-file-name
+       (if (file-exists-p buffer-file-name)
+           (not (verify-visited-file-modtime (current-buffer)))
+         ;; Distinguish a new file from one deleted after visiting.
+         (not (null buffer-file-number)))))
+
+(defvar scott/org-todo-reloading nil
+  "Non-nil while reloading before re-applying a TODO state change.")
+
+(defun scott/org-todo-reload-and-reapply (orig &rest args)
+  "Reload a stale, clean Org buffer before applying a TODO change.
+Emacs prompts on the first modification of a stale buffer, before
+`org-after-todo-state-change-hook' runs, so the reload has to happen here."
+  (if (or scott/org-todo-reloading
+          (not (derived-mode-p 'org-mode))
+          (not buffer-file-name)
+          (not (file-exists-p buffer-file-name))
+          (not (scott/org-file-changed-on-disk-p))
+          (buffer-modified-p)       ; other unsaved edits: do not discard them
+          (buffer-narrowed-p)       ; reverting would widen the buffer
+          (and (org-region-active-p)
+               org-loop-over-headlines-in-active-region))
+      (apply orig args)
+    (let (path id old-state)
+      (save-excursion
+        (org-back-to-heading t)
+        (setq path (org-get-outline-path t)
+              id (org-entry-get nil "ID")
+              old-state (org-get-todo-state)))
+      (condition-case err
+          (progn
+            ;; Fine-grain revert preserves markers and overlays, which matters
+            ;; when the change came from the agenda.
+            (revert-buffer-with-fine-grain t t)
+            (let ((marker (or (and id (org-find-entry-with-id id))
+                              (and path (org-find-olp path t)))))
+              (unless marker
+                (error "matching headline not found"))
+              (goto-char marker)
+              (unless (equal (or (org-get-todo-state) "")
+                             (or old-state ""))
+                (error "headline state changed on disk to %s"
+                       (or (org-get-todo-state) "none")))
+              (let ((scott/org-todo-reloading t))
+                (apply orig args))))
+        (error
+         (message "Org: TODO change not applied: %s"
+                  (error-message-string err)))))))
+
+(defun scott/org-save-after-todo-change ()
+  "Save the current Org buffer after a TODO state change."
+  (when (and (derived-mode-p 'org-mode)
+             buffer-file-name
+             (buffer-modified-p))
+    (if (scott/org-file-changed-on-disk-p)
+        (message "Org: %s changed on disk; not saving. Revert or save manually."
+                 (file-name-nondirectory buffer-file-name))
+      (condition-case err
+          (let ((save-silently t))
+            (save-buffer))
+        (error
+         (message "Org: could not save %s: %s"
+                  buffer-file-name (error-message-string err)))))))
+
 (after! org
   (setq org-default-notes-file (expand-file-name "inbox.org" org-directory)
         org-agenda-files (or (scott/org-files-under-directory org-directory)
-                             (list org-default-notes-file))))
+                             (list org-default-notes-file)))
+
+  (add-hook 'org-after-todo-state-change-hook
+            #'scott/org-save-after-todo-change)
+  (unless (advice-member-p #'scott/org-todo-reload-and-reapply 'org-todo)
+    (advice-add 'org-todo :around
+                #'scott/org-todo-reload-and-reapply)))
 
 (after! org-agenda
   ;; Ignore popup rules for our dedicated side-window buffer so Doom's popup
