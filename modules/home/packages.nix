@@ -59,10 +59,7 @@ let
     herdr = flake.inputs.herdr.packages.${system}.default;
     claude-code = llmAgents.claude-code;
     codex-acp = llmAgents.codex-acp;
-    opencode = llmAgents.opencode;
     antigravity-cli = llmAgents.antigravity-cli;
-    amp = llmAgents.amp;
-    mimo-code = llmAgents.mimo-code;
   };
 in
 {

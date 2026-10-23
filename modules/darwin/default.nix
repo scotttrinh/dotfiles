@@ -116,7 +116,6 @@ in
       "nikitabobko/tap/aerospace"
       "ghostty"
       "raycast"
-      "opencode-desktop"
     ];
     brews = [
       "Helmi/homebrew-tap/acal"

@@ -921,27 +921,6 @@
         "type": "github"
       }
     },
-    "nook": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1769612577,
-        "narHash": "sha256-EfuIm0K2WIdDqVaUbPZbYJT4v13gikdZY5wHQ6xo3aQ=",
-        "owner": "scotttrinh",
-        "repo": "nook",
-        "rev": "15073811fbbf2155b4ad384768570656bfa810c1",
-        "type": "github"
-      },
-      "original": {
-        "owner": "scotttrinh",
-        "repo": "nook",
-        "rev": "15073811fbbf2155b4ad384768570656bfa810c1",
-        "type": "github"
-      }
-    },
     "powertest": {
       "inputs": {
         "flake-utils": [
@@ -1017,10 +996,8 @@
         "nix-index-database": "nix-index-database",
         "nixos-unified": "nixos-unified",
         "nixpkgs": "nixpkgs_8",
-        "nook": "nook",
         "rust-overlay": "rust-overlay_5",
-        "sops-nix": "sops-nix",
-        "wigg": "wigg"
+        "sops-nix": "sops-nix"
       }
     },
     "rust-overlay": {
@@ -1253,26 +1230,6 @@
       "original": {
         "owner": "numtide",
         "repo": "treefmt-nix",
-        "type": "github"
-      }
-    },
-    "wigg": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1769458112,
-        "narHash": "sha256-03f7cs7FtIg4QS1ilGEnR+Z+UuCOf3FWODk+KKH37nI=",
-        "owner": "scotttrinh",
-        "repo": "wigg",
-        "rev": "60e3adb80e33665f561ea34740c63f801ecbe125",
-        "type": "github"
-      },
-      "original": {
-        "owner": "scotttrinh",
-        "repo": "wigg",
         "type": "github"
       }
     }

@@ -290,33 +290,7 @@
          :desc "Interrupt"             "c" #'agent-shell-interrupt
          :desc "Compose prompt"        "p" #'agent-shell-prompt-compose
          :desc "View traffic"          "l" #'agent-shell-view-traffic
-         :desc "Claude Code"           "C" #'agent-shell-anthropic-start-claude-code
-         :desc "oh-my-pi"              "o" #'agent-shell-omp-start-agent))
-  :config
-  ;; Define oh-my-pi (omp) agent config
-  (defun agent-shell-omp-make-config ()
-    (agent-shell-make-agent-config
-     :identifier 'omp
-     :mode-line-name "omp"
-     :buffer-name "omp"
-     :shell-prompt "omp> "
-     :shell-prompt-regexp "omp> "
-     :client-maker (lambda (buffer)
-                     (agent-shell--make-acp-client
-                      :command "omp"
-                      :command-params '("--mode" "acp" "--no-session")
-                      :environment-variables nil
-                      :context-buffer buffer))
-     :install-instructions "npm install -g @oh-my-pi/pi-coding-agent"))
-
-  (add-to-list 'agent-shell-agent-configs (agent-shell-omp-make-config))
-
-  ;; Define start command for omp
-  (defun agent-shell-omp-start-agent ()
-    "Start an oh-my-pi agent shell."
-    (interactive)
-    (agent-shell--dwim :config (agent-shell-omp-make-config)
-                       :new-shell t)))
+         :desc "Claude Code"           "C" #'agent-shell-anthropic-start-claude-code)))
 
 (setq xterm-extra-capabilities '(getSelection setSelection modifyOtherKeys))
 

@@ -1,7 +1,7 @@
 # Dotfiles on Nix (nixos-unified)
 
 This repository contains the flake-backed configuration that keeps my macOS
-machines, NixOS VMs, and Home Manager environment consistent. The setup uses
+machines and Home Manager environment consistent. The setup uses
 [nixos-unified](https://nixos-unified.org) to stitch together `nix-darwin`,
 `nixos`, `home-manager`, and custom packages behind a single flake.
 
@@ -14,7 +14,6 @@ dotfiles/
 ├── .sops.yaml                   # SOPS age key mapping (which keys decrypt which secrets)
 ├── secrets/                     # Per-machine SOPS-encrypted secrets
 │   ├── frannie.yaml
-│   ├── nooks.yaml
 │   └── triangle.yaml
 │
 ├── configurations/
@@ -22,8 +21,6 @@ dotfiles/
 │   │   ├── frankie.nix          #   Minimal personal machine
 │   │   ├── frannie.nix          #   Personal machine with Claude Code (API key auth)
 │   │   └── triangle.nix         #   Work machine with Claude Code (OAuth), Vercel tooling
-│   ├── nixos/                   # One file per NixOS host
-│   │   └── nooks.nix            #   OrbStack VM for AI agent containers
 │   └── home/                    # User-level Home Manager profiles
 │       └── scotttrinh.nix       #   Base user config (imports all home modules)
 │
@@ -34,18 +31,16 @@ dotfiles/
 │   │   ├── git.nix              #   Git config, global gitignore
 │   │   ├── agent-defaults/      #   Managed defaults merged under agents' own config
 │   │   ├── claude-code/         #   Claude Code settings + auth module
-│   │   ├── mimo-code/           #   MiMo-Code settings + auth module
 │   │   ├── aerospace/           #   Tiling window manager config
 │   │   ├── sketchybar/          #   Status bar config and plugins
 │   │   ├── direnv.nix           #   nix-direnv integration
 │   │   ├── emacs.nix            #   Emacs with tree-sitter
 │   │   ├── sops.nix             #   Secrets integration (age key path)
-│   │   └── ...                  #   gc, nix-index, me, opencode, gemini-cli
+│   │   └── ...                  #   gc, nix-index, me, gemini-cli
 │   ├── darwin/                  # Shared macOS system settings
 │   │   └── default.nix          #   Dock, Finder, keyboard, Homebrew, TouchID sudo
 │   ├── nixos/                   # Shared NixOS modules
-│   │   ├── common/              #   User management, home-manager wiring, caches
-│   │   └── orbstack/            #   OrbStack container-specific tweaks
+│   │   └── common/              #   User management, home-manager wiring, caches
 │   └── flake/                   # Flake infrastructure (nixos-unified glue)
 │
 └── packages/                    # Custom package definitions (manually imported)
@@ -77,9 +72,8 @@ configurations then layer on machine-specific settings:
 | Host | Platform | Notable Differences |
 |------|----------|---------------------|
 | **frankie** | aarch64-darwin | Minimal — just the shared defaults |
-| **frannie** | aarch64-darwin | Claude Code and OMP via z.ai (secret: `ZAI_CODING_PLAN_API_KEY`) |
-| **triangle** | aarch64-darwin | Work machine — Claude Code and MiMo-Code via OAuth-backed AI Gateway, Vercel CLI, git-lfs, work repo cloning activation script, extra Homebrew casks (1Password, Slack, Cursor, OrbStack) |
-| **nooks** | aarch64-linux | OrbStack NixOS VM — runs `nook` containers for AI agent development, injects Claude Code config into containers |
+| **frannie** | aarch64-darwin | Claude Code, fx via AI Gateway, Antigravity remote-control agent |
+| **triangle** | aarch64-darwin | Work machine — Claude Code via OAuth-backed AI Gateway, Vercel CLI, git-lfs, work repo cloning activation script, extra Homebrew casks (1Password, Slack, Cursor, OrbStack) |
 
 Per-machine overrides happen in the host file itself, which can extend the
 home-manager config inline:
@@ -233,7 +227,7 @@ All Darwin hosts inherit `modules/darwin/default.nix`, which configures:
 - **Trackpad**: Tap-to-click, secondary click enabled
 - **Menu bar**: Native menu bar auto-hidden; SketchyBar shows AeroSpace workspaces,
   the front app, volume, battery, and date/time
-- **Homebrew**: AeroSpace, Ghostty, Raycast, OpenCode Desktop, Secretive (casks),
+- **Homebrew**: AeroSpace, Ghostty, Raycast, Secretive (casks),
   Dato (App Store)
 
 Individual hosts can add more Homebrew packages or system settings on top.
@@ -283,12 +277,6 @@ changes):
    ```sh
    nix run .#activate <username>
    ```
-
-## OrbStack NixOS VM (nooks)
-
-The `nooks` host is a NixOS VM running in OrbStack that manages isolated AI
-agent containers. See [`configurations/nixos/NOOKS.md`](configurations/nixos/NOOKS.md)
-for setup and usage instructions.
 
 ## Updating Inputs
 
