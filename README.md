@@ -32,6 +32,7 @@ dotfiles/
 │   │   ├── packages.nix         #   CLI tools, dev tools, LLM tools
 │   │   ├── shell.nix            #   Zsh, starship prompt, aliases
 │   │   ├── git.nix              #   Git config, global gitignore
+│   │   ├── agent-defaults/      #   Managed defaults merged under agents' own config
 │   │   ├── claude-code/         #   Claude Code settings + auth module
 │   │   ├── mimo-code/           #   MiMo-Code settings + auth module
 │   │   ├── aerospace/           #   Tiling window manager config

@@ -209,9 +209,9 @@ in
       "slack"
       "cursor"
       "orbstack"
+      "vercel"
     ];
     brews = [
-      "vercel-cli"
       "supabase"
     ];
   };

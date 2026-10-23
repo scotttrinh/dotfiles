@@ -1080,6 +1080,8 @@ let
     };
 in
 {
+  imports = [ ../agent-defaults ];
+
   options.omp = {
     enable = mkEnableOption "oh-my-pi";
 
@@ -1878,21 +1880,31 @@ in
 
     home.packages = lib.optional (cfg.package != null) cfg.package;
 
-    sops.templates."omp-config" = {
-      content = configContent;
-      path = "${config.home.homeDirectory}/.omp/agent/config.yml";
-    };
-    sops.templates."omp-models" = {
-      content = modelsContent;
-      path = "${config.home.homeDirectory}/.omp/agent/models.yml";
-    };
+    agentDefaults.files =
+      {
+        "omp/config.yml" = {
+          target = ".omp/agent/config.yml";
+          format = "yaml";
+          secret = true;
+          content = configContent;
+        };
+        "omp/models.yml" = {
+          target = ".omp/agent/models.yml";
+          format = "yaml";
+          secret = true;
+          content = modelsContent;
+        };
+      }
+      // lib.optionalAttrs (cfg.keybindings != { }) {
+        "omp/keybindings.yml" = {
+          target = ".omp/agent/keybindings.yml";
+          format = "yaml";
+          content = builtins.toJSON cfg.keybindings;
+        };
+      };
 
     home.file =
-      lib.optionalAttrs (cfg.keybindings != { })
-        {
-          ".omp/agent/keybindings.yml".text = builtins.toJSON cfg.keybindings;
-        }
-      // generatedThemeFiles
+      generatedThemeFiles
       // generatedPromptFiles
       // generatedAgentFiles
       // generatedPluginFiles;

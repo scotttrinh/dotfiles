@@ -124,6 +124,8 @@ let
   );
 in
 {
+  imports = [ ../agent-defaults ];
+
   options.claudeCode = {
     enable = mkEnableOption "claude-code";
 
@@ -320,35 +322,38 @@ in
       };
     };
 
-    sops.templates."claude-settings".content = builtins.toJSON (
-      configuredSettings
-      // cfg.extraSettings
-      // {
-        env = {
-          ANTHROPIC_BASE_URL = cfg.baseUrl;
-          API_TIMEOUT_MS = toString cfg.timeoutMs;
+    agentDefaults.files."claude/settings.json" = {
+      target = ".claude/settings.json";
+      secret = true;
+      content = builtins.toJSON (
+        configuredSettings
+        // cfg.extraSettings
+        // {
+          env = {
+            ANTHROPIC_BASE_URL = cfg.baseUrl;
+            API_TIMEOUT_MS = toString cfg.timeoutMs;
+          }
+          // cfg.env
+          // (optionalAttrs (cfg.auth.type == "oauth") {
+            ANTHROPIC_AUTH_TOKEN = cfg.auth.secret;
+          })
+          // (optionalAttrs (cfg.auth.type == "apiKey") {
+            ANTHROPIC_API_KEY = cfg.auth.secret;
+          })
+          // cfg.extraEnv;
+          model = cfg.model;
         }
-        // cfg.env
-        // (optionalAttrs (cfg.auth.type == "oauth") {
-          ANTHROPIC_AUTH_TOKEN = cfg.auth.secret;
-        })
-        // (optionalAttrs (cfg.auth.type == "apiKey") {
-          ANTHROPIC_API_KEY = cfg.auth.secret;
-        })
-        // cfg.extraEnv;
-        model = cfg.model;
-      }
-      // optionalAttrs (cfg.statusLine.enable || statusLineSettings != { }) {
-        statusLine =
-          if cfg.statusLine.enable then
-            {
-              type = "command";
-              command = "${config.home.homeDirectory}/.claude/claude-statusline.sh";
-            }
-          else
-            statusLineSettings;
-      }
-    );
-    sops.templates."claude-settings".path = "${config.home.homeDirectory}/.claude/settings.json";
+        // optionalAttrs (cfg.statusLine.enable || statusLineSettings != { }) {
+          statusLine =
+            if cfg.statusLine.enable then
+              {
+                type = "command";
+                command = "${config.home.homeDirectory}/.claude/claude-statusline.sh";
+              }
+            else
+              statusLineSettings;
+        }
+      );
+    };
   };
 }

@@ -175,12 +175,13 @@ let
     ];
   };
 
-  configJson = builtins.fromJSON home.config.sops.templates.omp-config.content;
-  modelsJson = builtins.fromJSON home.config.sops.templates.omp-models.content;
+  configJson = builtins.fromJSON agentDefaults."omp/config.yml".content;
+  modelsJson = builtins.fromJSON agentDefaults."omp/models.yml".content;
   pluginPackageJson = builtins.fromJSON files.".omp/plugins/package.json".text;
   pluginLockJson = builtins.fromJSON files.".omp/plugins/omp-plugins.lock.json".text;
 
   files = home.config.home.file;
+  agentDefaults = home.config.agentDefaults.files;
   failedAssertions = builtins.filter (assertion: !assertion.assertion) home.config.assertions;
 in
 assert failedAssertions == [ ];
@@ -194,7 +195,8 @@ assert modelsJson.providers.custom.headers.X-Raw == "wins";
 assert modelsJson.providers.discovered.discovery.type == "ollama";
 assert modelsJson.providers.override-only.modelOverrides.bundled.name == "Renamed";
 assert modelsJson.equivalence.overrides."custom/reasoner" == "gpt-5.5";
-assert files.".omp/agent/keybindings.yml" ? text;
+assert agentDefaults."omp/keybindings.yml".target == ".omp/agent/keybindings.yml";
+assert !(files ? ".omp/agent/keybindings.yml");
 assert files.".omp/agent/themes/custom.json" ? text;
 assert files.".omp/agent/APPEND_SYSTEM.md".text == "Keep the default prompt.";
 assert files.".omp/agent/tools/check.sh".executable;

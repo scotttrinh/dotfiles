@@ -55,6 +55,8 @@ let
   );
 in
 {
+  imports = [ ../agent-defaults ];
+
   options.mimoCode = {
     enable = mkEnableOption "mimo-code";
 
@@ -185,7 +187,10 @@ in
   };
 
   config = mkIf cfg.enable {
-    sops.templates."mimocode-config".content = builtins.toJSON settings;
-    sops.templates."mimocode-config".path = "${config.home.homeDirectory}/.config/mimocode/config.json";
+    agentDefaults.files."mimocode/config.json" = {
+      target = ".config/mimocode/config.json";
+      secret = true;
+      content = builtins.toJSON settings;
+    };
   };
 }
