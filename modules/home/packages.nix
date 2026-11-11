@@ -60,6 +60,7 @@ let
     claude-code = llmAgents.claude-code;
     codex-acp = llmAgents.codex-acp;
     antigravity-cli = llmAgents.antigravity-cli;
+    copilot-cli = llmAgents.copilot-cli;
   };
 in
 {

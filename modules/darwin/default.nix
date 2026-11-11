@@ -116,6 +116,7 @@ in
       "nikitabobko/tap/aerospace"
       "ghostty"
       "raycast"
+      "vercel"
     ];
     brews = [
       "Helmi/homebrew-tap/acal"

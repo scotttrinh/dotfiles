@@ -133,7 +133,6 @@ in
       "slack"
       "cursor"
       "orbstack"
-      "vercel"
     ];
     brews = [
       "supabase"

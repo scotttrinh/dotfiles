@@ -97,8 +97,5 @@ in
       "orbstack"
       "openmtp"
     ];
-    brews = [
-      "vercel-cli"
-    ];
   };
 }
