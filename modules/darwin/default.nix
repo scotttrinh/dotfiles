@@ -121,6 +121,7 @@ in
       "Helmi/homebrew-tap/acal"
       "mas-cli/tap/mas"
       "switchaudio-osx"
+      "xcodegen"
     ];
     masApps = {
       Dato = 1470584107;

@@ -9,19 +9,19 @@ let
     {
       aarch64-darwin = {
         name = "macos-aarch64";
-        hash = "sha256-1hCbDKVfmz2YSezn4f19uyHJHNPhMWXVeRr/z05rdOM=";
+        hash = "sha256-w41A0rZr7szTknKrJag+7FQGqdL3pYtflvZPF/k0gYQ=";
       };
       x86_64-darwin = {
         name = "macos-x86_64";
-        hash = "sha256-IBZ1p9IbrUkLncKmf9AazHXEuicALpXExcrBm5pJ+rw=";
+        hash = "sha256-7vQ6Gz+vs48mz/Z0pHbmqji7oKu6ULGYQyaUarD62jk=";
       };
       aarch64-linux = {
         name = "linux-aarch64";
-        hash = "sha256-EsdPGL9HSYhOCgrfpjogqFU3s+G2laQtRi8VD5BHP+M=";
+        hash = "sha256-BoeIx5Ua/AsMoNGXwARO9ESSiS1yWdOs+SgqaVZbk8I=";
       };
       x86_64-linux = {
         name = "linux-x86_64";
-        hash = "sha256-yQI4MrAy4BTggDc3YCK2LHMUvQt9Ym+sf46LYbbsSU4=";
+        hash = "sha256-Cawi9iInkJg87OJk3WvsfRVMtudkjjbbXj0m1NRWuKc=";
       };
     }
     .${stdenvNoCC.hostPlatform.system}
@@ -29,8 +29,8 @@ let
 in
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "fx";
-  version = "0.0.15";
-  rev = "1c65871266514071ae3598cbb729c56493422ec6";
+  version = "0.0.16";
+  rev = "cf7a7754f443cd9a1d295a60dbbcb913e933c20c";
 
   src = fetchurl {
     url = "https://releases.fx.sh/dev/${finalAttrs.rev}/fx-${platform.name}.tar.gz";
