@@ -45,7 +45,8 @@ dotfiles/
 │
 └── packages/                    # Custom package definitions (manually imported)
     ├── pi.nix                   #   Wrapper script around `uvx pi@latest`
-    └── ty.nix                   #   Rust type checker (built from source)
+    ├── ty.nix                   #   Rust type checker (built from source)
+    └── zcode-acp.nix            #   ACP adapter for ZCode / GLM
 ```
 
 ### How Auto-Discovery Works
@@ -72,7 +73,7 @@ configurations then layer on machine-specific settings:
 | Host | Platform | Notable Differences |
 |------|----------|---------------------|
 | **frankie** | aarch64-darwin | Minimal — just the shared defaults |
-| **frannie** | aarch64-darwin | Claude Code, fx via AI Gateway, Antigravity remote-control agent |
+| **frannie** | aarch64-darwin | Claude Code, fx via AI Gateway, Antigravity remote-control agent, ZCode ACP |
 | **triangle** | aarch64-darwin | Work machine — Claude Code via OAuth-backed AI Gateway, Vercel CLI, git-lfs, work repo cloning activation script, extra Homebrew casks (1Password, Slack, Cursor, OrbStack) |
 
 Per-machine overrides happen in the host file itself, which can extend the

@@ -57,8 +57,10 @@ in
     };
 
     selectedPackages.fx = self.packages.${pkgs.stdenv.hostPlatform.system}.fx;
+    selectedPackages.zcode-acp = self.packages.${pkgs.stdenv.hostPlatform.system}.zcode-acp;
 
     home.packages = [
+      config.selectedPackages.zcode-acp
       (pkgs.writeShellScriptBin "fx" ''
         export AI_GATEWAY_API_KEY="$(cat ${config.sops.secrets.ai_gateway_api_key.path})"
         exec ${lib.getExe config.selectedPackages.fx} "$@"
