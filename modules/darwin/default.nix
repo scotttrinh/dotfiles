@@ -113,6 +113,7 @@ in
     ];
     casks = [
       "1password"
+      "1password-cli"
       "nikitabobko/tap/aerospace"
       "ghostty"
       "raycast"
